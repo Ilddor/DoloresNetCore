@@ -1,0 +1,6 @@
+.vs/*
+src/DoloresNetCore/obj/*
+src/DoloresNetCore/bin/*
+*.user
+*.dat
+*.mp3
