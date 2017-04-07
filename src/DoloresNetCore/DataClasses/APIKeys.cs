@@ -9,8 +9,8 @@ namespace Dolores.DataClasses
 {
     public class APIKeys
     {
-        public string DiscordAPIKey { get; private set; }
-        public string RiotAPIKey { get; private set; }
+        public string DiscordAPIKey { get; set; }
+        public string RiotAPIKey { get; set; }
 
         public void SaveToFile()
         {
