@@ -130,7 +130,7 @@ namespace Dolores.Modules.Misc
                 if (m_DBConnection.IsConnect())
                 {
                     string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
-                        +$"('{DateTime.Now.Ticks}', '"+(after.IsSelfMuted ? "MUTED":"UNMUTED")+"', '{after.Username}')";
+                        +$"('{DateTime.Now.Ticks}', '"+(after.IsSelfMuted ? "MUTED":"UNMUTED")+$"', '{user.Username}')";
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
@@ -140,7 +140,7 @@ namespace Dolores.Modules.Misc
                 if (m_DBConnection.IsConnect())
                 {
                     string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
-                        + $"('{DateTime.Now.Ticks}', '" + (after.IsSelfDeafened ? "DEAFENED" : "UNDEAFENED") + "', '{after.Username}')";
+                        + $"('{DateTime.Now.Ticks}', '" + (after.IsSelfDeafened ? "DEAFENED" : "UNDEAFENED") + $"', '{user.Username}')";
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
@@ -181,7 +181,7 @@ namespace Dolores.Modules.Misc
                 if (m_DBConnection.IsConnect())
                 {
                     string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
-                        + $"('{DateTime.Now.Ticks}', '{after.Status.ToString()}', '{after.Username}')";
+                        + $"('{DateTime.Now.Ticks}', '{after.Status.ToString().ToUpper()}', '{after.Username}')";
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
