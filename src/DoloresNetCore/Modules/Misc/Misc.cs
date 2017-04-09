@@ -7,6 +7,7 @@ using System.Threading;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Dolores.CustomAttributes;
 
 namespace Dolores.Modules.Misc
 {
@@ -32,7 +33,7 @@ namespace Dolores.Modules.Misc
             string message = "Dostępne komendy:\n";
             foreach(var it in m_Commands.Commands)
             {
-                if(it.Remarks != "hidden")
+                if(!it.Preconditions.Any(x => x is HiddenAttribute))
                     message += $" -`!{it.Name}`    - {it.Summary}\n";
             }
             message += $"\n\n";
@@ -51,7 +52,7 @@ namespace Dolores.Modules.Misc
 
         [Command("rawr")]
         [Summary("Zdjecie Dolores")]
-        [Remarks("hidden")]
+        [Hidden]
         public async Task Rawr()
         {
             await Context.Channel.SendFileAsync($"Dolores{m_Random.Next(1,7)}.jpg");
@@ -59,14 +60,14 @@ namespace Dolores.Modules.Misc
 
         [Command("goodnight")]
         [Summary("Zdjecie Dolores")]
-        [Remarks("hidden")]
+        [Hidden]
         public async Task Goodnight()
         {
             await Context.Channel.SendFileAsync($"DoloresGoodnight{m_Random.Next(1, 3)}.jpg");
         }
 
         [Command("bleh")]
-        [Remarks("hidden")]
+        [Hidden]
         public async Task bleh()
         {
             var client = m_Map.Get<DiscordSocketClient>();
@@ -155,7 +156,7 @@ namespace Dolores.Modules.Misc
 
         [Command("quit")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         [RequireOwner]
         private async Task Quit()
         {

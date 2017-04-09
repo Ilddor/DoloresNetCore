@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Addons;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 
 namespace Dolores.Modules.Social
 {
@@ -32,7 +33,7 @@ namespace Dolores.Modules.Social
 
         [Command("reactToMe")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         public async Task ReactToMe(params string[] messages)
         {
             List<string> reactions = new List<string>();
@@ -48,7 +49,7 @@ namespace Dolores.Modules.Social
 
         [Command("stopReactToMe")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         public async Task StopReactToMe(params string[] messages)
         {
             if (!messages.Any())
@@ -69,7 +70,7 @@ namespace Dolores.Modules.Social
 
         [Command("reactTo")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         [RequireOwner]
         public async Task ReactTo(IUser user, params string[] messages)
         {
@@ -86,7 +87,7 @@ namespace Dolores.Modules.Social
 
         [Command("stopReactTo")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         [RequireOwner]
         public async Task StopReactTo(IUser user, params string[] messages)
         {
