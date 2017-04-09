@@ -28,20 +28,31 @@ namespace Dolores.Modules.Misc
 
         [Command("help")]
         [Alias("analiza")]
-        [Summary("Wyświetla ten tekst")]
-        public async Task Help()
+        [Summary("Wyświetla ten tekst, dodając komendę jako parametr wyświetli dokładniejszy opis lub użycie")]
+        public async Task Help(string command = null)
         {
-            string message = "Dostępne komendy:\n";
-            foreach(var it in m_Commands.Commands)
+            if (command == null)
             {
-                if(!it.Preconditions.Any(x => x is HiddenAttribute))
-                    message += $" -`!{it.Name}`    - {it.Summary}\n";
+                string message = "Dostępne komendy:\n";
+                foreach (var it in m_Commands.Commands)
+                {
+                    if (!it.Preconditions.Any(x => x is HiddenAttribute))
+                        message += $" -`!{it.Name}`    - {it.Summary}\n";
+                }
+                message += $"\n\n";
+                var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
+                message += $"Czas online(bota): {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
+                message += $"Wersja: {Dolores.m_Instance.m_Version}\n";
+                await Context.Channel.SendMessageAsync(message);
             }
-            message += $"\n\n";
-            var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
-            message += $"Czas online(bota): {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
-            message += $"Wersja: {Dolores.m_Instance.m_Version}\n";
-            await Context.Channel.SendMessageAsync(message);
+            else
+            {
+                if(m_Commands.Commands.Any(x => x.Name == command))
+                {
+                    var commandInfo = m_Commands.Commands.Where(x => x.Name == command).First();
+                    await Context.Channel.SendMessageAsync($"`{commandInfo.Name}` - {commandInfo.Summary}\n{commandInfo.Remarks}");
+                }
+            }
         }
 
         [Command("ping")]
