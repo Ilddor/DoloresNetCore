@@ -96,6 +96,7 @@ namespace Dolores
         SignedUsers     m_SignedUsers;
         GameTimes       m_GameTimes;
         Reactions       m_Reactions;
+        Notifications   m_Notifications;
 
         Logging         m_Logging;
 
@@ -127,12 +128,14 @@ namespace Dolores
             m_SignedUsers = new SignedUsers();
             m_GameTimes = new GameTimes();
             m_Reactions = new Reactions();
+            m_Notifications = new Notifications();
             LoadState();
 
             map.Add(m_CreatedChannels);
             map.Add(m_SignedUsers);
             map.Add(m_GameTimes);
             map.Add(m_Reactions);
+            map.Add(m_Notifications);
             map.Add(m_APIKeys);
 
             GameChannels.Install(map);
@@ -159,6 +162,8 @@ namespace Dolores
             m_GameTimes.SaveToFile();
             // Reactions
             m_Reactions.SaveToFile();
+            // Notifications
+            m_Notifications.SaveToFile();
 
             Voice.AudioClientWrapper audioClient;
             if (map.TryGet(out audioClient))
@@ -179,6 +184,8 @@ namespace Dolores
             m_GameTimes.LoadFromFile();
             // Reactions
             m_Reactions.LoadFromFile();
+            // Notifications
+            m_Notifications.LoadFromFile();
 
             try
             {

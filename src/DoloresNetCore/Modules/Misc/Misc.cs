@@ -8,6 +8,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.CustomAttributes;
+using Dolores.DataClasses;
 
 namespace Dolores.Modules.Misc
 {
@@ -107,6 +108,16 @@ namespace Dolores.Modules.Misc
                 message += $"{it.Value}: {it.Key}\n";
             }
             await Context.Channel.SendMessageAsync(message);
+        }
+
+        [Command("notifyMe")]
+        [Summary("Wysyła jednorazowo notyfikację gdy poszukiwana osoba pojawi się online")]
+        [Remarks("W parametrze należy podać osobę o której chce się dostać notyfikację. Parametr musi używać \"Wzmianki\"")]
+        private async Task NotifyMe(IGuildUser notify)
+        {
+            var notifications = m_Map.Get<Notifications>();
+            notifications.AddNotification(Context.User.Id, notify.Id);
+            await Context.Message.DeleteAsync();
         }
 
         [Command("removeHistory")]

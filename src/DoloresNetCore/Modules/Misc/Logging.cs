@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Addons;
+using Dolores.DataClasses;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
@@ -23,13 +24,15 @@ namespace Dolores.Modules.Misc
         ulong m_DebugChannelId = 277410538844323840;
         ITextChannel m_LogChannel;
         ITextChannel m_DebugChannel;
+        Notifications m_Notifications; 
         string m_GuildName = "SurowcowaPL";
         Data.DBConnection m_DBConnection;
 
         public void Install(IDependencyMap map)
         {
             m_Map = map;
-            m_Client = map.Get<DiscordSocketClient>();
+            m_Client = m_Map.Get<DiscordSocketClient>();
+            m_Notifications = m_Map.Get<Notifications>();
             m_LogChannel = m_Client.GetChannel(m_LogChannelId) as ITextChannel;
             m_DebugChannel = m_Client.GetChannel(m_DebugChannelId) as ITextChannel;
             m_DBConnection = Data.DBConnection.Instance();
@@ -184,6 +187,19 @@ namespace Dolores.Modules.Misc
                         + $"('{DateTime.Now.Ticks}', '{after.Status.ToString().ToUpper()}', '{after.Username}')";
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
+                }
+
+                if (after.Status == UserStatus.Online)
+                {
+                    ulong id = m_Notifications.ShouldNofity(after.Id);
+                    if (id != 0)
+                    {
+                        var user = m_Client.GetUser(id);
+                        var notify = m_Client.GetUser(after.Id);
+
+                        var userChannel = await m_Client.GetDMChannelAsync(id);
+                        await userChannel.SendMessageAsync($"{notify.Mention} pojawił się online");
+                    }
                 }
             }
         }
