@@ -25,7 +25,7 @@ namespace Dolores.Modules.Misc
         ITextChannel m_LogChannel;
         ITextChannel m_DebugChannel;
         Notifications m_Notifications; 
-        string m_GuildName = "SurowcowaPL";
+        ulong m_GuildId = 269960016591716362;
         Data.DBConnection m_DBConnection;
 
         public void Install(IDependencyMap map)
@@ -89,9 +89,9 @@ namespace Dolores.Modules.Misc
 
         private async Task UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
         {
-            if (after.VoiceChannel != null && after.VoiceChannel.Guild.Name != m_GuildName)
+            if (after.VoiceChannel != null && after.VoiceChannel.Guild.Id != m_GuildId)
                 return;
-            if (before.VoiceChannel != null && before.VoiceChannel.Guild.Name != m_GuildName)
+            if (before.VoiceChannel != null && before.VoiceChannel.Guild.Id != m_GuildId)
                 return;
 
             if (before.VoiceChannel == null && after.VoiceChannel != null)
@@ -152,7 +152,7 @@ namespace Dolores.Modules.Misc
 
         private async Task UserLeft(SocketGuildUser user)
         {
-            if (user.Guild.Name != m_GuildName)
+            if (user.Guild.Id != m_GuildId)
                 return;
 
             await m_LogChannel.SendMessageAsync($"{user.Username} opuścił serwer");
@@ -160,7 +160,7 @@ namespace Dolores.Modules.Misc
 
         private async Task UserJoined(SocketGuildUser user)
         {
-            if (user.Guild.Name != m_GuildName)
+            if (user.Guild.Id != m_GuildId)
                 return;
 
             await m_LogChannel.SendMessageAsync($"{user.Username} dołączył do serwera");
@@ -168,7 +168,7 @@ namespace Dolores.Modules.Misc
 
         private async Task UserBanned(SocketUser user, SocketGuild guild)
         {
-            if (guild.Name != m_GuildName)
+            if (guild.Id != m_GuildId)
                 return;
 
             await m_LogChannel.SendMessageAsync($"{user.Username} został zbanowany");
@@ -176,7 +176,7 @@ namespace Dolores.Modules.Misc
 
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
         {
-            if(after.Guild.Name != m_GuildName)
+            if(after.Guild.Id != m_GuildId)
                 return;
             if(before.Status != after.Status)
             {
@@ -238,16 +238,20 @@ namespace Dolores.Modules.Misc
 
             public bool IsConnect()
             {
-                bool result = true;
-                if (Connection == null)
+                bool result = false;
+                try
                 {
-                    if (String.IsNullOrEmpty(databaseName))
-                        result = false;
-                    string connstring = string.Format("Server=localhost; database={0}; UID={1}; password={2}", databaseName, UserName, Password);
-                    connection = new MySqlConnection(connstring);
-                    connection.Open();
-                    result = true;
+                    if (Connection == null)
+                    {
+                        if (String.IsNullOrEmpty(databaseName))
+                            result = false;
+                        string connstring = string.Format("Server=localhost; database={0}; UID={1}; password={2}", databaseName, UserName, Password);
+                        connection = new MySqlConnection(connstring);
+                        connection.Open();
+                        result = true;
+                    }
                 }
+                catch (Exception) { }
 
                 return result;
             }

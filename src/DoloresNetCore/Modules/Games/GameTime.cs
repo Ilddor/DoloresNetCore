@@ -57,7 +57,7 @@ namespace Dolores.Modules.Games
         private static Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
             var gameTimes = Dolores.m_Instance.map.Get<GameTimes>();
-            if(after.Guild.Name == "SurowcowaPL")
+            if(after.Guild.Id == 269960016591716362)
             {
                 if(before.Game.HasValue || !after.Game.HasValue)
                 {
