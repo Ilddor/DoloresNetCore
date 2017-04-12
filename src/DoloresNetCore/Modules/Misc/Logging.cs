@@ -103,7 +103,7 @@ namespace Dolores.Modules.Misc
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
-                await m_LogChannel.SendMessageAsync($"{user.Username} połączył się z kanałem głosowym: {after.VoiceChannel.Name}");
+                await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} połączył się z kanałem głosowym: {after.VoiceChannel.Name}");
             }
             else if(before.VoiceChannel != null && after.VoiceChannel != null && before.VoiceChannel.Name != after.VoiceChannel.Name)
             {
@@ -114,7 +114,7 @@ namespace Dolores.Modules.Misc
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
-                await m_LogChannel.SendMessageAsync($"{user.Username} zmienił kanał głosowy: {before.VoiceChannel.Name} -> {after.VoiceChannel.Name}");
+                await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} zmienił kanał głosowy: {before.VoiceChannel.Name} -> {after.VoiceChannel.Name}");
             }
             else if(before.VoiceChannel != null && after.VoiceChannel == null)
             {
@@ -125,7 +125,7 @@ namespace Dolores.Modules.Misc
                     var cmd = new MySqlCommand(query, m_DBConnection.Connection);
                     cmd.ExecuteNonQuery();
                 }
-                await m_LogChannel.SendMessageAsync($"{user.Username} rozłączył się z kanału głosowego: {before.VoiceChannel.Name}");
+                await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} rozłączył się z kanału głosowego: {before.VoiceChannel.Name}");
             }
             // Just for DataBase purposes
             if(before.IsSelfMuted != after.IsSelfMuted)
@@ -155,7 +155,7 @@ namespace Dolores.Modules.Misc
             if (user.Guild.Id != m_GuildId)
                 return;
 
-            await m_LogChannel.SendMessageAsync($"{user.Username} opuścił serwer");
+            await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} opuścił serwer");
         }
 
         private async Task UserJoined(SocketGuildUser user)
@@ -163,7 +163,7 @@ namespace Dolores.Modules.Misc
             if (user.Guild.Id != m_GuildId)
                 return;
 
-            await m_LogChannel.SendMessageAsync($"{user.Username} dołączył do serwera");
+            await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} dołączył do serwera");
         }
 
         private async Task UserBanned(SocketUser user, SocketGuild guild)
@@ -171,7 +171,7 @@ namespace Dolores.Modules.Misc
             if (guild.Id != m_GuildId)
                 return;
 
-            await m_LogChannel.SendMessageAsync($"{user.Username} został zbanowany");
+            await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} został zbanowany");
         }
 
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
@@ -180,7 +180,7 @@ namespace Dolores.Modules.Misc
                 return;
             if(before.Status != after.Status)
             {
-                await m_LogChannel.SendMessageAsync($"{after.Username} zmienił status na: {after.Status.ToString()}");
+                await m_LogChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {after.Username} zmienił status na: {after.Status.ToString()}");
                 if (m_DBConnection.IsConnect())
                 {
                     string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
