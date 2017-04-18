@@ -92,20 +92,20 @@ namespace Dolores.Modules.Games
                             if (league.Queue == "RANKED_SOLO_5x5")
                             {
                                 Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
-                                message += $"{league.Tier,7} {league.Entries.First().Division,3} ({champion.Name,11}) - {league.Entries.First().PlayerOrTeamName}\n";
+                                message += $"{league.Tier,7} {league.Entries.First().Division,3} {"("+champion.Name+")",11} - {league.Entries.First().PlayerOrTeamName}\n";
                                 foundSolo = true;
                             }
                         }
                         if (!foundSolo)
                         {
                             Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
-                            message += $"Unranked    ({champion.Name,11}) - {teamPlayer.SummonerName}\n";
+                            message += $"Unranked    ({"("+champion.Name+")",11}) - {teamPlayer.SummonerName}\n";
                         }
                     }
                     else
                     {
                         Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
-                        message += $"Unranked    ({champion.Name,11}) - {teamPlayer.SummonerName}\n";
+                        message += $"Unranked    ({"("+champion.Name+")",11}) - {teamPlayer.SummonerName}\n";
                     }
                 }
 
