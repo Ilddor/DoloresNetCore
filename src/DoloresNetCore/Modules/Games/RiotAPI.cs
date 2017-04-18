@@ -78,25 +78,27 @@ namespace Dolores.Modules.Games
                             switch (key.Groups[1].Value)
                             {
                                 case "f":
-                                    if (spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).Any())
-                                        keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AD");
-                                    else
-                                        keyMatches.Add($" (+{key.Groups[0].Value})", "");
-                                    break;
+                                    {
+                                        var tmp = spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}");
+                                        if (tmp.Any())
+                                            keyMatches.Add(key.Groups[0].Value, tmp.First().Coeff.First().ToString() + "x " + tmp.First().Link);
+                                        else
+                                        {
+                                            keyMatches.Add($" (+{key.Groups[0].Value})", "");
+                                        }
+                                        break;
+                                    }
                                 case "a":
-                                    if (spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).Any())
-                                        keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AP");
-                                    else
-                                        keyMatches.Add($" (+{key.Groups[0].Value})", "");
-                                    break;
+                                    {
+                                        var tmp = spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}");
+                                        if (tmp.Any())
+                                            keyMatches.Add(key.Groups[0].Value, tmp.First().Coeff.First().ToString() + "x " + tmp.First().Link);
+                                        else
+                                            keyMatches.Add($" (+{key.Groups[0].Value})", "");
+                                        break;
+                                    }
                                 case "e":
                                     var values = spell.EffectBurn[int.Parse(key.Groups[2].Value)];
-                                    /*string valuesString = "";
-                                    foreach (var value in values)
-                                    {
-                                        valuesString += value + "/";
-                                    }
-                                    valuesString = valuesString.Substring(0, valuesString.Length - 1);*/
                                     keyMatches.Add(key.Groups[0].Value, values);
                                     break;
                             }
