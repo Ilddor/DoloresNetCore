@@ -14,6 +14,7 @@ using System.Net;
 using Dolores.LeagueOfLegends.DataObjects.League;
 using Dolores.LeagueOfLegends.DataObjects.Summoner;
 using Dolores.LeagueOfLegends.DataObjects.CurrentGame;
+using Dolores.LeagueOfLegends.DataObjects.StaticData;
 
 namespace Dolores.Modules.Games
 {
@@ -21,6 +22,7 @@ namespace Dolores.Modules.Games
     {
         IDependencyMap m_Map;
         Dictionary<ulong, string> m_SummonerNames;
+        ChampionList m_ChampionList;
 
         public RiotAPI(IDependencyMap map)
         {
@@ -36,10 +38,12 @@ namespace Dolores.Modules.Games
             m_SummonerNames[144175864505040896] = "Borodein";
         }
 
-        [Command("showEnemyLoL")]
+        [Command("showEnemyLoL", RunMode = RunMode.Async)]
         [Summary("Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
         public async Task ShowEnemyLoL(string summonerName = null)
         {
+            m_ChampionList = await APICalls.GetChampions(null);
+
             if (summonerName == null)
                 summonerName = m_SummonerNames[Context.User.Id];
             else
@@ -66,59 +70,47 @@ namespace Dolores.Modules.Games
             }
 
             var leaguesObj = await APICalls.GetLeagues(summonerIDs.ToArray());
+            List<int> teams = new List<int>();
+            teams.Add(100);
+            teams.Add(200);
 
             string message = "Twoja aktualna gra:\n";
-            message += "```md\n#Blue team:\n";
-            foreach(var teamPlayer in blueTeamIds)
+            foreach(var team in teams)
             {
-                if(leaguesObj.ContainsKey(teamPlayer.ToString()))
-                {
-                    bool foundSolo = false;
-                    foreach (var league in leaguesObj[teamPlayer.ToString()])
-                    {
-                        if (league.Queue == "RANKED_SOLO_5x5")
-                        {
-                            message += $"{league.Entries.First().PlayerOrTeamName,15} - {league.Tier} {league.Entries.First().Division}\n";
-                            foundSolo = true;
-                        }
-                    }
-                    if(!foundSolo)
-                    {
-                        message += $"{inMatchIDs[teamPlayer],15} - Unranked\n";
-                    }
-                }
+                if(team == 100)
+                    message += "```md\n#Blue team:\n";
                 else
-                {
-                    message += $"{inMatchIDs[teamPlayer],15} - Unranked\n";
-                }
-            }
-            message += "```";
+                    message += "```diff\n-Red team:\n";
 
-            message += "```diff\n-Red team:\n";
-            foreach (var teamPlayer in redTeamIds)
-            {
-                if (leaguesObj.ContainsKey(teamPlayer.ToString()))
+                foreach (var teamPlayer in curGameObj.Participants.Where(x => x.TeamID == team))
                 {
-                    bool foundSolo = false;
-                    foreach (var league in leaguesObj[teamPlayer.ToString()])
+                    if (leaguesObj.ContainsKey(teamPlayer.SummonerID.ToString()))
                     {
-                        if (league.Queue == "RANKED_SOLO_5x5")
+                        bool foundSolo = false;
+                        foreach (var league in leaguesObj[teamPlayer.SummonerID.ToString()])
                         {
-                            message += $"{league.Entries.First().PlayerOrTeamName,15} - {league.Tier} {league.Entries.First().Division}\n";
-                            foundSolo = true;
+                            if (league.Queue == "RANKED_SOLO_5x5")
+                            {
+                                Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                                message += $"{league.Tier,7} {league.Entries.First().Division,3} ({champion.Name,11}) - {league.Entries.First().PlayerOrTeamName}\n";
+                                foundSolo = true;
+                            }
+                        }
+                        if (!foundSolo)
+                        {
+                            Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                            message += $"Unranked    ({champion.Name,11}) - {teamPlayer.SummonerName}\n";
                         }
                     }
-                    if (!foundSolo)
+                    else
                     {
-                        message += $"{inMatchIDs[teamPlayer],15} - Unranked\n";
+                        Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                        message += $"Unranked    ({champion.Name,11}) - {teamPlayer.SummonerName}\n";
                     }
                 }
-                else
-                {
-                    message += $"{inMatchIDs[teamPlayer],15} - Unranked\n";
-                }
+
+                message += "```";
             }
-            message += "```\n";
 
             await Context.Channel.SendMessageAsync(message);
             
@@ -182,6 +174,20 @@ namespace Dolores.Modules.Games
                 }
                 var reader = new StreamReader(await summoner.Content.ReadAsStreamAsync());
                 return JsonConvert.DeserializeObject<Dictionary<string,Summoner>>(await reader.ReadToEndAsync());
+            }
+
+            public static async Task<ChampionList> GetChampions(IMessageChannel log)
+            {
+                var webClient = new HttpClient();
+
+                HttpResponseMessage summoner = await webClient.GetAsync($"https://eun1.api.riotgames.com/lol/static-data/v3/champions?api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                if (summoner.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    await log.SendMessageAsync("Błąd przy pobieraniu championów z serwera API Riot");
+                    return null;
+                }
+                var reader = new StreamReader(await summoner.Content.ReadAsStreamAsync());
+                return JsonConvert.DeserializeObject<ChampionList>(await reader.ReadToEndAsync());
             }
         }
 

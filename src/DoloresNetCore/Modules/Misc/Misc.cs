@@ -9,6 +9,11 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.CustomAttributes;
 using Dolores.DataClasses;
+using System.Net;
+using System.Net.Http;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Dolores.Modules.Misc
 {
@@ -174,6 +179,49 @@ namespace Dolores.Modules.Misc
             if (m_blacklistedUsers.ContainsKey(name))
                 m_blacklistedUsers.Remove(name);
             await Context.Channel.SendMessageAsync($"Ok");
+        }
+
+        [Command("nsfw", RunMode = RunMode.Async)]
+        [Summary("")]
+        [Remarks("hidden")]
+        [RequireOwner]
+        public async Task NSFW()
+        {
+            Random random = new Random();
+            var client = m_Map.Get<DiscordSocketClient>();
+            var channel = client.GetChannel(272419366744883200) as ITextChannel;
+            var subreddits = new List<string>();
+            subreddits.Add("redhead");
+            subreddits.Add("GirlsFinishingTheJob");
+            subreddits.Add("wincest");
+            subreddits.Add("cuckquean");
+            subreddits.Add("Unashamed");
+            subreddits.Add("whenitgoesin");
+            subreddits.Add("xxxcaptions");
+            subreddits.Add("underboob");
+            subreddits.Add("holdthemoan");
+            subreddits.Add("FlashingGirls");
+            subreddits.Add("lingerie");
+            subreddits.Add("Upskirt");
+            subreddits.Add("LegalCollegeGirls");
+            subreddits.Add("OnOff");
+            subreddits.Add("TightShorts");
+            subreddits.Add("BlowjobGifs");
+            subreddits.Add("BlowJob");
+            subreddits.Add("CellShots");
+            subreddits.Add("girlswhoride");
+
+            var cookieContainer = new CookieContainer();
+            var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
+            var webClient = new HttpClient(handler);
+            HttpResponseMessage page = await webClient.GetAsync($"https://www.reddit.com/r/{subreddits[random.Next(subreddits.Count)]}/new.json?sort=popular&limit=5");
+            var reader = new StreamReader(await page.Content.ReadAsStreamAsync());
+            JToken tmp = JsonConvert.DeserializeObject<JToken>(await reader.ReadToEndAsync());
+            foreach(var child in tmp["data"]["children"])
+            {
+                await channel.SendMessageAsync($"{child["data"]["url"]}");
+            }
+            await Context.Message.DeleteAsync();
         }
 
         [Command("quit")]
