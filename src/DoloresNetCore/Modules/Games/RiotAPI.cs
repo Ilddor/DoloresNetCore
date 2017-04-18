@@ -78,20 +78,26 @@ namespace Dolores.Modules.Games
                             switch (key.Groups[1].Value)
                             {
                                 case "f":
-                                    keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AD");
+                                    if (spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).Any())
+                                        keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AD");
+                                    else
+                                        keyMatches.Add($" (+{key.Groups[0].Value})", "");
                                     break;
                                 case "a":
-                                    keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AP");
+                                    if (spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).Any())
+                                        keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AP");
+                                    else
+                                        keyMatches.Add($" (+{key.Groups[0].Value})", "");
                                     break;
                                 case "e":
-                                    var values = spell.Effect[int.Parse(key.Groups[2].Value)];
-                                    string valuesString = "";
+                                    var values = spell.EffectBurn[int.Parse(key.Groups[2].Value)];
+                                    /*string valuesString = "";
                                     foreach (var value in values)
                                     {
                                         valuesString += value + "/";
                                     }
-                                    valuesString = valuesString.Substring(0, valuesString.Length - 1);
-                                    keyMatches.Add(key.Groups[0].Value, valuesString);
+                                    valuesString = valuesString.Substring(0, valuesString.Length - 1);*/
+                                    keyMatches.Add(key.Groups[0].Value, values);
                                     break;
                             }
                         }
@@ -101,10 +107,10 @@ namespace Dolores.Modules.Games
                     {
                         skillMessage = skillMessage.Replace(key.Key, key.Value);
                     }
-                    message += skillMessage;
+                    await Context.Channel.SendMessageAsync(skillMessage);
                 }
 
-                await Context.Channel.SendMessageAsync(message);
+                //await Context.Channel.SendMessageAsync(message);
             }
             else
             {
