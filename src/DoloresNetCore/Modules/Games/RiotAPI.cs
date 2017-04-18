@@ -15,6 +15,7 @@ using Dolores.LeagueOfLegends.DataObjects.League;
 using Dolores.LeagueOfLegends.DataObjects.Summoner;
 using Dolores.LeagueOfLegends.DataObjects.CurrentGame;
 using Dolores.LeagueOfLegends.DataObjects.StaticData;
+using System.Text.RegularExpressions;
 
 namespace Dolores.Modules.Games
 {
@@ -47,6 +48,63 @@ namespace Dolores.Modules.Games
             if(m_ChampionList.Data.ContainsKey(championName))
             {
                 await Context.Channel.SendMessageAsync(m_ChampionList.Data[championName].Lore.Replace("<br>", "\n"));
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("Nieprawidłowa nazwa bohatera");
+            }
+        }
+
+        [Command("showSkills", RunMode = RunMode.Async)]
+        [Summary("Wyświetla lore podanego bohatera z League of Legends")]
+        public async Task ShowSkills(string championName = null)
+        {
+            m_ChampionList = await APICalls.GetChampions(null);
+
+            if (m_ChampionList.Data.ContainsKey(championName))
+            {
+                string message = "";
+                var champion = m_ChampionList.Data[championName];
+
+                Regex rgx = new Regex(@"\{\{ ([eaf])([0-9]) \}\}");
+                foreach (var spell in champion.Spells)
+                {
+                    MatchCollection matches = rgx.Matches(spell.SanitizedTooltip);
+                    Dictionary<string, string> keyMatches = new Dictionary<string, string>();
+                    foreach (Match key in matches)
+                    {
+                        if (!keyMatches.ContainsKey(key.Groups[0].Value))
+                        {
+                            switch (key.Groups[1].Value)
+                            {
+                                case "f":
+                                    keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"f{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AD");
+                                    break;
+                                case "a":
+                                    keyMatches.Add(key.Groups[0].Value, spell.Vars.Where(x => x.Key == $"a{key.Groups[2].Value}").Select(x => x.Coeff).First().First().ToString() + "x AP");
+                                    break;
+                                case "e":
+                                    var values = spell.Effect[int.Parse(key.Groups[2].Value)];
+                                    string valuesString = "";
+                                    foreach (var value in values)
+                                    {
+                                        valuesString += value + "/";
+                                    }
+                                    valuesString = valuesString.Substring(0, valuesString.Length - 1);
+                                    keyMatches.Add(key.Groups[0].Value, valuesString);
+                                    break;
+                            }
+                        }
+                    }
+                    string skillMessage = $"```{spell.Name} - {spell.SanitizedTooltip}```";
+                    foreach (var key in keyMatches)
+                    {
+                        skillMessage = skillMessage.Replace(key.Key, key.Value);
+                    }
+                    message += skillMessage;
+                }
+
+                await Context.Channel.SendMessageAsync(message);
             }
             else
             {

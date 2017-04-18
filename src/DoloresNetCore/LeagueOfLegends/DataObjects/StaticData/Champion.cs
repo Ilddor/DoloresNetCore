@@ -58,6 +58,6 @@ namespace Dolores.LeagueOfLegends.DataObjects.StaticData
         public string Blurb { get; set; }
 
         [JsonProperty("spells")]
-        public JToken Spells { get; set; } // TODO
+        public List<Spell> Spells { get; set; }
     }
 }
