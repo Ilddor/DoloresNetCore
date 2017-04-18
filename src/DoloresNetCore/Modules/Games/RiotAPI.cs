@@ -38,6 +38,22 @@ namespace Dolores.Modules.Games
             m_SummonerNames[144175864505040896] = "Borodein";
         }
 
+        [Command("showLore", RunMode = RunMode.Async)]
+        [Summary("Wyświetla lore podanego bohatera z League of Legends")]
+        public async Task ShowLore(string championName = null)
+        {
+            m_ChampionList = await APICalls.GetChampions(null);
+
+            if(m_ChampionList.Data.ContainsKey(championName))
+            {
+                await Context.Channel.SendMessageAsync(m_ChampionList.Data[championName].Lore.Replace("<br>", "\n"));
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("Nieprawidłowa nazwa bohatera");
+            }
+        }
+
         [Command("showEnemyLoL", RunMode = RunMode.Async)]
         [Summary("Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
         public async Task ShowEnemyLoL(string summonerName = null)
@@ -180,7 +196,7 @@ namespace Dolores.Modules.Games
             {
                 var webClient = new HttpClient();
 
-                HttpResponseMessage summoner = await webClient.GetAsync($"https://eun1.api.riotgames.com/lol/static-data/v3/champions?api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                HttpResponseMessage summoner = await webClient.GetAsync($"https://eun1.api.riotgames.com/lol/static-data/v3/champions?champData=all&locale=pl_PL&api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
                 if (summoner.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     await log.SendMessageAsync("Błąd przy pobieraniu championów z serwera API Riot");
