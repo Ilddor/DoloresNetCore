@@ -99,13 +99,13 @@ namespace Dolores.Modules.Games
                         if (!foundSolo)
                         {
                             Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
-                            message += $"Unranked    ({"("+champion.Name+")",11}) - {teamPlayer.SummonerName}\n";
+                            message += $"Unranked    {"("+champion.Name+")",11} - {teamPlayer.SummonerName}\n";
                         }
                     }
                     else
                     {
                         Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
-                        message += $"Unranked    ({"("+champion.Name+")",11}) - {teamPlayer.SummonerName}\n";
+                        message += $"Unranked    {"("+champion.Name+")",11} - {teamPlayer.SummonerName}\n";
                     }
                 }
 
