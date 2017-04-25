@@ -25,6 +25,16 @@ namespace Dolores.Modules.Games
         Dictionary<ulong, string> m_SummonerNames;
         ChampionList m_ChampionList;
 
+        // Rework this function!
+        private async Task GetChampionList()
+        {
+            if(!m_Map.TryGet(out m_ChampionList))
+            {
+                m_ChampionList = await APICalls.GetChampions(null);
+                m_Map.Add(m_ChampionList);
+            }
+        }
+
         public RiotAPI(IDependencyMap map)
         {
             m_Map = map;
@@ -43,9 +53,10 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla lore podanego bohatera z League of Legends")]
         public async Task ShowLore(string championName = null)
         {
-            m_ChampionList = await APICalls.GetChampions(null);
+            await GetChampionList();
+            //m_ChampionList = await APICalls.GetChampions(null);
 
-            if(m_ChampionList.Data.ContainsKey(championName))
+            if (m_ChampionList.Data.ContainsKey(championName))
             {
                 await Context.Channel.SendMessageAsync(m_ChampionList.Data[championName].Lore.Replace("<br>", "\n"));
             }
@@ -59,7 +70,8 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla lore podanego bohatera z League of Legends")]
         public async Task ShowSkills(string championName = null)
         {
-            m_ChampionList = await APICalls.GetChampions(null);
+            await GetChampionList();
+            //m_ChampionList = await APICalls.GetChampions(null);
 
             if (m_ChampionList.Data.ContainsKey(championName))
             {
@@ -124,7 +136,8 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
         public async Task ShowEnemyLoL(string summonerName = null)
         {
-            m_ChampionList = await APICalls.GetChampions(null);
+            await GetChampionList();
+            //m_ChampionList = await APICalls.GetChampions(null);
 
             if (summonerName == null)
                 summonerName = m_SummonerNames[Context.User.Id];

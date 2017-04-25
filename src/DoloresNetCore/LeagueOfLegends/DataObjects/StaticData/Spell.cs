@@ -16,7 +16,7 @@ namespace Dolores.LeagueOfLegends.DataObjects.StaticData
         public string Resource { get; set; }
 
         [JsonProperty("leveltip")]
-        public JToken Leveltip { get; set; } // TODO
+        public LevelTip Leveltip { get; set; }
 
         [JsonProperty("vars")]
         public List<SpellVar> Vars { get; set; }
