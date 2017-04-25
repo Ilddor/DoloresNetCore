@@ -47,6 +47,7 @@ namespace Dolores.Modules.Games
             m_SummonerNames[248117703972225027] = "kamilosxd678";
             m_SummonerNames[128147347183108097] = "PepegoPL";
             m_SummonerNames[144175864505040896] = "Borodein";
+            m_SummonerNames[252033506941599744] = "ZdulaEzCebula";
         }
 
         [Command("showLore", RunMode = RunMode.Async)]
