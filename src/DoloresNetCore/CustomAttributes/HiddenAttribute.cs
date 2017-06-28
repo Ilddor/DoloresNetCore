@@ -10,7 +10,7 @@ namespace Dolores.CustomAttributes
     [AttributeUsage(AttributeTargets.Method)]
     public class HiddenAttribute : PreconditionAttribute
     {
-        public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
+        public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             return PreconditionResult.FromSuccess();
         }

@@ -8,21 +8,22 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Audio;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Voice
 {
     public class Voice : ModuleBase
     {
-        private IDependencyMap m_Map;
+        private IServiceProvider m_Map;
 
         public class AudioClientWrapper
         {
-            public IAudioClient m_AudioClient;
+            public IAudioClient m_AudioClient = null;
         }
 
         public class FFMPEGProcess
         {
-            public Process m_Process;
+            public Process m_Process = null;
             public bool m_Playing = false;
 
             public FFMPEGProcess(Process process)
@@ -31,7 +32,7 @@ namespace Dolores.Modules.Voice
             }
         }
 
-        public Voice(IDependencyMap map)
+        public Voice(IServiceProvider map)
         {
             m_Map = map;
         }
@@ -43,24 +44,17 @@ namespace Dolores.Modules.Voice
             //if (Context.User.Username == "Ilddor")
             {
                 IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
-                AudioClientWrapper audioClient;
-                if (!m_Map.TryGet<AudioClientWrapper>(out audioClient))
+                AudioClientWrapper audioClient = m_Map.GetService<AudioClientWrapper>();
+                if(audioClient.m_AudioClient != null)
                 {
-                    audioClient = new AudioClientWrapper();
-                    m_Map.Add(audioClient);
-                }
-                else
-                {
-                    FFMPEGProcess ffmpegProcess;
-                    if (m_Map.TryGet(out ffmpegProcess))
+                    FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
+                    if (ffmpegProcess.m_Playing)
                     {
-                        if (ffmpegProcess.m_Playing)
-                        {
-                            await StopPlay();
-                        }
+                        await StopPlay();
                     }
                     await audioClient.m_AudioClient.StopAsync();
                 }
+
                 audioClient.m_AudioClient = await channel.ConnectAsync();
             }
         }
@@ -69,17 +63,13 @@ namespace Dolores.Modules.Voice
         [Summary("Powoduje że bot wychodzi z kanału głosowego")]
         private async Task LeaveAudio()
         {
-            AudioClientWrapper audioClient;
-            if (m_Map.TryGet<AudioClientWrapper>(out audioClient))
+            AudioClientWrapper audioClient = m_Map.GetService<AudioClientWrapper>();
+            if (audioClient.m_AudioClient != null)
             {
-
-                FFMPEGProcess ffmpegProcess;
-                if (m_Map.TryGet(out ffmpegProcess))
+                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
+                if (ffmpegProcess.m_Playing)
                 {
-                    if (ffmpegProcess.m_Playing)
-                    {
-                        await StopPlay();
-                    }
+                    await StopPlay();
                 }
                 await audioClient.m_AudioClient.StopAsync();
             }
@@ -92,18 +82,11 @@ namespace Dolores.Modules.Voice
             //if (Context.User.Username == "Ilddor")
             {
                 var ffmpeg = CreateStream("WestworldMainTheme.mp3");
-                FFMPEGProcess ffmpegProcess;
-                if (!m_Map.TryGet(out ffmpegProcess))
-                {
-                    ffmpegProcess = new FFMPEGProcess(ffmpeg);
-                    m_Map.Add(ffmpegProcess);
-                }
-                else
-                {
-                    ffmpegProcess.m_Process = ffmpeg;
-                }
+                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
+                ffmpegProcess.m_Process = ffmpeg;
+
                 var output = ffmpegProcess.m_Process.StandardOutput.BaseStream;
-                var discord = m_Map.Get<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
+                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 //ffmpeg.Close();
@@ -140,14 +123,11 @@ namespace Dolores.Modules.Voice
         [Summary("Podaj link jako parametr, a zagra muzyke z tego linka(youtube)")]
         private async Task Play(string url)
         {
-            FFMPEGProcess tmp;
-            if (m_Map.TryGet(out tmp))
+            FFMPEGProcess tmp = m_Map.GetService<FFMPEGProcess>();
+            if (tmp.m_Playing)
             {
-                if (tmp.m_Playing)
-                {
-                    await Context.Channel.SendMessageAsync("Aktualnie odtwarzana jest muzyka, kolejka nie jest jeszcze wspierana, by zmienic utwór wpisz najpierw !stopPlay");
-                    return;
-                }
+                await Context.Channel.SendMessageAsync("Aktualnie odtwarzana jest muzyka, kolejka nie jest jeszcze wspierana, by zmienic utwór wpisz najpierw !stopPlay");
+                return;
             }
 
             string name = "/home/ilddor/Music/" + url.Substring(url.Length - 11, 11) + ".mp3";
@@ -171,19 +151,11 @@ namespace Dolores.Modules.Voice
             await Context.Channel.SendMessageAsync("Właczam odtwarzanie");
             {
                 var ffmpeg = CreateStream(name);
-                FFMPEGProcess ffmpegProcess;
-                if(!m_Map.TryGet(out ffmpegProcess))
-                {
-                    ffmpegProcess = new FFMPEGProcess(ffmpeg);
-                    m_Map.Add(ffmpegProcess);
-                }
-                else
-                {
-                    ffmpegProcess.m_Process = ffmpeg;
-                }
+                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
+                ffmpegProcess.m_Process = ffmpeg;
                 ffmpegProcess.m_Playing = true;
                 var output = ffmpegProcess.m_Process.StandardOutput.BaseStream;
-                var discord = m_Map.Get<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
+                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 //ffmpeg.Close();
@@ -199,8 +171,8 @@ namespace Dolores.Modules.Voice
         [Summary("Przerywa wykonywanie aktualnego utworu jeśli jest odtwarzany")]
         private async Task StopPlay()
         {
-            FFMPEGProcess process;
-            if(m_Map.TryGet(out process))
+            FFMPEGProcess process = m_Map.GetService<FFMPEGProcess>();
+            if (process.m_Process != null)
             {
                 //process.m_Process.Dispose();
                 //process.m_Process.StandardInput.WriteLine("\x3");

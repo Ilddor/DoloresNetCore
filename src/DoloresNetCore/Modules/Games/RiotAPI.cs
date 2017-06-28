@@ -16,26 +16,41 @@ using Dolores.LeagueOfLegends.DataObjects.Summoner;
 using Dolores.LeagueOfLegends.DataObjects.CurrentGame;
 using Dolores.LeagueOfLegends.DataObjects.StaticData;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
     public class RiotAPI : ModuleBase
     {
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
         Dictionary<ulong, string> m_SummonerNames;
-        ChampionList m_ChampionList;
+
+        public class ChampionListWrapper
+        {
+            public ChampionList m_ChampionList;
+
+            public ChampionListWrapper()
+            {
+                Task<ChampionList> task = APICalls.GetChampions(null);
+                task.Wait();
+                m_ChampionList = task.Result;
+            }
+        }
+
+        ChampionListWrapper m_ChampionList;
 
         // Rework this function!
         private async Task GetChampionList()
         {
-            if(!m_Map.TryGet(out m_ChampionList))
+            m_ChampionList = m_Map.GetService<ChampionListWrapper>();
+            /*if(!m_Map.TryGet(out m_ChampionList))
             {
                 m_ChampionList = await APICalls.GetChampions(null);
                 m_Map.Add(m_ChampionList);
-            }
+            }*/
         }
 
-        public RiotAPI(IDependencyMap map)
+        public RiotAPI(IServiceProvider map)
         {
             m_Map = map;
             //TODO move it from here, make it changable and savable to file, make keys hidden in files
@@ -57,9 +72,9 @@ namespace Dolores.Modules.Games
             await GetChampionList();
             //m_ChampionList = await APICalls.GetChampions(null);
 
-            if (m_ChampionList.Data.ContainsKey(championName))
+            if (m_ChampionList.m_ChampionList.Data.ContainsKey(championName))
             {
-                await Context.Channel.SendMessageAsync(m_ChampionList.Data[championName].Lore.Replace("<br>", "\n"));
+                await Context.Channel.SendMessageAsync(m_ChampionList.m_ChampionList.Data[championName].Lore.Replace("<br>", "\n"));
             }
             else
             {
@@ -74,10 +89,10 @@ namespace Dolores.Modules.Games
             await GetChampionList();
             //m_ChampionList = await APICalls.GetChampions(null);
 
-            if (m_ChampionList.Data.ContainsKey(championName))
+            if (m_ChampionList.m_ChampionList.Data.ContainsKey(championName))
             {
                 string message = "";
-                var champion = m_ChampionList.Data[championName];
+                var champion = m_ChampionList.m_ChampionList.Data[championName];
 
                 Regex rgx = new Regex(@"\{\{ ([eaf])([0-9]) \}\}");
                 foreach (var spell in champion.Spells)
@@ -187,20 +202,20 @@ namespace Dolores.Modules.Games
                         {
                             if (league.Queue == "RANKED_SOLO_5x5")
                             {
-                                Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                                Champion champion = m_ChampionList.m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
                                 message += $"{league.Tier,7} {league.Entries.First().Division,3} {"("+champion.Name+")",11} - {league.Entries.First().PlayerOrTeamName}\n";
                                 foundSolo = true;
                             }
                         }
                         if (!foundSolo)
                         {
-                            Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                            Champion champion = m_ChampionList.m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
                             message += $"Unranked    {"("+champion.Name+")",11} - {teamPlayer.SummonerName}\n";
                         }
                     }
                     else
                     {
-                        Champion champion = m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
+                        Champion champion = m_ChampionList.m_ChampionList.Data.Where(x => x.Value.ID == teamPlayer.ChampionID).First().Value;
                         message += $"Unranked    {"("+champion.Name+")",11} - {teamPlayer.SummonerName}\n";
                     }
                 }
@@ -212,9 +227,9 @@ namespace Dolores.Modules.Games
             
         }
 
-        public static void Install(IDependencyMap map)
+        public static void Install(IServiceProvider map)
         {
-            var client = map.Get<DiscordSocketClient>();
+            var client = map.GetService<DiscordSocketClient>();
 
             client.GuildMemberUpdated += GameChanged;
         }

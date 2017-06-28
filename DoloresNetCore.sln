@@ -1,16 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4CA164C9-2DF2-4419-A04E-1C67BCDDD72A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F64FFB03-D83C-4B84-BAE0-026A14B5D343}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DoloresNetCore", "src\DoloresNetCore\DoloresNetCore.xproj", "{6BF9825D-B4F6-4A71-B453-3E0F82010F34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoloresNetCore", "src\DoloresNetCore\DoloresNetCore.csproj", "{6BF9825D-B4F6-4A71-B453-3E0F82010F34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -9,13 +9,14 @@ using Discord.Addons;
 using Dolores.DataClasses;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Misc
 {
     public class Logging
     {
         private DiscordSocketClient m_Client;
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
 #if !_WINDOWS_
         ulong m_LogChannelId = 296679909856641024;
 #else
@@ -28,11 +29,11 @@ namespace Dolores.Modules.Misc
         ulong m_GuildId = 269960016591716362;
         Data.DBConnection m_DBConnection;
 
-        public void Install(IDependencyMap map)
+        public void Install(IServiceProvider map)
         {
             m_Map = map;
-            m_Client = m_Map.Get<DiscordSocketClient>();
-            m_Notifications = m_Map.Get<Notifications>();
+            m_Client = m_Map.GetService<DiscordSocketClient>();
+            m_Notifications = m_Map.GetService<Notifications>();
             m_LogChannel = m_Client.GetChannel(m_LogChannelId) as ITextChannel;
             m_DebugChannel = m_Client.GetChannel(m_DebugChannelId) as ITextChannel;
             m_DBConnection = Data.DBConnection.Instance();

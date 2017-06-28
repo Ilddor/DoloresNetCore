@@ -7,20 +7,21 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
     public class GameChannels : ModuleBase
     {
-        IDependencyMap m_Map;
-        public GameChannels(IDependencyMap map)
+        IServiceProvider m_Map;
+        public GameChannels(IServiceProvider map)
         {
             m_Map = map;
         }
 
-        static public void Install(IDependencyMap map)
+        static public void Install(IServiceProvider map)
         {
-            var client = map.Get<DiscordSocketClient>();
+            var client = map.GetService<DiscordSocketClient>();
             client.UserVoiceStateUpdated += Client_UserVoiceStateUpdated;
         }
 
@@ -28,7 +29,7 @@ namespace Dolores.Modules.Games
         {
             if(before.VoiceChannel != after.VoiceChannel)
             {
-                var createdChannels = Dolores.m_Instance.map.Get<CreatedChannels>();
+                var createdChannels = Dolores.m_Instance.map.GetService<CreatedChannels>();
                 bool delete = false;
                 createdChannels.m_Mutex.WaitOne();
                 try
@@ -92,7 +93,7 @@ namespace Dolores.Modules.Games
 
                 if (success)
                 {
-                    var createdChannels = m_Map.Get<CreatedChannels>();
+                    var createdChannels = m_Map.GetService<CreatedChannels>();
                     createdChannels.m_Mutex.WaitOne();
                     try
                     {

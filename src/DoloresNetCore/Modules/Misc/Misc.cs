@@ -14,18 +14,19 @@ using System.Net.Http;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Misc
 {
     public class Misc : ModuleBase
     {
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
         CommandService m_Commands;
         private Random m_Random = new Random();
         private Dictionary<string, bool> m_blacklistedUsers;
         private Mutex m_usersMutex;
 
-        public Misc(CommandService commands, IDependencyMap map)
+        public Misc(CommandService commands, IServiceProvider map)
         {
             m_Map = map;
             m_Commands = commands;
@@ -87,7 +88,7 @@ namespace Dolores.Modules.Misc
         [Hidden]
         public async Task bleh()
         {
-            var client = m_Map.Get<DiscordSocketClient>();
+            var client = m_Map.GetService<DiscordSocketClient>();
             var channel = client.GetChannel(273786708120829952);
             var text = channel as ITextChannel;
             var message = await text.GetMessageAsync(299580095868305409);
@@ -131,7 +132,7 @@ namespace Dolores.Modules.Misc
         [Remarks("W parametrze należy podać osobę o której chce się dostać notyfikację. Parametr musi używać \"Wzmianki\"")]
         private async Task NotifyMe(IGuildUser notify)
         {
-            var notifications = m_Map.Get<Notifications>();
+            var notifications = m_Map.GetService<Notifications>();
             notifications.AddNotification(Context.User.Id, notify.Id);
             await Context.Message.DeleteAsync();
         }
@@ -154,7 +155,7 @@ namespace Dolores.Modules.Misc
             {
                 foreach (var it in x)
                 {
-                    if ((it.Author.Id == m_Map.Get<DiscordSocketClient>().CurrentUser.Id) || allUsers)
+                    if ((it.Author.Id == m_Map.GetService<DiscordSocketClient>().CurrentUser.Id) || allUsers)
                     {
                         await it.DeleteAsync();
                     }
@@ -188,7 +189,7 @@ namespace Dolores.Modules.Misc
         public async Task NSFW()
         {
             Random random = new Random();
-            var client = m_Map.Get<DiscordSocketClient>();
+            var client = m_Map.GetService<DiscordSocketClient>();
             var channel = client.GetChannel(272419366744883200) as ITextChannel;
             var subreddits = new List<string>();
             subreddits.Add("redhead");

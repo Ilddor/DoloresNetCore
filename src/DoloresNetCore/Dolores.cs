@@ -18,6 +18,7 @@ using Dolores.Modules.Games;
 using Dolores.Modules.Voice;
 using Dolores.Modules.Misc;
 using Dolores.DataClasses;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores
 {
@@ -85,7 +86,9 @@ namespace Dolores
         public static Dolores m_Instance;
         public DateTime m_StartTime = DateTime.Now;
         public int m_Version = 0;
-        public DependencyMap map = new DependencyMap();
+        //public DependencyMap map = new DependencyMap();
+        public IServiceProvider map;
+
         public APIKeys m_APIKeys;
 
         private DiscordSocketClient m_Client;
@@ -99,6 +102,33 @@ namespace Dolores
         Notifications   m_Notifications;
 
         Logging         m_Logging;
+
+        private IServiceProvider ConfigureServices()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(m_Client);
+
+            m_CreatedChannels = new CreatedChannels();
+            m_SignedUsers = new SignedUsers();
+            m_GameTimes = new GameTimes();
+            m_Reactions = new Reactions();
+            m_Notifications = new Notifications();
+            LoadState();
+
+            services.AddSingleton(m_CreatedChannels);
+            services.AddSingleton(m_SignedUsers);
+            services.AddSingleton(m_GameTimes);
+            services.AddSingleton(m_Reactions);
+            services.AddSingleton(m_Notifications);
+            services.AddSingleton(m_APIKeys);
+
+            services.AddSingleton<Voice.AudioClientWrapper>();
+            services.AddSingleton<Voice.FFMPEGProcess>();
+
+            var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
+            provider.GetService<DiscordSocketClient>();
+            return provider;
+        }
 
         public async Task Start()
         {
@@ -122,7 +152,8 @@ namespace Dolores
 
         private async Task Connected()
         {
-            map.Add(m_Client);
+            /*var services = new ServiceCollection();
+            services.AddSingleton(m_Client);
 
             m_CreatedChannels = new CreatedChannels();
             m_SignedUsers = new SignedUsers();
@@ -131,12 +162,13 @@ namespace Dolores
             m_Notifications = new Notifications();
             LoadState();
 
-            map.Add(m_CreatedChannels);
-            map.Add(m_SignedUsers);
-            map.Add(m_GameTimes);
-            map.Add(m_Reactions);
-            map.Add(m_Notifications);
-            map.Add(m_APIKeys);
+            services.AddSingleton(m_CreatedChannels);
+            services.AddSingleton(m_SignedUsers);
+            services.AddSingleton(m_GameTimes);
+            services.AddSingleton(m_Reactions);
+            services.AddSingleton(m_Notifications);
+            services.AddSingleton(m_APIKeys);*/
+            map = ConfigureServices();
 
             GameChannels.Install(map);
             GameTime.Install(map);
@@ -165,8 +197,8 @@ namespace Dolores
             // Notifications
             m_Notifications.SaveToFile();
 
-            Voice.AudioClientWrapper audioClient;
-            if (map.TryGet(out audioClient))
+            Voice.AudioClientWrapper audioClient = map.GetService<Voice.AudioClientWrapper>();
+            if (audioClient.m_AudioClient != null)
             {
                 await audioClient.m_AudioClient.StopAsync();
             }

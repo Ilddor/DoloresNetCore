@@ -8,14 +8,15 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Rest;
 using Dolores.DataClasses;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
     public class SteamGiveaway : ModuleBase
     {
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
         private Random m_Random = new Random();
-        public SteamGiveaway(IDependencyMap map)
+        public SteamGiveaway(IServiceProvider map)
         {
             m_Map = map;
         }
@@ -25,13 +26,13 @@ namespace Dolores.Modules.Games
         [RequireContext(ContextType.DM)]
         public async Task Key(string key)
         {
-            SignedUsers signedUsers = m_Map.Get<SignedUsers>();
+            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
 
             signedUsers.m_Mutex.WaitOne();
             int usersCount = signedUsers.m_Users.Count;
             ulong userId = signedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount-1)).Key;
             signedUsers.m_Mutex.ReleaseMutex();
-            SocketGuild misiaki = m_Map.Get<DiscordSocketClient>().GetGuild(269960016591716362);
+            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
             RestDMChannel winnerChannel = await winningUser.CreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
@@ -43,8 +44,8 @@ namespace Dolores.Modules.Games
         [Summary("Wpisuje liste osób zapisanych do losowania kluczy")]
         public async Task ListKey()
         {
-            SignedUsers signedUsers = m_Map.Get<SignedUsers>();
-            SocketGuild misiaki = m_Map.Get<DiscordSocketClient>().GetGuild(269960016591716362);
+            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
+            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             string message = "Zapisani: ";
             signedUsers.m_Mutex.WaitOne();
             try
@@ -73,7 +74,7 @@ namespace Dolores.Modules.Games
             //SocketUser user = Context.Guild.GetUserAsync()
             if (roles.Contains(role))
             {
-                SignedUsers signedUsers = m_Map.Get<SignedUsers>();
+                SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
                 signedUsers.m_Mutex.WaitOne();
                 bool added = true;
                 try

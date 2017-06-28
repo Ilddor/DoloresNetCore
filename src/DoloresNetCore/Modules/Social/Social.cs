@@ -8,26 +8,27 @@ using Discord.WebSocket;
 using Discord.Addons;
 using Dolores.DataClasses;
 using Dolores.CustomAttributes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Social
 {
     public class Social : ModuleBase
     {
         private DiscordSocketClient m_Client;
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
         Reactions m_Reactions;
 
-        public Social(IDependencyMap map)
+        public Social(IServiceProvider map)
         {
             m_Map = map;
-            m_Client = map.Get<DiscordSocketClient>();
-            map.TryGet<Reactions>(out m_Reactions);
+            m_Client = map.GetService<DiscordSocketClient>();
+            m_Reactions = map.GetService<Reactions>();
         }
 
-        public void Install(IDependencyMap map)
+        public void Install(IServiceProvider map)
         {
-            m_Client = map.Get<DiscordSocketClient>();
-            map.TryGet<Reactions>(out m_Reactions);
+            m_Client = map.GetService<DiscordSocketClient>();
+            m_Reactions = map.GetService<Reactions>();
             m_Client.MessageReceived += MessageReceived;
         }
 
@@ -113,19 +114,22 @@ namespace Dolores.Modules.Social
             if (message.Author.Id == m_Client.CurrentUser.Id) return;
             /*if (message.Author.Id == 132131643849834497) // Bodziu messages reactions:D
             {
-                SocketGuild misiaki = m_Map.Get<DiscordSocketClient>().GetGuild(269960016591716362);
+                SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
                 await message.AddReactionAsync($"Polandball:272424031892930561");
                 await message.AddReactionAsync($"Bodzia:272421593416990728");
             }
 
             if (message.Author.Id == 131816357980405760)
             {
-                SocketGuild misiaki = m_Map.Get<DiscordSocketClient>().GetGuild(269960016591716362);
+                SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
                 await message.AddReactionAsync($"Polandball:272424031892930561");
             }*/
             var reactions = m_Reactions.GetReactions(message.Author.Id);
+            
             foreach (var reaction in reactions)
-                await message.AddReactionAsync(reaction);
+            {
+                await message.AddReactionAsync(new Emoji(reaction));
+            }
 
             if (message.Content == "Jaki jest twój cel?")
                 await message.Channel.SendMessageAsync("Znaleźć środek labiryntu");

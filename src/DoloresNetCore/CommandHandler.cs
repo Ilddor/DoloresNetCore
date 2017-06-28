@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores
 {
@@ -14,11 +14,11 @@ namespace Dolores
     {
         private CommandService m_Commands;
         private DiscordSocketClient m_Client;
-        private IDependencyMap m_Map;
+        private IServiceProvider m_Map;
 
-        public async Task Install(IDependencyMap map)
+        public async Task Install(IServiceProvider map)
         {
-            m_Client = map.Get<DiscordSocketClient>();
+            m_Client = map.GetService<DiscordSocketClient>();
             m_Commands = new CommandService();
             m_Map = map;
 

@@ -6,14 +6,15 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
     public class GameTime : ModuleBase
     {
-        IDependencyMap m_Map;
+        IServiceProvider m_Map;
 
-        public GameTime(IDependencyMap map)
+        public GameTime(IServiceProvider map)
         {
             m_Map = map;
         }
@@ -22,8 +23,8 @@ namespace Dolores.Modules.Games
         [Summary("Pokazuje czas gry spędzony w konkretnych grach")]
         public async Task ShowGameTime()
         {
-            var gameTimes = m_Map.Get<GameTimes>();
-            var client = m_Map.Get<DiscordSocketClient>();
+            var gameTimes = m_Map.GetService<GameTimes>();
+            var client = m_Map.GetService<DiscordSocketClient>();
             string message = "Czas gry\n```";
             gameTimes.m_Mutex.WaitOne();
             try
@@ -48,15 +49,15 @@ namespace Dolores.Modules.Games
             await Context.Channel.SendMessageAsync(message);
         }
 
-        public static void Install(IDependencyMap map)
+        public static void Install(IServiceProvider map)
         {
-            var client = map.Get<DiscordSocketClient>();
+            var client = map.GetService<DiscordSocketClient>();
             client.GuildMemberUpdated += GameChanged;
         }
 
         private static Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
-            var gameTimes = Dolores.m_Instance.map.Get<GameTimes>();
+            var gameTimes = Dolores.m_Instance.map.GetService<GameTimes>();
             if(after.Guild.Id == 269960016591716362)
             {
                 if(before.Game.HasValue || !after.Game.HasValue)
