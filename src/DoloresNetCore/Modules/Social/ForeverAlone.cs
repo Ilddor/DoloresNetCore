@@ -55,6 +55,7 @@ namespace Dolores.Modules.Social
                     }
                 }
             }
+            return;
         }
     }
 }
