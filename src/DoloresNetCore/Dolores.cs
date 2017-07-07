@@ -13,9 +13,9 @@ using Discord.Commands;
 using Discord.Audio;
 using System.Runtime.Loader;
 using System.Xml.Serialization;
-using Dolores.Modules.Social;
 using Dolores.Modules.Games;
 using Dolores.Modules.Voice;
+using Dolores.Modules.Social;
 using Dolores.Modules.Misc;
 using Dolores.DataClasses;
 using Microsoft.Extensions.DependencyInjection;
@@ -96,6 +96,7 @@ namespace Dolores
 
         CreatedChannels m_CreatedChannels;
         Social          m_SocialModule;
+        ForeverAlone    m_ForeverAlone;
         SignedUsers     m_SignedUsers;
         GameTimes       m_GameTimes;
         Reactions       m_Reactions;
@@ -123,7 +124,7 @@ namespace Dolores
             services.AddSingleton(m_APIKeys);
 
             services.AddSingleton<Voice.AudioClientWrapper>();
-            services.AddSingleton<Voice.FFMPEGProcess>();
+            //services.AddSingleton<Voice.FFMPEGProcess>();
 
             var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
             provider.GetService<DiscordSocketClient>();
@@ -178,6 +179,9 @@ namespace Dolores
 
             m_SocialModule = new Social(map);
             m_SocialModule.Install(map);
+
+            //m_ForeverAlone = new ForeverAlone();
+            //m_ForeverAlone.Install(map);
 
             m_Logging = new Logging();
             m_Logging.Install(map);

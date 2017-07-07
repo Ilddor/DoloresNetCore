@@ -19,9 +19,50 @@ namespace Dolores.Modules.Voice
         public class AudioClientWrapper
         {
             public IAudioClient m_AudioClient = null;
+            public Process m_Process = null;
+            public bool m_Playing = false;
+
+            public async Task JoinVoiceChannel(IServiceProvider map, IVoiceChannel channel)
+            {
+                //AudioClientWrapper audioClient = map.GetService<AudioClientWrapper>();
+                if (m_AudioClient != null)
+                {
+                    if (m_Playing)
+                    {
+                        StopPlay(map);
+                    }
+                    await m_AudioClient.StopAsync();
+                }
+
+                m_AudioClient = await channel.ConnectAsync();
+            }
+
+            public async Task LeaveVoiceChannel(IServiceProvider map)
+            {
+                AudioClientWrapper audioClient = map.GetService<AudioClientWrapper>();
+                if (audioClient.m_AudioClient != null)
+                {
+                    if (m_Playing)
+                    {
+                        StopPlay(map);
+                    }
+                    await audioClient.m_AudioClient.StopAsync();
+                }
+            }
+
+            public void StopPlay(IServiceProvider map)
+            {
+                if (m_Process != null)
+                {
+                    m_Process.Kill();
+                    m_Process.WaitForExit();
+                    m_Playing = false;
+                    m_Process = null;
+                }
+            }
         }
 
-        public class FFMPEGProcess
+        /*public class FFMPEGProcess
         {
             public Process m_Process = null;
             public bool m_Playing = false;
@@ -30,7 +71,7 @@ namespace Dolores.Modules.Voice
             {
                 m_Process = process;
             }
-        }
+        }*/
 
         public Voice(IServiceProvider map)
         {
@@ -41,38 +82,16 @@ namespace Dolores.Modules.Voice
         [Summary("Powoduje że bot dołącza do twojego kanału głosowego")]
         private async Task JoinAudio()
         {
-            //if (Context.User.Username == "Ilddor")
-            {
-                IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
-                AudioClientWrapper audioClient = m_Map.GetService<AudioClientWrapper>();
-                if(audioClient.m_AudioClient != null)
-                {
-                    FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
-                    if (ffmpegProcess.m_Playing)
-                    {
-                        await StopPlay();
-                    }
-                    await audioClient.m_AudioClient.StopAsync();
-                }
-
-                audioClient.m_AudioClient = await channel.ConnectAsync();
-            }
+            IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
+            await m_Map.GetService<AudioClientWrapper>().JoinVoiceChannel(m_Map, channel);
         }
 
         [Command("leaveAudio", RunMode = RunMode.Async)]
         [Summary("Powoduje że bot wychodzi z kanału głosowego")]
         private async Task LeaveAudio()
         {
-            AudioClientWrapper audioClient = m_Map.GetService<AudioClientWrapper>();
-            if (audioClient.m_AudioClient != null)
-            {
-                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
-                if (ffmpegProcess.m_Playing)
-                {
-                    await StopPlay();
-                }
-                await audioClient.m_AudioClient.StopAsync();
-            }
+            await m_Map.GetService<AudioClientWrapper>().LeaveVoiceChannel(m_Map);
+            //await AudioClientWrapper.LeaveVoiceChannel(m_Map);
         }
 
         [Command("westworld", RunMode = RunMode.Async)]
@@ -82,16 +101,14 @@ namespace Dolores.Modules.Voice
             //if (Context.User.Username == "Ilddor")
             {
                 var ffmpeg = CreateStream("WestworldMainTheme.mp3");
-                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
-                ffmpegProcess.m_Process = ffmpeg;
+                AudioClientWrapper audioWrapper = m_Map.GetService<AudioClientWrapper>();
+                audioWrapper.m_Process = ffmpeg;
 
-                var output = ffmpegProcess.m_Process.StandardOutput.BaseStream;
+                var output = audioWrapper.m_Process.StandardOutput.BaseStream;
                 var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
-                //ffmpeg.Close();
-                ffmpegProcess.m_Process.Kill();
-                ffmpegProcess.m_Process.WaitForExit();
+                audioWrapper.StopPlay(m_Map);
             }
             /*WaveFormat outFormat = new WaveFormat(48000, 16, m_audio.Config.Channels);
             using (Mp3FileReader reader = new Mp3FileReader("WestworldMainTheme.mp3"))
@@ -123,7 +140,7 @@ namespace Dolores.Modules.Voice
         [Summary("Podaj link jako parametr, a zagra muzyke z tego linka(youtube)")]
         private async Task Play(string url)
         {
-            FFMPEGProcess tmp = m_Map.GetService<FFMPEGProcess>();
+            AudioClientWrapper tmp = m_Map.GetService<AudioClientWrapper>();
             if (tmp.m_Playing)
             {
                 await Context.Channel.SendMessageAsync("Aktualnie odtwarzana jest muzyka, kolejka nie jest jeszcze wspierana, by zmienic utwór wpisz najpierw !stopPlay");
@@ -151,18 +168,13 @@ namespace Dolores.Modules.Voice
             await Context.Channel.SendMessageAsync("Właczam odtwarzanie");
             {
                 var ffmpeg = CreateStream(name);
-                FFMPEGProcess ffmpegProcess = m_Map.GetService<FFMPEGProcess>();
-                ffmpegProcess.m_Process = ffmpeg;
-                ffmpegProcess.m_Playing = true;
-                var output = ffmpegProcess.m_Process.StandardOutput.BaseStream;
+                tmp.m_Process = ffmpeg;
+                tmp.m_Playing = true;
+                var output = tmp.m_Process.StandardOutput.BaseStream;
                 var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
-                //ffmpeg.Close();
-                //ffmpegProcess.m_Process.Kill();
-                //ffmpegProcess.m_Process.Dispose();
-                ffmpegProcess.m_Process.WaitForExit();
-                ffmpegProcess.m_Playing = false;
+                tmp.StopPlay(m_Map);
                 await Context.Channel.SendMessageAsync("Koniec utworu");
             }
         }
@@ -171,15 +183,13 @@ namespace Dolores.Modules.Voice
         [Summary("Przerywa wykonywanie aktualnego utworu jeśli jest odtwarzany")]
         private async Task StopPlay()
         {
-            FFMPEGProcess process = m_Map.GetService<FFMPEGProcess>();
-            if (process.m_Process != null)
+            AudioClientWrapper audioWrapper = m_Map.GetService<AudioClientWrapper>();
+            if (audioWrapper.m_Process != null)
             {
                 //process.m_Process.Dispose();
                 //process.m_Process.StandardInput.WriteLine("\x3");
-                process.m_Process.Kill();
-                process.m_Process.WaitForExit();
-                process.m_Playing = false;
-                await Context.Channel.SendMessageAsync($"Przerywam odtwarzanie, proces sie zakonczyl: {process.m_Process.HasExited}");
+                audioWrapper.StopPlay(m_Map);
+                await Context.Channel.SendMessageAsync($"Przerywam odtwarzanie, proces sie zakonczyl: {audioWrapper.m_Process.HasExited}");
             }
         }
 
