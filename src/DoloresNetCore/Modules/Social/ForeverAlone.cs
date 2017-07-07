@@ -51,7 +51,7 @@ namespace Dolores.Modules.Social
                         {
                             audioClient.StopPlay(m_Map);
                         }
-                        await audioClient.JoinVoiceChannel(m_Map, guildUser.VoiceChannel);
+                        audioClient.JoinVoiceChannel(m_Map, guildUser.VoiceChannel);
                     }
                 }
             }

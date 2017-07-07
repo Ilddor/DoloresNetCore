@@ -23,7 +23,7 @@ namespace Dolores.Modules.Voice
             public bool m_Playing = false;
             public IVoiceChannel m_CurrentChannel = null;
 
-            public async Task JoinVoiceChannel(IServiceProvider map, IVoiceChannel channel)
+            public async void JoinVoiceChannel(IServiceProvider map, IVoiceChannel channel)
             {
                 //AudioClientWrapper audioClient = map.GetService<AudioClientWrapper>();
                 if (m_AudioClient != null)
@@ -75,7 +75,7 @@ namespace Dolores.Modules.Voice
         private async Task JoinAudio()
         {
             IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
-            await m_Map.GetService<AudioClientWrapper>().JoinVoiceChannel(m_Map, channel);
+            m_Map.GetService<AudioClientWrapper>().JoinVoiceChannel(m_Map, channel);
         }
 
         [Command("leaveAudio", RunMode = RunMode.Async)]
