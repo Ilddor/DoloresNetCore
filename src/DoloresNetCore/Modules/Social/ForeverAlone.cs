@@ -28,7 +28,7 @@ namespace Dolores.Modules.Social
             SocketUser user = guild.GetUser(m_UserIDToFollow);
 
             IGuildUser guildUser = user as IGuildUser;
-            if (updatedUser.Id == guildUser.Id && guildUser.VoiceChannel != null)
+            if (guildUser.VoiceChannel != null)
             {
                 var usersOnVoiceChannelAsync = guildUser.VoiceChannel.GetUsersAsync();
                 var usersOnVoiceChannel = await usersOnVoiceChannelAsync.Flatten();
