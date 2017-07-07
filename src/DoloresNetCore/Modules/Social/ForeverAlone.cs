@@ -22,27 +22,38 @@ namespace Dolores.Modules.Social
             m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
         }
 
-        private async Task UserVoiceStateUpdated(SocketUser unused, SocketVoiceState before, SocketVoiceState after)
+        private async Task UserVoiceStateUpdated(SocketUser updatedUser, SocketVoiceState before, SocketVoiceState after)
         {
             SocketGuild guild = m_Client.GetGuild(269960016591716362);
             SocketUser user = guild.GetUser(m_UserIDToFollow);
 
             IGuildUser guildUser = user as IGuildUser;
-            var usersOnVoiceChannelAsync = guildUser.VoiceChannel.GetUsersAsync();
-            var usersOnVoiceChannel = await usersOnVoiceChannelAsync.Flatten();
-            int usersCount = System.Linq.Enumerable.Count(usersOnVoiceChannel);
-            Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
-            if (usersCount == 1)
+            if (updatedUser.Id == guildUser.Id && guildUser.VoiceChannel != null)
             {
-                if(audioClient.m_CurrentChannel != null && audioClient.m_CurrentChannel.Id != guildUser.VoiceChannel.Id)
+                var usersOnVoiceChannelAsync = guildUser.VoiceChannel.GetUsersAsync();
+                var usersOnVoiceChannel = await usersOnVoiceChannelAsync.Flatten();
+                int usersCount = System.Linq.Enumerable.Count(usersOnVoiceChannel);
+                Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
+                if (usersCount == 1)
                 {
-                    var usersOnBotsVoiceChannelAsync = audioClient.m_CurrentChannel.GetUsersAsync();
-                    var usersOnBotsVoiceChannel = await usersOnBotsVoiceChannelAsync.Flatten();
-                    int usersOnBotsVoiceChannelCount = System.Linq.Enumerable.Count(usersOnBotsVoiceChannel);
-                    if (usersOnBotsVoiceChannelCount > 1)
-                        return;
+                    bool follow = true;
+                    if (audioClient.m_CurrentChannel != null && audioClient.m_CurrentChannel.Id != guildUser.VoiceChannel.Id)
+                    {
+                        var usersOnBotsVoiceChannelAsync = audioClient.m_CurrentChannel.GetUsersAsync();
+                        var usersOnBotsVoiceChannel = await usersOnBotsVoiceChannelAsync.Flatten();
+                        int usersOnBotsVoiceChannelCount = System.Linq.Enumerable.Count(usersOnBotsVoiceChannel);
+                        if (usersOnBotsVoiceChannelCount > 1)
+                            follow = false;
+                    }
+                    if (follow)
+                    {
+                        if (audioClient.m_Playing)
+                        {
+                            audioClient.StopPlay(m_Map);
+                        }
+                        await audioClient.JoinVoiceChannel(m_Map, guildUser.VoiceChannel);
+                    }
                 }
-                await audioClient.JoinVoiceChannel(m_Map, guildUser.VoiceChannel);
             }
         }
     }
