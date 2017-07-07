@@ -21,6 +21,7 @@ namespace Dolores.Modules.Voice
             public IAudioClient m_AudioClient = null;
             public Process m_Process = null;
             public bool m_Playing = false;
+            public IVoiceChannel m_CurrentChannel = null;
 
             public async Task JoinVoiceChannel(IServiceProvider map, IVoiceChannel channel)
             {
@@ -34,6 +35,7 @@ namespace Dolores.Modules.Voice
                     await m_AudioClient.StopAsync();
                 }
 
+                m_CurrentChannel = channel;
                 m_AudioClient = await channel.ConnectAsync();
             }
 
@@ -46,6 +48,7 @@ namespace Dolores.Modules.Voice
                     {
                         StopPlay(map);
                     }
+                    m_CurrentChannel = null;
                     await audioClient.m_AudioClient.StopAsync();
                 }
             }
@@ -61,17 +64,6 @@ namespace Dolores.Modules.Voice
                 }
             }
         }
-
-        /*public class FFMPEGProcess
-        {
-            public Process m_Process = null;
-            public bool m_Playing = false;
-
-            public FFMPEGProcess(Process process)
-            {
-                m_Process = process;
-            }
-        }*/
 
         public Voice(IServiceProvider map)
         {
@@ -91,14 +83,12 @@ namespace Dolores.Modules.Voice
         private async Task LeaveAudio()
         {
             await m_Map.GetService<AudioClientWrapper>().LeaveVoiceChannel(m_Map);
-            //await AudioClientWrapper.LeaveVoiceChannel(m_Map);
         }
 
         [Command("westworld", RunMode = RunMode.Async)]
         [Summary("Odtawrza Westworld Main Theme")]
         private async Task Westworld()
         {
-            //if (Context.User.Username == "Ilddor")
             {
                 var ffmpeg = CreateStream("WestworldMainTheme.mp3");
                 AudioClientWrapper audioWrapper = m_Map.GetService<AudioClientWrapper>();
@@ -110,30 +100,6 @@ namespace Dolores.Modules.Voice
                 await discord.FlushAsync();
                 audioWrapper.StopPlay(m_Map);
             }
-            /*WaveFormat outFormat = new WaveFormat(48000, 16, m_audio.Config.Channels);
-            using (Mp3FileReader reader = new Mp3FileReader("WestworldMainTheme.mp3"))
-            using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, outFormat))
-            {
-                resampler.ResamplerQuality = 60;
-                int blockSize = outFormat.AverageBytesPerSecond / 50;
-                byte[] buffer = new byte[blockSize];
-                int byteCount;
-
-                while ((byteCount = resampler.Read(buffer, 0, blockSize)) > 0)
-                {
-                    if (byteCount < blockSize)
-                    {
-                        for (int i = byteCount; i < blockSize; i++)
-                        {
-                            buffer[i] = 0;
-                        }
-                    }
-                    ScaleVolumeSafeNoAlloc(buffer, 1f);
-
-                    m_audioClient.Send(buffer, 0, blockSize);
-                }
-            }
-            return e.Channel.SendMessage("Odtwarzanie: Westworld Main Theme");*/
         }
 
         [Command("play", RunMode = RunMode.Async)]

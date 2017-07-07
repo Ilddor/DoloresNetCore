@@ -19,7 +19,7 @@ namespace Dolores.Modules.Social
         {
             m_Client = map.GetService<DiscordSocketClient>();
             m_Map = map;
-            //m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
+            m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
         }
 
         private async Task UserVoiceStateUpdated(SocketUser unused, SocketVoiceState before, SocketVoiceState after)
@@ -31,9 +31,17 @@ namespace Dolores.Modules.Social
             var usersOnVoiceChannelAsync = guildUser.VoiceChannel.GetUsersAsync();
             var usersOnVoiceChannel = await usersOnVoiceChannelAsync.Flatten();
             int usersCount = System.Linq.Enumerable.Count(usersOnVoiceChannel);
-            if(usersCount == 1)
+            Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
+            if (usersCount == 1)
             {
-                Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
+                if(audioClient.m_CurrentChannel != null)
+                {
+                    var usersOnBotsVoiceChannelAsync = audioClient.m_CurrentChannel.GetUsersAsync();
+                    var usersOnBotsVoiceChannel = await usersOnBotsVoiceChannelAsync.Flatten();
+                    int usersOnBotsVoiceChannelCount = System.Linq.Enumerable.Count(usersOnBotsVoiceChannel);
+                    if (usersOnBotsVoiceChannelCount > 1)
+                        return;
+                }
                 await audioClient.JoinVoiceChannel(m_Map, guildUser.VoiceChannel);
             }
         }

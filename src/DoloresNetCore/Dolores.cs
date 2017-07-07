@@ -124,7 +124,6 @@ namespace Dolores
             services.AddSingleton(m_APIKeys);
 
             services.AddSingleton<Voice.AudioClientWrapper>();
-            //services.AddSingleton<Voice.FFMPEGProcess>();
 
             var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
             provider.GetService<DiscordSocketClient>();
@@ -180,8 +179,8 @@ namespace Dolores
             m_SocialModule = new Social(map);
             m_SocialModule.Install(map);
 
-            //m_ForeverAlone = new ForeverAlone();
-            //m_ForeverAlone.Install(map);
+            m_ForeverAlone = new ForeverAlone();
+            m_ForeverAlone.Install(map);
 
             m_Logging = new Logging();
             m_Logging.Install(map);
