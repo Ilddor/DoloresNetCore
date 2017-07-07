@@ -34,7 +34,7 @@ namespace Dolores.Modules.Social
             Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
             if (usersCount == 1)
             {
-                if(audioClient.m_CurrentChannel != null)
+                if(audioClient.m_CurrentChannel != null && audioClient.m_CurrentChannel.Id != guildUser.VoiceChannel.Id)
                 {
                     var usersOnBotsVoiceChannelAsync = audioClient.m_CurrentChannel.GetUsersAsync();
                     var usersOnBotsVoiceChannel = await usersOnBotsVoiceChannelAsync.Flatten();
