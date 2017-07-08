@@ -37,6 +37,10 @@ namespace Dolores.Modules.Social
                 if (usersCount == 1)
                 {
                     bool follow = true;
+                    if(audioClient.m_CurrentChannel != null && audioClient.m_CurrentChannel.Id == guildUser.VoiceChannel.Id)
+                    {
+                        follow = false;
+                    }
                     if (audioClient.m_CurrentChannel != null && audioClient.m_CurrentChannel.Id != guildUser.VoiceChannel.Id)
                     {
                         var usersOnBotsVoiceChannelAsync = audioClient.m_CurrentChannel.GetUsersAsync();
