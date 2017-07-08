@@ -33,6 +33,7 @@ namespace Dolores.Modules.Voice
                         StopPlay(map);
                     }
                     await m_AudioClient.StopAsync();
+                    m_AudioClient = null;
                 }
 
                 m_CurrentChannel = channel;
