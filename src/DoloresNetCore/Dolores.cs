@@ -86,6 +86,7 @@ namespace Dolores
         public static Dolores m_Instance;
         public DateTime m_StartTime = DateTime.Now;
         public int m_Version = 0;
+        public bool m_Installed = false;
         //public DependencyMap map = new DependencyMap();
         public IServiceProvider map;
 
@@ -168,22 +169,27 @@ namespace Dolores
             services.AddSingleton(m_Reactions);
             services.AddSingleton(m_Notifications);
             services.AddSingleton(m_APIKeys);*/
-            map = ConfigureServices();
+            if (!m_Installed)
+            {
+                map = ConfigureServices();
 
-            GameChannels.Install(map);
-            GameTime.Install(map);
+                GameChannels.Install(map);
+                GameTime.Install(map);
 
-            m_CommandHandler = new CommandHandler();
-            await m_CommandHandler.Install(map);
+                m_CommandHandler = new CommandHandler();
+                await m_CommandHandler.Install(map);
 
-            m_SocialModule = new Social(map);
-            m_SocialModule.Install(map);
+                m_SocialModule = new Social(map);
+                m_SocialModule.Install(map);
 
-            m_ForeverAlone = new ForeverAlone();
-            m_ForeverAlone.Install(map);
+                m_ForeverAlone = new ForeverAlone();
+                m_ForeverAlone.Install(map);
 
-            m_Logging = new Logging();
-            m_Logging.Install(map);
+                m_Logging = new Logging();
+                m_Logging.Install(map);
+
+                m_Installed = true;
+            }
         }
 
         public async Task SaveState()
