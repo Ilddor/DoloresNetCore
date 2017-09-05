@@ -183,9 +183,10 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("nsfw", RunMode = RunMode.Async)]
+        [Alias("bodziuBajt")]
         [Summary("")]
         [Remarks("hidden")]
-        [RequireOwner]
+        [OwnerOrBodziu]
         public async Task NSFW()
         {
             Random random = new Random();
