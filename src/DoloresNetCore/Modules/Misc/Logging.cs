@@ -18,7 +18,7 @@ namespace Dolores.Modules.Misc
         private DiscordSocketClient m_Client;
         IServiceProvider m_Map;
 #if !_WINDOWS_
-        ulong m_LogChannelId = 272513888539639818;
+        ulong m_LogChannelId = 356852896559661056;
 #else
         ulong m_LogChannelId = 356852896559661056;
 #endif
