@@ -15,6 +15,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 
 namespace Dolores.Modules.Misc
 {
@@ -23,8 +24,6 @@ namespace Dolores.Modules.Misc
         IServiceProvider m_Map;
         CommandService m_Commands;
         private Random m_Random = new Random();
-        private Dictionary<string, bool> m_blacklistedUsers;
-        private Mutex m_usersMutex;
 
         public Misc(CommandService commands, IServiceProvider map)
         {
@@ -161,37 +160,40 @@ namespace Dolores.Modules.Misc
             Random random = new Random();
             var client = m_Map.GetService<DiscordSocketClient>();
             var channel = client.GetChannel(272419366744883200) as ITextChannel;
-            var subreddits = new List<string>();
-            subreddits.Add("redhead");
-            subreddits.Add("GirlsFinishingTheJob");
-            subreddits.Add("wincest");
-            subreddits.Add("cuckquean");
-            subreddits.Add("Unashamed");
-            subreddits.Add("whenitgoesin");
-            subreddits.Add("xxxcaptions");
-            subreddits.Add("underboob");
-            subreddits.Add("holdthemoan");
-            subreddits.Add("FlashingGirls");
-            subreddits.Add("lingerie");
-            subreddits.Add("Upskirt");
-            subreddits.Add("LegalCollegeGirls");
-            subreddits.Add("OnOff");
-            subreddits.Add("TightShorts");
-            subreddits.Add("BlowjobGifs");
-            subreddits.Add("BlowJob");
-            subreddits.Add("CellShots");
-            subreddits.Add("girlswhoride");
+
+            BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
 
             var cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
             var webClient = new HttpClient(handler);
-            HttpResponseMessage page = await webClient.GetAsync($"https://www.reddit.com/r/{subreddits[random.Next(subreddits.Count)]}/new.json?sort=popular&limit=5");
+            //HttpResponseMessage page = await webClient.GetAsync($"https://www.reddit.com/r/{subreddits[random.Next(subreddits.Count)]}/new.json?sort=popular&limit=5");
+            HttpResponseMessage page;
+            string subreddit;
+            do
+            {
+                page = await webClient.GetAsync($"https://www.reddit.com/r/randnsfw/new.json?sort=popular&limit=5");
+                subreddit = page.RequestMessage.RequestUri.LocalPath;
+                subreddit = Regex.Match(subreddit, "/r/(.*)/").Groups[1].Value;
+            } while (banned.Contains(subreddit));
             var reader = new StreamReader(await page.Content.ReadAsStreamAsync());
             JToken tmp = JsonConvert.DeserializeObject<JToken>(await reader.ReadToEndAsync());
             foreach(var child in tmp["data"]["children"])
             {
-                await channel.SendMessageAsync($"{child["data"]["url"]}");
+                await channel.SendMessageAsync($"Subreddit: {subreddit} {child["data"]["url"]}");
             }
+            await Context.Message.DeleteAsync();
+        }
+
+        [Command("banSubreddit", RunMode = RunMode.Async)]
+        [Summary("")]
+        [Remarks("hidden")]
+        [OwnerOrBodziu]
+        public async Task BanSubreddit(string subreddit)
+        {
+            BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
+
+            banned.Ban(subreddit);
+
             await Context.Message.DeleteAsync();
         }
     }

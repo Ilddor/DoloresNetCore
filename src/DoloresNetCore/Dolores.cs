@@ -95,13 +95,14 @@ namespace Dolores
         private DiscordSocketClient m_Client;
         private CommandHandler m_CommandHandler;
 
-        CreatedChannels m_CreatedChannels;
-        Social          m_SocialModule;
-        ForeverAlone    m_ForeverAlone;
-        SignedUsers     m_SignedUsers;
-        GameTimes       m_GameTimes;
-        Reactions       m_Reactions;
-        Notifications   m_Notifications;
+        CreatedChannels  m_CreatedChannels;
+        Social           m_SocialModule;
+        ForeverAlone     m_ForeverAlone;
+        SignedUsers      m_SignedUsers;
+        GameTimes        m_GameTimes;
+        Reactions        m_Reactions;
+        Notifications    m_Notifications;
+        BannedSubreddits m_BannedSubreddits;
 
         Logging         m_Logging;
 
@@ -115,6 +116,7 @@ namespace Dolores
             m_GameTimes = new GameTimes();
             m_Reactions = new Reactions();
             m_Notifications = new Notifications();
+            m_BannedSubreddits = new BannedSubreddits();
             LoadState();
 
             services.AddSingleton(m_CreatedChannels);
@@ -122,6 +124,7 @@ namespace Dolores
             services.AddSingleton(m_GameTimes);
             services.AddSingleton(m_Reactions);
             services.AddSingleton(m_Notifications);
+            services.AddSingleton(m_BannedSubreddits);
             services.AddSingleton(m_APIKeys);
 
             services.AddSingleton<Voice.AudioClientWrapper>();
@@ -205,6 +208,8 @@ namespace Dolores
             m_Reactions.SaveToFile();
             // Notifications
             m_Notifications.SaveToFile();
+            // Banned subreddits
+            m_BannedSubreddits.SaveToFile();
 
             Voice.AudioClientWrapper audioClient = map.GetService<Voice.AudioClientWrapper>();
             if (audioClient.m_AudioClient != null)
@@ -227,6 +232,8 @@ namespace Dolores
             m_Reactions.LoadFromFile();
             // Notifications
             m_Notifications.LoadFromFile();
+            // Banned subreddits
+            m_BannedSubreddits.LoadFromFile();
 
             try
             {
