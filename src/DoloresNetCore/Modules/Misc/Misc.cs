@@ -153,7 +153,7 @@ namespace Dolores.Modules.Misc
         [Command("nsfw", RunMode = RunMode.Async)]
         [Alias("bodziuBajt")]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         [OwnerOrBodziu]
         public async Task NSFW()
         {
@@ -186,7 +186,7 @@ namespace Dolores.Modules.Misc
 
         [Command("banSubreddit", RunMode = RunMode.Async)]
         [Summary("")]
-        [Remarks("hidden")]
+        [Hidden]
         [OwnerOrBodziu]
         public async Task BanSubreddit(string subreddit)
         {
