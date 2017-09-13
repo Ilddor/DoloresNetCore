@@ -84,18 +84,6 @@ namespace Dolores.Modules.Misc
             await Context.Channel.SendFileAsync($"DoloresGoodnight{m_Random.Next(1, 3)}.jpg");
         }
 
-        [Command("bleh")]
-        [Hidden]
-        public async Task bleh()
-        {
-            var client = m_Map.GetService<DiscordSocketClient>();
-            var channel = client.GetChannel(273786708120829952);
-            var text = channel as ITextChannel;
-            var message = await text.GetMessageAsync(299580095868305409);
-            await message.DeleteAsync();
-            await Context.Message.DeleteAsync();
-        }
-
         [Command("roll")]
         [Summary("Losuje liczbę z podanego przedziału (100 jeśli nie zdefiniowano)")]
         private async Task Roll(int max = 100)
@@ -163,25 +151,6 @@ namespace Dolores.Modules.Misc
             });
         }
 
-        [Command("abl")]
-        [Summary("Dodaje osobę na czarną listę")]
-        [RequireOwner]
-        private async Task AddBlackList(string name)
-        {
-            m_blacklistedUsers.Add(name, true);
-            await Context.Channel.SendMessageAsync($"Ok");
-        }
-
-        [Command("rbl")]
-        [Summary("Usuwa osobę z czarnej listy")]
-        [RequireOwner]
-        private async Task RemoveBlackList(string name)
-        {
-            if (m_blacklistedUsers.ContainsKey(name))
-                m_blacklistedUsers.Remove(name);
-            await Context.Channel.SendMessageAsync($"Ok");
-        }
-
         [Command("nsfw", RunMode = RunMode.Async)]
         [Alias("bodziuBajt")]
         [Summary("")]
@@ -224,15 +193,6 @@ namespace Dolores.Modules.Misc
                 await channel.SendMessageAsync($"{child["data"]["url"]}");
             }
             await Context.Message.DeleteAsync();
-        }
-
-        [Command("quit")]
-        [Summary("")]
-        [Hidden]
-        [RequireOwner]
-        private async Task Quit()
-        {
-            await Dolores.m_Instance.SaveState();
         }
     }
 }

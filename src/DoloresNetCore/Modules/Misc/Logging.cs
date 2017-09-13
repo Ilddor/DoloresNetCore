@@ -20,7 +20,7 @@ namespace Dolores.Modules.Misc
 #if !_WINDOWS_
         ulong m_LogChannelId = 356852896559661056;
 #else
-        ulong m_LogChannelId = 356852896559661056;
+        ulong m_LogChannelId = 272513888539639818;
 #endif
         ulong m_DebugChannelId = 272513888539639818;
         ITextChannel m_LogChannel;
