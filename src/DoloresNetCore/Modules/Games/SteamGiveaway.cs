@@ -34,7 +34,7 @@ namespace Dolores.Modules.Games
             signedUsers.m_Mutex.ReleaseMutex();
             SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
-            RestDMChannel winnerChannel = await winningUser.CreateDMChannelAsync();
+            IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
             await Context.Channel.SendMessageAsync($"Klucz wygrał(a): {winningUser.Mention} , udział brało {usersCount} użytkowników.");
             await misiaki.DefaultChannel.SendMessageAsync($"{winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {usersCount}. Gratulacje!");

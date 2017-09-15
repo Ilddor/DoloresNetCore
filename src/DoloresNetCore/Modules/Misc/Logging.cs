@@ -198,7 +198,7 @@ namespace Dolores.Modules.Misc
                         var user = m_Client.GetUser(id);
                         var notify = m_Client.GetUser(after.Id);
 
-                        var userChannel = await user.CreateDMChannelAsync();
+                        var userChannel = await user.GetOrCreateDMChannelAsync();
                         await userChannel.SendMessageAsync($"{notify.Mention} pojawił się online");
                     }
                 }

@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <DefineConstants>$(DefineConstants);_WINDOWS_</DefineConstants>
     <AssemblyName>DoloresNetCore</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DoloresNetCore</PackageId>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -21,13 +20,13 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Addons.EmojiTools" Version="2.0.1" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc3-00744" />
-    <PackageReference Include="Discord.Net.Commands" Version="1.0.0-rc3-00744" />
-    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc3-00744" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc3-00744" />
+    <PackageReference Include="Discord.Net" Version="1.0.2" />
+    <PackageReference Include="Discord.Net.Commands" Version="1.0.2" />
+    <PackageReference Include="Discord.Net.Core" Version="1.0.2" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.2" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
   </ItemGroup>
 
