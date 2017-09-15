@@ -11,6 +11,7 @@ namespace Dolores.DataClasses
     {
         public string DiscordAPIKey { get; set; }
         public string RiotAPIKey { get; set; }
+        public string PUBGTrackerKey { get; set; }
 
         public void SaveToFile()
         {
