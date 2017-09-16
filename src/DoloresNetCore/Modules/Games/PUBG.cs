@@ -31,6 +31,7 @@ namespace Dolores.Modules.Games
         {
             var statsClient = new PUBGStatsClient(Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
             var stats = await statsClient.GetPlayerStatsAsync(name);
+            int startX = 10, startY = 10;
             using (var image = new Bitmap(640,480))
             {
                 var graphics = Graphics.FromImage(image);
@@ -53,21 +54,34 @@ namespace Dolores.Modules.Games
                 // Draw avatar
                 WebRequest avatarRequest = WebRequest.Create(stats.Avatar);
                 var avatar = new Bitmap(System.Drawing.Image.FromStream(avatarRequest.GetResponse().GetResponseStream()));
-                graphics.DrawImage(avatar, 0, 0, avatar.Width, avatar.Height);
+                graphics.DrawImage(avatar, startX, startY, avatar.Width, avatar.Height);
                 // Yes I do know GetResponse() can fail etc. I just assume it'll be fine, TODO: add error handling
 
                 // Draw player name
                 Font drawFont = new Font("Arial", 20);
-                var rect = new RectangleF(avatar.Width, 0, 200, avatar.Height);
                 String playerName = stats.PlayerName;
-                try
-                {
-                    graphics.DrawString(stats.PlayerName, drawFont, Brushes.White, rect);
-                }
-                catch(Exception e)
-                {
-                    await Context.Channel.SendMessageAsync(e.Message);
-                }
+                graphics.DrawString(stats.PlayerName, drawFont, Brushes.White, avatar.Width + startX, startY);
+
+                string typeString = "Last Day Played";
+                var typeSize = graphics.MeasureString(typeString, drawFont);
+                graphics.DrawString(typeString, drawFont, Brushes.White, image.Width / 2 - typeSize.Width / 2, startY);
+
+                var lastMatch = stats.MatchHistory[0];
+
+                int posY = startY + avatar.Height + 30;
+                graphics.DrawString($"Assists: {lastMatch.Assists}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"DMG: {lastMatch.Damage}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Kills: {lastMatch.Kills}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Traveled: {lastMatch.MoveDistance}m", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Rounds played: {lastMatch.Rounds}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Top 10s: {lastMatch.Top10}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Wins: {lastMatch.Wins}", drawFont, Brushes.White, startX, posY);
 
                 graphics.Save();
                 var fileOutput = File.Open($"{name}.png", FileMode.OpenOrCreate);
