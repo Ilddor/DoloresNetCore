@@ -30,9 +30,15 @@ namespace Dolores
             handler = new HandlerRoutine(ConsoleCtrlCheck);
             SetConsoleCtrlHandler(handler, true);
 #endif
+#if DEBUG
+            Thread ConsoleKeyListener = new Thread(new ThreadStart(ListerKeyBoardEvent));
+#endif
             AssemblyLoadContext.Default.Unloading += ClosingEvent;
             m_Instance = new Dolores();
             Console.CancelKeyPress += Console_CancelKeyPress;
+#if DEBUG
+            ConsoleKeyListener.Start();
+#endif
             m_Instance.Start().GetAwaiter().GetResult();
         }
 
@@ -46,6 +52,21 @@ namespace Dolores
             Dolores.m_Instance.SaveState().GetAwaiter().GetResult();
         }
 
+#if DEBUG
+        public static async void ListerKeyBoardEvent()
+        {
+            do
+            {
+                if (Console.ReadKey(true).Key == ConsoleKey.D)
+                {
+                    var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(357908791745839104);
+                    var message = await channel.GetMessageAsync(358726726513065985);
+                    var context = new CommandContext(Dolores.m_Instance.m_Client, (IUserMessage)message);
+                    await Dolores.m_Instance.m_CommandHandler.m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
+                }
+            } while (true);
+        }
+#endif
 #if _WINDOWS_
         private static bool ConsoleCtrlCheck(CtrlTypes eventType)
         {

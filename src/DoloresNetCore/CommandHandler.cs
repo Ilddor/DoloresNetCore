@@ -12,7 +12,7 @@ namespace Dolores
 {
     class CommandHandler
     {
-        private CommandService m_Commands;
+        public CommandService m_Commands;
         private DiscordSocketClient m_Client;
         private IServiceProvider m_Map;
 
