@@ -35,6 +35,7 @@ namespace Dolores.Modules.Games
             int startX = 10, startY = 10;
             using (var image = new Bitmap(640,480))
             {
+                image.SetResolution(96, 96);
                 var graphics = Graphics.FromImage(image);
                 graphics.CompositingQuality = CompositingQuality.HighSpeed;
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
