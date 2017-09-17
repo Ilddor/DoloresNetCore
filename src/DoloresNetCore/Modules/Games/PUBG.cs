@@ -94,7 +94,7 @@ namespace Dolores.Modules.Games
                 graphics.DrawString(dateString, drawFont, Brushes.White, image.Width - dateSize.Width - 10 , startY);
 
                 posY += 30;
-                graphics.DrawString($"Assists: {lastMatch.Assists}", drawFont, Brushes.White, startX, posY);
+                /*graphics.DrawString($"Assists: {lastMatch.Assists}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
                 graphics.DrawString($"DMG: {lastMatch.Damage}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
@@ -112,7 +112,56 @@ namespace Dolores.Modules.Games
                 posY += 40;
                 graphics.DrawString($"Survived: {lastMatch.TimeSurvived}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
-                graphics.DrawString($"Wins: {lastMatch.Wins}", drawFont, Brushes.White, startX, posY);
+                graphics.DrawString($"Wins: {lastMatch.Wins}", drawFont, Brushes.White, startX, posY);*/
+
+                Tuple<string, string>[,] statsToRender = new Tuple<string, string>[4, 3];
+                statsToRender[0, 0] = new Tuple<string, string>("Kills: ", lastMatch.Kills.ToString());
+                statsToRender[0, 1] = new Tuple<string, string>("Headshots: ", lastMatch.Headshots.ToString());
+                statsToRender[0, 2] = new Tuple<string, string>("Assists: ", lastMatch.Assists.ToString());
+                statsToRender[1, 0] = new Tuple<string, string>("DMG: ", lastMatch.Damage.ToString());
+                statsToRender[1, 1] = new Tuple<string, string>("K/D: ", lastMatch.Kd.ToString());
+                statsToRender[1, 2] = new Tuple<string, string>("Traveled: ", lastMatch.MoveDistance.ToString());
+                statsToRender[2, 0] = new Tuple<string, string>("Rounds played: ", lastMatch.Rounds.ToString());
+                statsToRender[2, 1] = new Tuple<string, string>("Top 10s: ", lastMatch.Top10.ToString());
+                statsToRender[2, 2] = new Tuple<string, string>("Survived: ", $"{(int)(lastMatch.TimeSurvived / 60)}m {(int)(lastMatch.TimeSurvived % 60)}s");
+                statsToRender[3, 0] = null;
+                statsToRender[3, 1] = new Tuple<string, string>("Wins: ", lastMatch.Wins.ToString());
+                statsToRender[3, 2] = null;
+
+                SizeF statsChunk = new SizeF((image.Width - 20) / statsToRender.GetLength(1), (image.Height - posY - 10) / statsToRender.GetLength(0));
+                for(int row = 0; row < statsToRender.GetLength(0); row++)
+                {
+                    for (int col = 0; col < statsToRender.GetLength(1); col++)
+                    {
+                        if (statsToRender[row, col] != null)
+                        {
+                            // Line
+                            graphics.DrawLine(
+                                new Pen(Brushes.DimGray),
+                                new PointF(startX + col * statsChunk.Width + 10, posY + row * statsChunk.Height + statsChunk.Height / 2),
+                                new PointF(startX + (col + 1) * statsChunk.Width - 10, posY + row * statsChunk.Height + statsChunk.Height / 2));
+                            PointF chunkCorner = new PointF(startX + col * statsChunk.Width, posY + row * statsChunk.Height);
+                            var categorySize = graphics.MeasureString(statsToRender[row, col].Item1, drawFont);
+                            var valueSize = graphics.MeasureString(statsToRender[row, col].Item2, drawFont);
+
+                            // Category
+                            graphics.DrawString(
+                                statsToRender[row, col].Item1,
+                                drawFont,
+                                Brushes.DarkGray,
+                                chunkCorner.X + statsChunk.Width / 2 - categorySize.Width / 2,
+                                chunkCorner.Y + statsChunk.Height / 2 - categorySize.Height);
+
+                            // Value
+                            graphics.DrawString(
+                                statsToRender[row, col].Item2,
+                                drawFont,
+                                Brushes.White,
+                                chunkCorner.X + statsChunk.Width / 2 - valueSize.Width / 2,
+                                chunkCorner.Y + statsChunk.Height / 2);
+                        }
+                    }
+                }
 
                 graphics.Save();
                 var fileOutput = File.Open($"PUBGStats/{name}.png", FileMode.OpenOrCreate);
