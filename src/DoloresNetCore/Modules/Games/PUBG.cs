@@ -65,7 +65,9 @@ namespace Dolores.Modules.Games
                 // Draw player name
                 PrivateFontCollection fonts = new PrivateFontCollection();
                 fonts.AddFontFile("Teko-Regular.ttf");
-                Font drawFont = new Font(fonts.Families[0], 20, FontStyle.Regular, GraphicsUnit.Point);
+                //Font drawFont = new Font(fonts.Families[0], 20, FontStyle.Regular, GraphicsUnit.Point);
+                // Looks like bug in CoreCompat? Font does not get to DrawString on Linux(Debian)
+                Font drawFont = new Font(SystemFonts.DefaultFont.FontFamily, 18, FontStyle.Regular, GraphicsUnit.Point);
                 String playerName = stats.PlayerName;
                 var nameSize = graphics.MeasureString(playerName, drawFont);
                 graphics.DrawString(playerName, drawFont, Brushes.White, avatar.Width + startX, startY);
