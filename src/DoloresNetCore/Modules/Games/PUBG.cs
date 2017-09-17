@@ -14,6 +14,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Drawing.Drawing2D;
 using System.Net;
+using System.Drawing.Text;
 
 namespace Dolores.Modules.Games
 {
@@ -32,7 +33,6 @@ namespace Dolores.Modules.Games
             var statsClient = new PUBGStatsClient(Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
             var stats = await statsClient.GetPlayerStatsAsync(name);
             int startX = 10, startY = 10;
-            await Context.Channel.SendMessageAsync("test1");
             using (var image = new Bitmap(640,480))
             {
                 var graphics = Graphics.FromImage(image);
@@ -58,24 +58,51 @@ namespace Dolores.Modules.Games
                 graphics.DrawImage(avatar, startX, startY, avatar.Width, avatar.Height);
                 // Yes I do know GetResponse() can fail etc. I just assume it'll be fine, TODO: add error handling
 
+                var lastMatch = stats.MatchHistory[0];
+
                 // Draw player name
-                Font drawFont = new Font("Arial", 20);
-                await Context.Channel.SendMessageAsync("test2");
+                PrivateFontCollection fonts = new PrivateFontCollection();
+                fonts.AddFontFile("Teko-Regular.ttf");
+                Font drawFont = new Font(fonts.Families[0], 20);
                 String playerName = stats.PlayerName;
-                graphics.DrawString(stats.PlayerName, drawFont, Brushes.White, avatar.Width + startX, startY);
+                var nameSize = graphics.MeasureString(playerName, drawFont);
+                graphics.DrawString(playerName, drawFont, Brushes.White, avatar.Width + startX, startY);
+
+                float posX = startX;
+                float posY = startY + avatar.Height;
+
+                // Rating with change
+                string playerRankPart1 = $"Rank: {lastMatch.RatingRank} (";
+                string playerRankPart2 = $"{lastMatch.RatingRankChange}";
+                string playerRankPart3 = $")";
+                var part1Size = graphics.MeasureString(playerRankPart1, drawFont);
+                var part2Size = graphics.MeasureString(playerRankPart2, drawFont);
+                
+                graphics.DrawString(playerRankPart1, drawFont, Brushes.White, posX, posY);
+                Brush changeBrush = lastMatch.RatingRankChange >= 0 ? Brushes.Green : Brushes.Red;
+                posX += part1Size.Width;
+                graphics.DrawString(playerRankPart2, drawFont, changeBrush, posX, posY);
+                posX += part2Size.Width;
+                graphics.DrawString(playerRankPart3, drawFont, Brushes.White, posX, posY);
 
                 string typeString = "Last Day Played";
                 var typeSize = graphics.MeasureString(typeString, drawFont);
                 graphics.DrawString(typeString, drawFont, Brushes.White, image.Width / 2 - typeSize.Width / 2, startY);
 
-                var lastMatch = stats.MatchHistory[0];
+                string dateString = lastMatch.Updated.ToString("yyyy-MM-dd");
+                var dateSize = graphics.MeasureString(dateString, drawFont);
+                graphics.DrawString(dateString, drawFont, Brushes.White, image.Width - dateSize.Width - 10 , startY);
 
-                int posY = startY + avatar.Height + 30;
+                posY += 30;
                 graphics.DrawString($"Assists: {lastMatch.Assists}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
                 graphics.DrawString($"DMG: {lastMatch.Damage}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
                 graphics.DrawString($"Kills: {lastMatch.Kills}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"Headshots: {lastMatch.Headshots}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
+                graphics.DrawString($"K/D: {lastMatch.Kd}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
                 graphics.DrawString($"Traveled: {lastMatch.MoveDistance}m", drawFont, Brushes.White, startX, posY);
                 posY += 40;
@@ -83,17 +110,21 @@ namespace Dolores.Modules.Games
                 posY += 40;
                 graphics.DrawString($"Top 10s: {lastMatch.Top10}", drawFont, Brushes.White, startX, posY);
                 posY += 40;
+                graphics.DrawString($"Survived: {lastMatch.TimeSurvived}", drawFont, Brushes.White, startX, posY);
+                posY += 40;
                 graphics.DrawString($"Wins: {lastMatch.Wins}", drawFont, Brushes.White, startX, posY);
 
                 graphics.Save();
-                var fileOutput = File.Open($"{name}.png", FileMode.OpenOrCreate);
+                var fileOutput = File.Open($"PUBGStats/{name}.png", FileMode.OpenOrCreate);
                 var encoderParameters = new EncoderParameters(1);
                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
                 var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
                 image.Save(fileOutput, codec, encoderParameters);
                 fileOutput.Close();
+                drawFont.Dispose();
+                fonts.Dispose();
             }
-            await Context.Channel.SendFileAsync($"{name}.png");
+            await Context.Channel.SendFileAsync($"PUBGStats/{name}.png");
         }
     }
 }

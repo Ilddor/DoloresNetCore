@@ -4,3 +4,5 @@ src/DoloresNetCore/bin/*
 *.user
 *.dat
 *.mp3
+*.ttf
+src/DoloresNetCore/PUBGStats/*
