@@ -38,6 +38,7 @@ namespace Dolores.Modules.Games
                 var graphics = Graphics.FromImage(image);
                 graphics.CompositingQuality = CompositingQuality.HighSpeed;
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
                 //graphics.CompositingMode = CompositingMode.SourceCopy;
 
                 // Fill red to easily spot errors
@@ -63,7 +64,7 @@ namespace Dolores.Modules.Games
                 // Draw player name
                 PrivateFontCollection fonts = new PrivateFontCollection();
                 fonts.AddFontFile("Teko-Regular.ttf");
-                Font drawFont = new Font(fonts.Families[0], 20);
+                Font drawFont = new Font(fonts.Families[0], 20, FontStyle.Regular, GraphicsUnit.Point);
                 String playerName = stats.PlayerName;
                 var nameSize = graphics.MeasureString(playerName, drawFont);
                 graphics.DrawString(playerName, drawFont, Brushes.White, avatar.Width + startX, startY);
