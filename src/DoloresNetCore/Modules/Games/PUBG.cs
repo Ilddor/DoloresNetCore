@@ -32,6 +32,7 @@ namespace Dolores.Modules.Games
             var statsClient = new PUBGStatsClient(Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
             var stats = await statsClient.GetPlayerStatsAsync(name);
             int startX = 10, startY = 10;
+            await Context.Channel.SendMessageAsync("test1");
             using (var image = new Bitmap(640,480))
             {
                 var graphics = Graphics.FromImage(image);
@@ -59,6 +60,7 @@ namespace Dolores.Modules.Games
 
                 // Draw player name
                 Font drawFont = new Font("Arial", 20);
+                await Context.Channel.SendMessageAsync("test2");
                 String playerName = stats.PlayerName;
                 graphics.DrawString(stats.PlayerName, drawFont, Brushes.White, avatar.Width + startX, startY);
 
