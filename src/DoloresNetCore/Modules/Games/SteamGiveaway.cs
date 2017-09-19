@@ -30,7 +30,11 @@ namespace Dolores.Modules.Games
 
             signedUsers.m_Mutex.WaitOne();
             int usersCount = signedUsers.m_Users.Count;
-            ulong userId = signedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount-1)).Key;
+            ulong userId = 0;
+            do
+            {
+                userId = signedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount - 1)).Key;
+            } while (userId == Context.User.Id);
             signedUsers.m_Mutex.ReleaseMutex();
             SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
