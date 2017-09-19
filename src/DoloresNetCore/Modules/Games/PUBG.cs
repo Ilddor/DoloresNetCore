@@ -238,7 +238,12 @@ namespace Dolores.Modules.Games
             InfoToRender toRender = new InfoToRender();
             toRender.m_Stats = new Tuple<string, string>[4, 3];
 
-            var lastMatch = stats.MatchHistory[0];
+            MatchHistoryStat lastMatch = null;
+            for(int i = 0; i < stats.MatchHistory.Count; i++)
+            {
+                if (stats.MatchHistory[i].Mode == mode.ToString())
+                    lastMatch = stats.MatchHistory[i];
+            }
 
             toRender.m_Title = $"Last Match";
             if (lastMatch.Rounds > 1)
