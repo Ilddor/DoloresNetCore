@@ -22,7 +22,7 @@ namespace Dolores.Modules.Games
         }
 
         [Command("key")]
-        [Summary("Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników, w przypadku gdy nie")]
+        [Summary("Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników")]
         [RequireContext(ContextType.DM)]
         public async Task Key(string key)
         {
@@ -57,7 +57,7 @@ namespace Dolores.Modules.Games
             int userCount = donor.VoiceChannel.Users.Count - 1;
             if (donor.VoiceChannel != null)
             {
-                if (donor.VoiceChannel.Users.Count > 2)
+                if (donor.VoiceChannel.Users.Count >= 2)
                 {
                     do
                     {
