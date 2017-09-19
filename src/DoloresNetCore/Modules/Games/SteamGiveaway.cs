@@ -45,7 +45,7 @@ namespace Dolores.Modules.Games
         }
 
         [Command("keyChannel")]
-        [Summary("Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników, w przypadku gdy nie")]
+        [Summary("Działa podobnie do komendy key z tą różnicą, że losuje klucz z osób znajdujących się na twoim kanale głosowym")]
         [RequireContext(ContextType.DM)]
         public async Task KeyChannel(string key)
         {
