@@ -238,10 +238,24 @@ namespace Dolores.Modules.Games
             InfoToRender toRender = new InfoToRender();
             toRender.m_Stats = new Tuple<string, string>[4, 3];
 
+            string otherTypeOfModeString ="";
+            switch(mode)
+            {
+                case PUBGSharp.Data.Mode.SoloFpp:
+                    otherTypeOfModeString = "FP Solo";
+                    break;
+                case PUBGSharp.Data.Mode.DuoFpp:
+                    otherTypeOfModeString = "FP Duo";
+                    break;
+                case PUBGSharp.Data.Mode.SquadFpp:
+                    otherTypeOfModeString = "FP Squad";
+                    break;
+            }
+
             MatchHistoryStat lastMatch = null;
             for(int i = 0; i < stats.MatchHistory.Count; i++)
             {
-                if (stats.MatchHistory[i].Mode == mode.ToString())
+                if (stats.MatchHistory[i].Mode == otherTypeOfModeString)
                     lastMatch = stats.MatchHistory[i];
             }
 
