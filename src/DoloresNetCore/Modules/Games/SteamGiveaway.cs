@@ -44,6 +44,35 @@ namespace Dolores.Modules.Games
             await misiaki.DefaultChannel.SendMessageAsync($"{winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {usersCount}. Gratulacje!");
         }
 
+        [Command("keyChannel")]
+        [Summary("Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników, w przypadku gdy nie")]
+        [RequireContext(ContextType.DM)]
+        public async Task KeyChannel(string key)
+        {
+            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
+
+            ulong userId = 0;
+            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
+            SocketGuildUser donor = misiaki.GetUser(Context.User.Id);
+            int userCount = donor.VoiceChannel.Users.Count - 1;
+            if (donor.VoiceChannel != null)
+            {
+                if (donor.VoiceChannel.Users.Count > 2)
+                {
+                    do
+                    {
+                        userId = donor.VoiceChannel.Users.ElementAt(m_Random.Next(0, userCount)).Id;
+                    } while (userId == Context.User.Id);
+                }
+            }
+
+            SocketGuildUser winningUser = misiaki.GetUser(userId);
+            IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
+            await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
+            await Context.Channel.SendMessageAsync($"Klucz wygrał(a): {winningUser.Mention} , udział brało {userCount} użytkowników.");
+            await misiaki.DefaultChannel.SendMessageAsync($"Spośród osób na kanale głosowym {winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {userCount}. Gratulacje!");
+        }
+
         [Command("listKey")]
         [Summary("Wpisuje liste osób zapisanych do losowania kluczy")]
         public async Task ListKey()
