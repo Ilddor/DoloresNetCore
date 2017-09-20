@@ -61,7 +61,9 @@ namespace Dolores.Modules.Games
             image.Save(fileOutput, codec, encoderParameters);
             fileOutput.Close();
 
-            await Context.Channel.SendFileAsync($"StatsPUBG/{name}.png");
+            Context.Message.DeleteAsync();
+            var channelPUBGStats = await Context.Guild.GetTextChannelAsync(359789815576788992);
+            await channelPUBGStats.SendFileAsync($"StatsPUBG/{name}.png");
         }
 
         private Bitmap RenderStats(PUBGSharp.Net.Model.StatsResponse stats, PUBGSharp.Data.Mode mode, StatType type)

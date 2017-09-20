@@ -26,7 +26,7 @@ namespace Dolores.Modules.Games
         }
 
         [Command("CSGO", RunMode = RunMode.Async)]
-        [Summary("Wyświetla staty danego gracza w CS:GO")]
+        [Summary("Wyświetla staty danego gracza w CS:GO (trzeba podac login steam zamiast nick)")]
         public async Task CSGOStats(string name)
         {
             string steamWebAPIKey = (Dolores.m_Instance.m_APIKeys.SteamWebAPIKey);
@@ -49,7 +49,9 @@ namespace Dolores.Modules.Games
             image.Save(fileOutput, codec, encoderParameters);
             fileOutput.Close();
 
-            await Context.Channel.SendFileAsync($"StatsCSGO/{name}.png");
+            Context.Message.DeleteAsync();
+            var channelCSGOStats = await Context.Guild.GetTextChannelAsync(360033939257032704);
+            await channelCSGOStats.SendFileAsync($"StatsCSGO/{name}.png");
         }
 
         private Bitmap RenderStats(Steam.DataObjects.PlayerStats stats, string name)

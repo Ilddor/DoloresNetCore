@@ -7,6 +7,7 @@ using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Discord;
 
 namespace Dolores
 {
@@ -36,6 +37,7 @@ namespace Dolores
 
             if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasCharPrefix('!', ref argPos))) return;
 
+            var typingState = message.Channel.EnterTypingState();
             var context = new CommandContext(m_Client, message);
             var result = await m_Commands.ExecuteAsync(context, argPos, m_Map);
 
@@ -46,6 +48,7 @@ namespace Dolores
                 else
                     await message.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
             }
+            typingState.Dispose();
         }
     }
 }
