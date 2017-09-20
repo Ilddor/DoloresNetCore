@@ -195,6 +195,18 @@ namespace Dolores.Modules.Misc
             banned.Ban(subreddit);
 
             await Context.Message.DeleteAsync();
+
+            var client = m_Map.GetService<DiscordSocketClient>();
+            var channel = client.GetChannel(272419366744883200) as ITextChannel;
+            var messages = channel.GetMessagesAsync(5);
+            await messages.ForEachAsync(async x =>
+            {
+                foreach (var it in x)
+                {
+                    if(it.Content.Contains(subreddit))
+                        it.DeleteAsync();
+                }
+            });
         }
     }
 }
