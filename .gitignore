@@ -5,4 +5,5 @@ src/DoloresNetCore/bin/*
 *.dat
 *.mp3
 *.ttf
-src/DoloresNetCore/PUBGStats/*
+src/DoloresNetCore/StatsPUBG/*
+src/DoloresNetCore/StatsCSGO/*

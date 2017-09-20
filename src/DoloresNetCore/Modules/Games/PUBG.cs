@@ -54,14 +54,14 @@ namespace Dolores.Modules.Games
 
             var image = RenderStats(stats, mode, type);
 
-            var fileOutput = File.Open($"PUBGStats/{name}.png", FileMode.OpenOrCreate);
+            var fileOutput = File.Open($"StatsPUBG/{name}.png", FileMode.OpenOrCreate);
             var encoderParameters = new EncoderParameters(1);
             encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
             var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
             image.Save(fileOutput, codec, encoderParameters);
             fileOutput.Close();
 
-            await Context.Channel.SendFileAsync($"PUBGStats/{name}.png");
+            await Context.Channel.SendFileAsync($"StatsPUBG/{name}.png");
         }
 
         private Bitmap RenderStats(PUBGSharp.Net.Model.StatsResponse stats, PUBGSharp.Data.Mode mode, StatType type)
