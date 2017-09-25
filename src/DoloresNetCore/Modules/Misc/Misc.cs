@@ -169,6 +169,7 @@ namespace Dolores.Modules.Misc
             //HttpResponseMessage page = await webClient.GetAsync($"https://www.reddit.com/r/{subreddits[random.Next(subreddits.Count)]}/new.json?sort=popular&limit=5");
             HttpResponseMessage page;
             string subreddit;
+            bool isBanned = false;
             do
             {
                 page = await webClient.GetAsync($"https://www.reddit.com/r/randnsfw/new.json?sort=popular&limit=5");
