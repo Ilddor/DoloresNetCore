@@ -19,7 +19,7 @@ namespace Dolores.Modules.Games
             m_Map = map;
         }
 
-        static public void Install(IServiceProvider map)
+        public static void Install(IServiceProvider map)
         {
             var client = map.GetService<DiscordSocketClient>();
             client.UserVoiceStateUpdated += Client_UserVoiceStateUpdated;

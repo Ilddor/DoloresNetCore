@@ -7,3 +7,4 @@ src/DoloresNetCore/bin/*
 *.ttf
 src/DoloresNetCore/StatsPUBG/*
 src/DoloresNetCore/StatsCSGO/*
+src/DoloresNetCore/RTResources/*

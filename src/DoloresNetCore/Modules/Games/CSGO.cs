@@ -42,7 +42,7 @@ namespace Dolores.Modules.Games
 
             var image = RenderStats(statsResponse["playerstats"], name);
 
-            var fileOutput = File.Open($"StatsCSGO/{name}.png", FileMode.OpenOrCreate);
+            var fileOutput = File.Open($"RTResources/Images/StatsCSGO/{name}.png", FileMode.OpenOrCreate);
             var encoderParameters = new EncoderParameters(1);
             encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
             var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
@@ -51,7 +51,7 @@ namespace Dolores.Modules.Games
 
             Context.Message.DeleteAsync();
             var channelCSGOStats = await Context.Guild.GetTextChannelAsync(360033939257032704);
-            await channelCSGOStats.SendFileAsync($"StatsCSGO/{name}.png");
+            await channelCSGOStats.SendFileAsync($"RTResources/Images/StatsCSGO/{name}.png");
         }
 
         private Bitmap RenderStats(Steam.DataObjects.PlayerStats stats, string name)
