@@ -258,7 +258,10 @@ namespace Dolores.Modules.Games
             for(int i = 0; i < stats.MatchHistory.Count; i++)
             {
                 if (stats.MatchHistory[i].Mode == otherTypeOfModeString)
+                {
                     lastMatch = stats.MatchHistory[i];
+                    break;
+                }
             }
 
             toRender.m_Title = $"Last Match";

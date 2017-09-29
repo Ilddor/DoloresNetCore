@@ -60,7 +60,6 @@ namespace Dolores.Modules.Games
                 graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
                 graphics.CompositingMode = CompositingMode.SourceOver;
 
-                // Fill red to easily spot errors
                 var regionAll = new Region(new Rectangle(0, 0, image.Width, image.Height));
                 graphics.FillRegion(Brushes.Black, regionAll);
 
