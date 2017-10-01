@@ -8,10 +8,12 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
+using Dolores.Modules.Social;
+using Dolores.EventHandlers;
 
 namespace Dolores
 {
-    class CommandHandler
+    class CommandHandler : IInstallable
     {
         public CommandService m_Commands;
         private DiscordSocketClient m_Client;

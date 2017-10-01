@@ -7,13 +7,14 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Addons;
 using Dolores.DataClasses;
+using Dolores.EventHandlers;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Misc
 {
-    public class Logging
+    public class LogHandler : IInstallable
     {
         private DiscordSocketClient m_Client;
         IServiceProvider m_Map;
@@ -29,7 +30,7 @@ namespace Dolores.Modules.Misc
         ulong m_GuildId = 269960016591716362;
         Data.DBConnection m_DBConnection;
 
-        public void Install(IServiceProvider map)
+        public Task Install(IServiceProvider map)
         {
             m_Map = map;
             m_Client = m_Map.GetService<DiscordSocketClient>();
@@ -86,6 +87,8 @@ namespace Dolores.Modules.Misc
             m_Client.UserJoined += UserJoined;
             m_Client.UserLeft += UserLeft;
             m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
+
+            return Task.CompletedTask;
         }
 
         private async Task UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)

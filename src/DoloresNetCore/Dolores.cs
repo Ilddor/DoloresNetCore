@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Reflection;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
@@ -18,6 +19,7 @@ using Dolores.Modules.Voice;
 using Dolores.Modules.Social;
 using Dolores.Modules.Misc;
 using Dolores.DataClasses;
+using Dolores.EventHandlers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores
@@ -60,9 +62,9 @@ namespace Dolores
                 if (Console.ReadKey(true).Key == ConsoleKey.D)
                 {
                     var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(357908791745839104);
-                    var message = await channel.GetMessageAsync(361966704860987404);
+                    var message = await channel.GetMessageAsync(363950355202965504);
                     var context = new CommandContext(Dolores.m_Instance.m_Client, (IUserMessage)message);
-                    await Dolores.m_Instance.m_CommandHandler.m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
+                    await ((CommandHandler)Dolores.m_Instance.m_Handlers.Find(x => x.GetType() == typeof(CommandHandler))).m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
                 }
             } while (true);
         }
@@ -108,24 +110,19 @@ namespace Dolores
         public DateTime m_StartTime = DateTime.Now;
         public int m_Version = 0;
         public bool m_Installed = false;
-        //public DependencyMap map = new DependencyMap();
         public IServiceProvider map;
 
         public APIKeys m_APIKeys;
 
         private DiscordSocketClient m_Client;
-        private CommandHandler m_CommandHandler;
 
         CreatedChannels  m_CreatedChannels;
-        Social           m_SocialModule;
-        ForeverAlone     m_ForeverAlone;
         SignedUsers      m_SignedUsers;
         GameTimes        m_GameTimes;
         Reactions        m_Reactions;
         Notifications    m_Notifications;
         BannedSubreddits m_BannedSubreddits;
-
-        Logging         m_Logging;
+        public List<IInstallable> m_Handlers;
 
         private IServiceProvider ConfigureServices()
         {
@@ -187,20 +184,16 @@ namespace Dolores
 
                 map = ConfigureServices();
 
-                GameChannels.Install(map);
-                GameTime.Install(map);
+                m_Handlers = new List<IInstallable>();
 
-                m_CommandHandler = new CommandHandler();
-                await m_CommandHandler.Install(map);
-
-                m_SocialModule = new Social(map);
-                m_SocialModule.Install(map);
-
-                m_ForeverAlone = new ForeverAlone();
-                m_ForeverAlone.Install(map);
-
-                m_Logging = new Logging();
-                m_Logging.Install(map);
+                foreach(var handler in Assembly.GetEntryAssembly().DefinedTypes)
+                {
+                    if(handler.ImplementedInterfaces.Contains(typeof(IInstallable)))
+                    {
+                        m_Handlers.Add((IInstallable)Activator.CreateInstance(handler));
+                        m_Handlers.Last().Install(map);
+                    }
+                }
 
                 m_Installed = true;
             }

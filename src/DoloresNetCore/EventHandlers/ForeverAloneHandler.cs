@@ -6,20 +6,23 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Dolores.EventHandlers;
 
 namespace Dolores.Modules.Social
 {
-    public class ForeverAlone
+    public class ForeverAloneHandler : IInstallable
     {
         private DiscordSocketClient m_Client;
         private IServiceProvider m_Map;
         private ulong m_UserIDToFollow = 131816357980405760;
 
-        public void Install(IServiceProvider map)
+        public Task Install(IServiceProvider map)
         {
             m_Client = map.GetService<DiscordSocketClient>();
             m_Map = map;
             m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
+
+            return Task.CompletedTask;
         }
 
         private async Task UserVoiceStateUpdated(SocketUser updatedUser, SocketVoiceState before, SocketVoiceState after)

@@ -41,69 +41,6 @@ namespace Dolores.Modules.Games
             await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png");
         }
 
-        public static void Install(IServiceProvider map)
-        {
-            var client = map.GetService<DiscordSocketClient>();
-            client.GuildMemberUpdated += GameChanged;
-        }
-
-        private static Task GameChanged(SocketGuildUser before, SocketGuildUser after)
-        {
-            var gameTimes = Dolores.m_Instance.map.GetService<GameTimes>();
-            if(after.Guild.Id == 269960016591716362)
-            {
-                if(before.Game.HasValue || !after.Game.HasValue)
-                {
-                    gameTimes.m_Mutex.WaitOne();
-                    try
-                    {
-                        if (gameTimes.m_StartTimes.ContainsKey(after.Id))
-                        {
-                            var timeSpent = DateTime.Now - gameTimes.m_StartTimes[after.Id].Item2;
-                            if (!gameTimes.m_Times.ContainsKey(after.Id))
-                                gameTimes.m_Times[after.Id] = new Dictionary<string, long>();
-
-                            if (!gameTimes.m_Times[after.Id].ContainsKey(gameTimes.m_StartTimes[after.Id].Item1))
-                                gameTimes.m_Times[after.Id][gameTimes.m_StartTimes[after.Id].Item1] = timeSpent.Ticks;
-                            else
-                                gameTimes.m_Times[after.Id][gameTimes.m_StartTimes[after.Id].Item1] += timeSpent.Ticks;
-
-                            gameTimes.m_StartTimes.Remove(after.Id);
-                        }
-                    }
-                    catch (Exception) { }
-                    gameTimes.m_Mutex.ReleaseMutex();
-                }
-
-                if(after.Game.HasValue)
-                {
-                    gameTimes.m_Mutex.WaitOne();
-                    try
-                    {
-                        if (gameTimes.m_StartTimes.ContainsKey(after.Id))
-                        {
-                            var timeSpent = DateTime.Now - gameTimes.m_StartTimes[after.Id].Item2;
-                            if (!gameTimes.m_Times.ContainsKey(after.Id))
-                                gameTimes.m_Times[after.Id] = new Dictionary<string, long>();
-
-                            if (!gameTimes.m_Times[after.Id].ContainsKey(gameTimes.m_StartTimes[after.Id].Item1))
-                                gameTimes.m_Times[after.Id][gameTimes.m_StartTimes[after.Id].Item1] = timeSpent.Ticks;
-                            else
-                                gameTimes.m_Times[after.Id][gameTimes.m_StartTimes[after.Id].Item1] += timeSpent.Ticks;
-
-                            gameTimes.m_StartTimes.Remove(after.Id);
-                        }
-
-                        gameTimes.m_StartTimes[after.Id] = new Tuple<string, DateTime>(after.Game.Value.Name, DateTime.Now);
-                    }
-                    catch (Exception) { }
-                    gameTimes.m_Mutex.ReleaseMutex();
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
         private Bitmap DrawBitmap()
         {
             var gameTimes = m_Map.GetService<GameTimes>();

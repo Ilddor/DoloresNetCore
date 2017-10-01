@@ -49,8 +49,15 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla staty danego gracza w PUBG")]
         public async Task PUBGStats(string name, PUBGSharp.Data.Mode mode, StatType type)
         {
+            /*HttpClient tmp = new HttpClient();
+            tmp.DefaultRequestHeaders.TryAddWithoutValidation("TRN-Api-Key", Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
+
+            var response = await tmp.GetAsync($"https://pubgtracker.com/api/profile/pc/{name}?region=AGG").ConfigureAwait(false);
+            var responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var result = JsonConvert.DeserializeObject<StatsResponse>(responseData);*/
+
             var statsClient = new PUBGStatsClient(Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
-            PUBGSharp.Net.Model.StatsResponse stats = await statsClient.GetPlayerStatsAsync(name);
+            var stats = await statsClient.GetPlayerStatsAsync(name);
 
             var image = RenderStats(stats, mode, type);
 

@@ -19,38 +19,6 @@ namespace Dolores.Modules.Games
             m_Map = map;
         }
 
-        public static void Install(IServiceProvider map)
-        {
-            var client = map.GetService<DiscordSocketClient>();
-            client.UserVoiceStateUpdated += Client_UserVoiceStateUpdated;
-        }
-
-        private static async Task Client_UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
-        {
-            if(before.VoiceChannel != after.VoiceChannel)
-            {
-                var createdChannels = Dolores.m_Instance.map.GetService<CreatedChannels>();
-                bool delete = false;
-                createdChannels.m_Mutex.WaitOne();
-                try
-                {
-                    if (createdChannels.m_Channels.ContainsKey(before.VoiceChannel.Id) && !before.VoiceChannel.Users.Any())
-                    {
-                        createdChannels.m_Channels.Remove(before.VoiceChannel.Id);
-                        delete = true;
-                    }
-                }
-                catch (Exception) { }
-                createdChannels.m_Mutex.ReleaseMutex();
-                if(delete)
-                {
-                    ITextChannel channel = await (user as IGuildUser).Guild.GetDefaultChannelAsync();
-                    await channel.SendMessageAsync($"Usuwam kanał gry: {before.VoiceChannel.Name}");
-                    await before.VoiceChannel.DeleteAsync();
-                }
-            }
-        }
-
         [Command("game")]
         [Summary("Tworzy kanał dla gry oraz przenosi wszystkich użytkowników z aktualnego kanału grających w tę samą gre co autor na nowy kanał")]
         private async Task GameStart(string mention = null)
