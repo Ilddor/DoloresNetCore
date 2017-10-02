@@ -64,7 +64,7 @@ namespace Dolores.Modules.Misc
         [Summary("Umożliwia sprawdzenie działania bota")]
         public async Task Ping()
         {
-            await Context.Channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription("Pong!"));
+            await Context.Channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription("Pong!").WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
         [Command("rawr")]
@@ -138,16 +138,18 @@ namespace Dolores.Modules.Misc
                 channel = (from chan in textChannels where chan.Mention == channelName select chan) as SocketTextChannel;
             }
             var messages = channel.GetMessagesAsync(count);
+            List<IMessage> forDelete = new List<IMessage>();
             await messages.ForEachAsync(async x =>
             {
                 foreach (var it in x)
                 {
                     if ((it.Author.Id == m_Map.GetService<DiscordSocketClient>().CurrentUser.Id) || allUsers)
                     {
-                        await it.DeleteAsync();
+                        forDelete.Add(it);
                     }
                 }
             });
+            channel.DeleteMessagesAsync(forDelete);
         }
 
         [Command("nsfw", RunMode = RunMode.Async)]
@@ -166,7 +168,6 @@ namespace Dolores.Modules.Misc
             var cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
             var webClient = new HttpClient(handler);
-            //HttpResponseMessage page = await webClient.GetAsync($"https://www.reddit.com/r/{subreddits[random.Next(subreddits.Count)]}/new.json?sort=popular&limit=5");
             HttpResponseMessage page;
             string subreddit;
             bool isBanned = false;
@@ -180,7 +181,7 @@ namespace Dolores.Modules.Misc
             JToken tmp = JsonConvert.DeserializeObject<JToken>(await reader.ReadToEndAsync());
             foreach(var child in tmp["data"]["children"])
             {
-                await channel.SendMessageAsync($"Subreddit: {subreddit} {child["data"]["url"]}");
+                channel.SendMessageAsync($"Subreddit: {subreddit} {child["data"]["url"]}");
             }
             await Context.Message.DeleteAsync();
         }
@@ -200,14 +201,17 @@ namespace Dolores.Modules.Misc
             var client = m_Map.GetService<DiscordSocketClient>();
             var channel = client.GetChannel(272419366744883200) as ITextChannel;
             var messages = channel.GetMessagesAsync(5);
+            List<IMessage> forDelete = new List<IMessage>();
             await messages.ForEachAsync(async x =>
             {
                 foreach (var it in x)
                 {
-                    if(it.Content.Contains(subreddit))
-                        it.DeleteAsync();
+                    if (it.Content.Contains(subreddit))
+                        forDelete.Add(it);
                 }
             });
+
+            channel.DeleteMessagesAsync(forDelete);
         }
     }
 }

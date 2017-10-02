@@ -62,7 +62,7 @@ namespace Dolores
                 if (Console.ReadKey(true).Key == ConsoleKey.D)
                 {
                     var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(272419366744883200);
-                    var message = await channel.GetMessageAsync(364501554713067520);
+                    var message = await channel.GetMessageAsync(364517733808865281);
                     var context = new CommandContext(Dolores.m_Instance.m_Client, (IUserMessage)message);
                     await ((CommandHandler)Dolores.m_Instance.m_Handlers.Find(x => x.GetType() == typeof(CommandHandler))).m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
                 }
