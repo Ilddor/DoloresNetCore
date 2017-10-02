@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Dolores.DataClasses
 {
-    public class APIKeys
+    public struct APIKeys
     {
         public string DiscordAPIKey { get; set; }
         public string RiotAPIKey { get; set; }
@@ -29,18 +29,17 @@ namespace Dolores.DataClasses
             catch (Exception) { }
         }
 
-        public static APIKeys LoadKeys()
+        public void LoadFromFile()
         {
             try
             {
                 using (Stream stream = File.Open("keys.dat", FileMode.Open))
                 {
                     var streamReader = new StreamReader(stream);
-                    return JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadLine());
+                    this = JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadLine());
                 }
             }
             catch (Exception) { }
-            return null;
         }
     }
 }

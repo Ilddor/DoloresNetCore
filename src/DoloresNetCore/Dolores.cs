@@ -61,8 +61,8 @@ namespace Dolores
             {
                 if (Console.ReadKey(true).Key == ConsoleKey.D)
                 {
-                    var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(357908791745839104);
-                    var message = await channel.GetMessageAsync(363950355202965504);
+                    var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(272419366744883200);
+                    var message = await channel.GetMessageAsync(364501554713067520);
                     var context = new CommandContext(Dolores.m_Instance.m_Client, (IUserMessage)message);
                     await ((CommandHandler)Dolores.m_Instance.m_Handlers.Find(x => x.GetType() == typeof(CommandHandler))).m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
                 }
@@ -137,13 +137,14 @@ namespace Dolores
             m_BannedSubreddits = new BannedSubreddits();
             LoadState();
 
+            services.AddSingleton(this);
             services.AddSingleton(m_CreatedChannels);
             services.AddSingleton(m_SignedUsers);
             services.AddSingleton(m_GameTimes);
             services.AddSingleton(m_Reactions);
             services.AddSingleton(m_Notifications);
             services.AddSingleton(m_BannedSubreddits);
-            services.AddSingleton(m_APIKeys);
+            //services.AddSingleton<APIKeys>(m_APIKeys);
 
             services.AddSingleton<Voice.AudioClientWrapper>();
 
@@ -162,7 +163,8 @@ namespace Dolores
 
             m_Client.Log += Log;
 
-            m_APIKeys = APIKeys.LoadKeys();
+            m_APIKeys = new APIKeys();
+            m_APIKeys.LoadFromFile();
 
             await m_Client.LoginAsync(TokenType.Bot, m_APIKeys.DiscordAPIKey);
             await m_Client.StartAsync();
@@ -214,6 +216,8 @@ namespace Dolores
             m_Notifications.SaveToFile();
             // Banned subreddits
             m_BannedSubreddits.SaveToFile();
+
+            m_APIKeys.SaveToFile();
 
             Voice.AudioClientWrapper audioClient = map.GetService<Voice.AudioClientWrapper>();
             if (audioClient.m_AudioClient != null)

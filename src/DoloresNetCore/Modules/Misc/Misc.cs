@@ -64,7 +64,7 @@ namespace Dolores.Modules.Misc
         [Summary("Umożliwia sprawdzenie działania bota")]
         public async Task Ping()
         {
-            await Context.Channel.SendMessageAsync("pong");
+            await Context.Channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription("Pong!"));
         }
 
         [Command("rawr")]
