@@ -11,19 +11,22 @@ namespace Dolores.EventHandlers
 {
     class GameChannelsHandler : IInstallable
     {
+        private IServiceProvider m_Map;
+
         public Task Install(IServiceProvider map)
         {
-            var client = map.GetService<DiscordSocketClient>();
+            m_Map = map;
+            var client = m_Map.GetService<DiscordSocketClient>();
             client.UserVoiceStateUpdated += Client_UserVoiceStateUpdated;
 
             return Task.CompletedTask;
         }
 
-        private static async Task Client_UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
+        private async Task Client_UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
         {
             if (before.VoiceChannel != after.VoiceChannel)
             {
-                var createdChannels = Dolores.m_Instance.map.GetService<CreatedChannels>();
+                var createdChannels = m_Map.GetService<CreatedChannels>();
                 bool delete = false;
                 createdChannels.m_Mutex.WaitOne();
                 try

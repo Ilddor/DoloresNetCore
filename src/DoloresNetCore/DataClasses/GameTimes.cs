@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Dolores.DataClasses
 {
-    public class GameTimes
+    public class GameTimes : IState
     {
         public Dictionary<ulong, Dictionary<string, long>> m_Times = new Dictionary<ulong, Dictionary<string, long>>();
         public Dictionary<ulong, Tuple<string, DateTime>> m_StartTimes = new Dictionary<ulong, Tuple<string, DateTime>>();
         public Mutex m_Mutex = new Mutex();
 
-        public void SaveToFile()
+        public void Save()
         {
             m_Mutex.WaitOne();
             try
@@ -32,7 +32,7 @@ namespace Dolores.DataClasses
             m_Mutex.ReleaseMutex();
         }
 
-        public void LoadFromFile()
+        public void Load()
         {
             m_Mutex.WaitOne();
             try

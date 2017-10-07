@@ -5,7 +5,7 @@ using System.Drawing;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Dolores;
+using Dolores.DataClasses;
 using PUBGSharp;
 using PUBGSharp.Exceptions;
 using PUBGSharp.Helpers;
@@ -18,12 +18,13 @@ using System.Drawing.Text;
 using System.Net.Http;
 using Newtonsoft.Json;
 using PUBGSharp.Net.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
     public class PUBG : ModuleBase
     {
-        IServiceProvider m_Map;
+        private IServiceProvider m_Map;
         public PUBG(IServiceProvider map)
         {
             m_Map = map;
@@ -56,7 +57,7 @@ namespace Dolores.Modules.Games
             var responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var result = JsonConvert.DeserializeObject<StatsResponse>(responseData);*/
 
-            var statsClient = new PUBGStatsClient(Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
+            var statsClient = new PUBGStatsClient(m_Map.GetService<APIKeys>().PUBGTrackerKey);
             var stats = await statsClient.GetPlayerStatsAsync(name);
 
             var image = RenderStats(stats, mode, type);

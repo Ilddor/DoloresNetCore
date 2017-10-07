@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dolores.DataClasses
 {
-    public class Notifications
+    public class Notifications : IState
     {
         private Dictionary<ulong, ulong> m_Notifications = new Dictionary<ulong, ulong>();
         private Mutex m_Mutex = new Mutex();
@@ -44,7 +44,7 @@ namespace Dolores.DataClasses
             return result;
         }
 
-        public void SaveToFile()
+        public void Save()
         {
             m_Mutex.WaitOne();
             try
@@ -61,7 +61,7 @@ namespace Dolores.DataClasses
             m_Mutex.ReleaseMutex();
         }
 
-        public void LoadFromFile()
+        public void Load()
         {
             m_Mutex.WaitOne();
             try

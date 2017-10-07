@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Dolores.DataClasses
 {
-    public class CreatedChannels
+    public class CreatedChannels : IState
     {
         public Dictionary<ulong, bool> m_Channels = new Dictionary<ulong, bool>();
         public Mutex m_Mutex = new Mutex();
         
-        public void SaveToFile()
+        public void Save()
         {
             m_Mutex.WaitOne();
             try
@@ -32,7 +32,7 @@ namespace Dolores.DataClasses
             m_Mutex.ReleaseMutex();
         }
 
-        public void LoadFromFile()
+        public void Load()
         {
             m_Mutex.WaitOne();
             try

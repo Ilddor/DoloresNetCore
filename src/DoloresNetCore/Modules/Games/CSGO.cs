@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Dolores;
 using System.Net.Http;
 using System.IO;
 using Newtonsoft.Json;
@@ -14,6 +13,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Net;
+using Dolores.DataClasses;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
@@ -29,7 +30,7 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla staty danego gracza w CS:GO (trzeba podac login steam zamiast nick)")]
         public async Task CSGOStats(string name)
         {
-            string steamWebAPIKey = (Dolores.m_Instance.m_APIKeys.SteamWebAPIKey);
+            string steamWebAPIKey = (m_Map.GetService<APIKeys>().SteamWebAPIKey);
 
             var webClient = new HttpClient();
             HttpResponseMessage steamIDResponse = await webClient.GetAsync($"http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key={steamWebAPIKey}&vanityurl={name}");

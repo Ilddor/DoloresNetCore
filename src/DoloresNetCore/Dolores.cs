@@ -64,7 +64,7 @@ namespace Dolores
                     var channel = (ITextChannel)Dolores.m_Instance.m_Client.GetChannel(272419366744883200);
                     var message = await channel.GetMessageAsync(364517733808865281);
                     var context = new CommandContext(Dolores.m_Instance.m_Client, (IUserMessage)message);
-                    await ((CommandHandler)Dolores.m_Instance.m_Handlers.Find(x => x.GetType() == typeof(CommandHandler))).m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.map);
+                    await ((CommandHandler)Dolores.m_Instance.m_Handlers.Find(x => x.GetType() == typeof(CommandHandler))).m_Commands.ExecuteAsync(context, 1, Dolores.m_Instance.m_Map);
                 }
             } while (true);
         }
@@ -110,41 +110,24 @@ namespace Dolores
         public DateTime m_StartTime = DateTime.Now;
         public int m_Version = 0;
         public bool m_Installed = false;
-        public IServiceProvider map;
-
-        public APIKeys m_APIKeys;
+        public IServiceProvider m_Map;
 
         private DiscordSocketClient m_Client;
 
-        CreatedChannels  m_CreatedChannels;
-        SignedUsers      m_SignedUsers;
-        GameTimes        m_GameTimes;
-        Reactions        m_Reactions;
-        Notifications    m_Notifications;
-        BannedSubreddits m_BannedSubreddits;
-        public List<IInstallable> m_Handlers;
+        private List<IInstallable> m_Handlers;
+        private List<IState> m_DataContainers;
 
         private IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
             services.AddSingleton(m_Client);
 
-            m_CreatedChannels = new CreatedChannels();
-            m_SignedUsers = new SignedUsers();
-            m_GameTimes = new GameTimes();
-            m_Reactions = new Reactions();
-            m_Notifications = new Notifications();
-            m_BannedSubreddits = new BannedSubreddits();
-            LoadState();
-
             services.AddSingleton(this);
-            services.AddSingleton(m_CreatedChannels);
-            services.AddSingleton(m_SignedUsers);
-            services.AddSingleton(m_GameTimes);
-            services.AddSingleton(m_Reactions);
-            services.AddSingleton(m_Notifications);
-            services.AddSingleton(m_BannedSubreddits);
-            //services.AddSingleton<APIKeys>(m_APIKeys);
+
+            foreach(var dataClass in m_DataContainers)
+            {
+                services.AddSingleton(dataClass.GetType(), dataClass);
+            }
 
             services.AddSingleton<Voice.AudioClientWrapper>();
 
@@ -163,10 +146,11 @@ namespace Dolores
 
             m_Client.Log += Log;
 
-            m_APIKeys = new APIKeys();
-            m_APIKeys.LoadFromFile();
+            LoadState();
 
-            await m_Client.LoginAsync(TokenType.Bot, m_APIKeys.DiscordAPIKey);
+            m_Map = ConfigureServices();
+
+            await m_Client.LoginAsync(TokenType.Bot, m_Map.GetService<APIKeys>().DiscordAPIKey);
             await m_Client.StartAsync();
 
             m_Client.Connected += Connected;
@@ -184,16 +168,14 @@ namespace Dolores
                 Directory.CreateDirectory("RTResources/Images/StatsPUBG");
                 Directory.CreateDirectory("RTResources/Images/StatsCSGO");
 
-                map = ConfigureServices();
-
+                // Create and install all IInstallable modules
                 m_Handlers = new List<IInstallable>();
-
                 foreach(var handler in Assembly.GetEntryAssembly().DefinedTypes)
                 {
                     if(handler.ImplementedInterfaces.Contains(typeof(IInstallable)))
                     {
                         m_Handlers.Add((IInstallable)Activator.CreateInstance(handler));
-                        m_Handlers.Last().Install(map);
+                        m_Handlers.Last().Install(m_Map);
                     }
                 }
 
@@ -204,22 +186,13 @@ namespace Dolores
         public async Task SaveState()
         {
             await m_Client.SetStatusAsync(UserStatus.Invisible);
-            // Channels
-            m_CreatedChannels.SaveToFile();
-            // Signed Users
-            m_SignedUsers.SaveToFile();
-            // Game Times
-            m_GameTimes.SaveToFile();
-            // Reactions
-            m_Reactions.SaveToFile();
-            // Notifications
-            m_Notifications.SaveToFile();
-            // Banned subreddits
-            m_BannedSubreddits.SaveToFile();
 
-            m_APIKeys.SaveToFile();
+            foreach(var dataClass in m_DataContainers)
+            {
+                dataClass.Save();
+            }
 
-            Voice.AudioClientWrapper audioClient = map.GetService<Voice.AudioClientWrapper>();
+            Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.AudioClientWrapper>();
             if (audioClient.m_AudioClient != null)
             {
                 await audioClient.m_AudioClient.StopAsync();
@@ -230,18 +203,16 @@ namespace Dolores
 
         public void LoadState()
         {
-            // Channels
-            m_CreatedChannels.LoadFromFile();
-            // Signed Users
-            m_SignedUsers.LoadFromFile();
-            // Game Times
-            m_GameTimes.LoadFromFile();
-            // Reactions
-            m_Reactions.LoadFromFile();
-            // Notifications
-            m_Notifications.LoadFromFile();
-            // Banned subreddits
-            m_BannedSubreddits.LoadFromFile();
+            // Create and load all DataClasses implementing IState
+            m_DataContainers = new List<IState>();
+            foreach (var handler in Assembly.GetEntryAssembly().DefinedTypes)
+            {
+                if (handler.ImplementedInterfaces.Contains(typeof(IState)))
+                {
+                    m_DataContainers.Add((IState)Activator.CreateInstance(handler));
+                    m_DataContainers.Last().Load();
+                }
+            }
 
             try
             {

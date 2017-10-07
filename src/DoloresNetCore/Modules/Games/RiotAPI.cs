@@ -29,20 +29,23 @@ namespace Dolores.Modules.Games
         {
             public ChampionList m_ChampionList;
 
-            public ChampionListWrapper()
+            public ChampionListWrapper(string apiKey)
             {
-                Task<ChampionList> task = APICalls.GetChampions(null);
+                Task<ChampionList> task = APICalls.GetChampions(null, apiKey);
                 task.Wait();
                 m_ChampionList = task.Result;
             }
+
+            private ChampionListWrapper() { }
         }
 
         ChampionListWrapper m_ChampionList;
 
         // Rework this function!
-        private async Task GetChampionList()
+        private async Task GetChampionList(string apiKey)
         {
-            m_ChampionList = m_Map.GetService<ChampionListWrapper>();
+            //m_ChampionList = m_Map.GetService<ChampionListWrapper>();
+            m_ChampionList = new ChampionListWrapper(apiKey);
             /*if(!m_Map.TryGet(out m_ChampionList))
             {
                 m_ChampionList = await APICalls.GetChampions(null);
@@ -69,7 +72,8 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla lore podanego bohatera z League of Legends")]
         public async Task ShowLore(string championName = null)
         {
-            await GetChampionList();
+            string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;
+            await GetChampionList(apiKey);
             //m_ChampionList = await APICalls.GetChampions(null);
 
             if (m_ChampionList.m_ChampionList.Data.ContainsKey(championName))
@@ -86,7 +90,8 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla lore podanego bohatera z League of Legends")]
         public async Task ShowSkills(string championName = null)
         {
-            await GetChampionList();
+            string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;
+            await GetChampionList(apiKey);
             //m_ChampionList = await APICalls.GetChampions(null);
 
             if (m_ChampionList.m_ChampionList.Data.ContainsKey(championName))
@@ -152,7 +157,8 @@ namespace Dolores.Modules.Games
         [Summary("Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
         public async Task ShowEnemyLoL(string summonerName = null)
         {
-            await GetChampionList();
+            string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;
+            await GetChampionList(apiKey);
             //m_ChampionList = await APICalls.GetChampions(null);
 
             if (summonerName == null)
@@ -160,13 +166,13 @@ namespace Dolores.Modules.Games
             else
                 summonerName = summonerName.Replace("\"", "").Replace(" ", "");
 
-            var summonerObj = await APICalls.GetSummoner(Context.Channel, summonerName);
+            var summonerObj = await APICalls.GetSummoner(Context.Channel, apiKey, summonerName);
             if (summonerObj == null)
                 return;
             //long summonerId = long.Parse(summonerObj.First.First["id"].ToString());
             long summonerId = summonerObj[summonerName.ToLower()].ID;
 
-            var curGameObj = await APICalls.GetCurrentGame(summonerId, Context.Channel);
+            var curGameObj = await APICalls.GetCurrentGame(summonerId, Context.Channel, apiKey);
             if (curGameObj == null)
                 return;
 
@@ -180,7 +186,7 @@ namespace Dolores.Modules.Games
                 inMatchIDs[participant.SummonerID] = participant.SummonerName;
             }
 
-            var leaguesObj = await APICalls.GetLeagues(summonerIDs.ToArray());
+            var leaguesObj = await APICalls.GetLeagues(apiKey, summonerIDs.ToArray());
             List<int> teams = new List<int>();
             teams.Add(100);
             teams.Add(200);
@@ -241,7 +247,7 @@ namespace Dolores.Modules.Games
 
         private class APICalls
         {
-            public static async Task<Dictionary<string, List<League>>> GetLeagues(params string[] summonerIDs)
+            public static async Task<Dictionary<string, List<League>>> GetLeagues(string apiKey, params string[] summonerIDs)
             {
                 var webClient = new HttpClient();
 
@@ -250,15 +256,15 @@ namespace Dolores.Modules.Games
                     idString += summonerID + ",";
                 idString = idString.Substring(0, idString.Length - 1);
 
-                HttpResponseMessage leagues = await webClient.GetAsync($"https://eune.api.pvp.net/api/lol/EUNE/v2.5/league/by-summoner/{idString}/entry?api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                HttpResponseMessage leagues = await webClient.GetAsync($"https://eune.api.pvp.net/api/lol/EUNE/v2.5/league/by-summoner/{idString}/entry?api_key={apiKey}");
                 var reader = new StreamReader(await leagues.Content.ReadAsStreamAsync());
                 return JsonConvert.DeserializeObject<Dictionary<string, List<League>>>(await reader.ReadToEndAsync());
             }
 
-            public static async Task<CurrentGameInfo> GetCurrentGame(long summonerId, IMessageChannel log)
+            public static async Task<CurrentGameInfo> GetCurrentGame(long summonerId, IMessageChannel log, string apiKey)
             {
                 var webClient = new HttpClient();
-                HttpResponseMessage game = await webClient.GetAsync($"https://eune.api.riotgames.com/observer-mode/rest/consumer/getSpectatorGameInfo/EUN1/{summonerId}?api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                HttpResponseMessage game = await webClient.GetAsync($"https://eune.api.riotgames.com/observer-mode/rest/consumer/getSpectatorGameInfo/EUN1/{summonerId}?api_key={apiKey}");
                 if (game.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     await log.SendMessageAsync("Nie grasz aktualnie w żadnym meczu");
@@ -268,7 +274,7 @@ namespace Dolores.Modules.Games
                 return JsonConvert.DeserializeObject<CurrentGameInfo>(await reader.ReadToEndAsync());
             }
 
-            public static async Task<Dictionary<string, Summoner>> GetSummoner(IMessageChannel log, params string[] summonerNames)
+            public static async Task<Dictionary<string, Summoner>> GetSummoner(IMessageChannel log, string apiKey, params string[] summonerNames)
             {
                 var webClient = new HttpClient();
 
@@ -277,7 +283,7 @@ namespace Dolores.Modules.Games
                     nameString += summonerName + ",";
                 nameString = nameString.Substring(0, nameString.Length - 1);
 
-                HttpResponseMessage summoner = await webClient.GetAsync($"https://eune.api.pvp.net/api/lol/eune/v1.4/summoner/by-name/{nameString}?api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                HttpResponseMessage summoner = await webClient.GetAsync($"https://eune.api.pvp.net/api/lol/eune/v1.4/summoner/by-name/{nameString}?api_key={apiKey}");
                 if (summoner.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     await log.SendMessageAsync("Nie znam twojej nazwy przywoływacza lub jest ona nieprawidłowa");
@@ -287,11 +293,11 @@ namespace Dolores.Modules.Games
                 return JsonConvert.DeserializeObject<Dictionary<string,Summoner>>(await reader.ReadToEndAsync());
             }
 
-            public static async Task<ChampionList> GetChampions(IMessageChannel log)
+            public static async Task<ChampionList> GetChampions(IMessageChannel log, string apiKey)
             {
                 var webClient = new HttpClient();
 
-                HttpResponseMessage summoner = await webClient.GetAsync($"https://eun1.api.riotgames.com/lol/static-data/v3/champions?champData=all&locale=pl_PL&api_key={Dolores.m_Instance.m_APIKeys.RiotAPIKey}");
+                HttpResponseMessage summoner = await webClient.GetAsync($"https://eun1.api.riotgames.com/lol/static-data/v3/champions?champData=all&locale=pl_PL&api_key={apiKey}");
                 if (summoner.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     await log.SendMessageAsync("Błąd przy pobieraniu championów z serwera API Riot");

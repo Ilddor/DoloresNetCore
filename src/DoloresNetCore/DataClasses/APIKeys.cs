@@ -4,17 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using System.Reflection;
 
 namespace Dolores.DataClasses
 {
-    public struct APIKeys
+    public class APIKeys : IState
     {
         public string DiscordAPIKey { get; set; }
         public string RiotAPIKey { get; set; }
         public string PUBGTrackerKey { get; set; }
         public string SteamWebAPIKey { get; set; }
 
-        public void SaveToFile()
+        public void Save()
         {
             try
             {
@@ -29,14 +30,21 @@ namespace Dolores.DataClasses
             catch (Exception) { }
         }
 
-        public void LoadFromFile()
+        public void Load()
         {
             try
             {
                 using (Stream stream = File.Open("keys.dat", FileMode.Open))
                 {
                     var streamReader = new StreamReader(stream);
-                    this = JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadLine());
+                    var tmp = JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadLine());
+                    // Is here a better way to do this?
+                    Type t = this.GetType();
+                    PropertyInfo[] properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    foreach(var prop in properties)
+                    {
+                        prop.SetValue(this, prop.GetValue(tmp));
+                    }
                 }
             }
             catch (Exception) { }

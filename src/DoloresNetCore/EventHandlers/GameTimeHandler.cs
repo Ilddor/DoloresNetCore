@@ -10,9 +10,12 @@ namespace Dolores.EventHandlers
 {
     class GameTimeHandler : IInstallable
     {
+        private IServiceProvider m_Map;
+
         public Task Install(IServiceProvider map)
         {
-            var client = map.GetService<DiscordSocketClient>();
+            m_Map = map;
+            var client = m_Map.GetService<DiscordSocketClient>();
             client.GuildMemberUpdated += GameChanged;
 
             return Task.CompletedTask;
@@ -20,7 +23,7 @@ namespace Dolores.EventHandlers
 
         private Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
-            var gameTimes = Dolores.m_Instance.map.GetService<GameTimes>();
+            var gameTimes = m_Map.GetService<GameTimes>();
             if (after.Guild.Id == 269960016591716362)
             {
                 if (before.Game.HasValue || !after.Game.HasValue)
