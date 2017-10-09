@@ -113,10 +113,12 @@ namespace Dolores.Modules.Voice
         [LangSummary(LanguageDictionary.Language.EN, "When a youtube link is given, bot will start to play a song from that link")]
         private async Task Play(string url)
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             AudioClientWrapper tmp = m_Map.GetService<AudioClientWrapper>();
             if (tmp.m_Playing)
             {
-                await Context.Channel.SendMessageAsync("Aktualnie odtwarzana jest muzyka, kolejka nie jest jeszcze wspierana, by zmienic utwór wpisz najpierw !stopPlay");
+                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.CurrentlyPlaying, guildConfig.Lang)}");
                 return;
             }
 
@@ -138,7 +140,7 @@ namespace Dolores.Modules.Voice
             }
 
             
-            await Context.Channel.SendMessageAsync("Właczam odtwarzanie");
+            await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.StartingPlaying, guildConfig.Lang)}");
             {
                 var ffmpeg = CreateStream(name);
                 tmp.m_Process = ffmpeg;
@@ -148,7 +150,7 @@ namespace Dolores.Modules.Voice
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync("Koniec utworu");
+                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.SongEnd, guildConfig.Lang)}");
             }
         }
 
@@ -157,13 +159,15 @@ namespace Dolores.Modules.Voice
         [LangSummary(LanguageDictionary.Language.EN, "Stops playing current song")]
         private async Task StopPlay()
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             AudioClientWrapper audioWrapper = m_Map.GetService<AudioClientWrapper>();
             if (audioWrapper.m_Process != null)
             {
                 //process.m_Process.Dispose();
                 //process.m_Process.StandardInput.WriteLine("\x3");
                 audioWrapper.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync($"Przerywam odtwarzanie, proces sie zakonczyl: {audioWrapper.m_Process.HasExited}");
+                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.StoppingPlaying, guildConfig.Lang)}: {audioWrapper.m_Process.HasExited}");
             }
         }
 

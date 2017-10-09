@@ -128,6 +128,8 @@ namespace Dolores.Modules.Misc
         [LangSummary(LanguageDictionary.Language.EN, "Draws random numbers for each person in your voice channel and shows it in descending order")]
         private async Task RollChannel()
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             SortedDictionary<int, string> results = new SortedDictionary<int, string>();
             int roll = 0;
             foreach (SocketGuildUser user in (Context.User as SocketGuildUser).VoiceChannel.Users)
@@ -140,7 +142,7 @@ namespace Dolores.Modules.Misc
 
                 results.Add(roll, user.Mention);
             }
-            string message = "Wyniki:\n";
+            string message = $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Results, guildConfig.Lang)}:\n";
             foreach (var it in results.OrderByDescending(x => x.Key))
             {
                 message += $"{it.Value}: {it.Key}\n";

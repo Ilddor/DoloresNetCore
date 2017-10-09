@@ -17,6 +17,15 @@ namespace Dolores.DataClasses
             AvailableCommands,
             TimeOnline,
             Version,
+            Results,
+            UnknownCommand,
+            CurrentlyPlaying,
+            StartingPlaying,
+            SongEnd,
+            StoppingPlaying,
+            Moving,
+            ToChannel,
+            RemovingChannel,
         }
 
         private static Dictionary<LangString, Dictionary<Language, string>> m_Dict = new Dictionary<LangString, Dictionary<Language, string>>();
@@ -55,6 +64,60 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Wersja" },
                         { Language.EN, "Version" },
+                    }
+                },
+                { LangString.Results, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Wyniki" },
+                        { Language.EN, "Results" },
+                    }
+                },
+                { LangString.UnknownCommand, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Niczego mi to nie przypomina" },
+                        { Language.EN, "Doesn't look like anything to me" },
+                    }
+                },
+                { LangString.CurrentlyPlaying, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Aktualnie odtwarzana jest muzyka, kolejka nie jest jeszcze wspierana, by zmienic utwór wpisz najpierw !stopPlay" },
+                        { Language.EN, "Currently playing a song, queue is not yet supported, to change song use !stopPlay before" },
+                    }
+                },
+                { LangString.StartingPlaying, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Właczam odtwarzanie" },
+                        { Language.EN, "starting playing" },
+                    }
+                },
+                { LangString.SongEnd, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Koniec utworu" },
+                        { Language.EN, "Song end" },
+                    }
+                },
+                { LangString.StoppingPlaying, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Przerywam odtwarzanie, proces sie zakonczyl" },
+                        { Language.EN, "Stopping playing, process has ended" },
+                    }
+                },
+                { LangString.Moving, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Przenoszę" },
+                        { Language.EN, "Moving" },
+                    }
+                },
+                { LangString.ToChannel, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "na kanał gry" },
+                        { Language.EN, "to game voice channel" },
+                    }
+                },
+                { LangString.RemovingChannel, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Usuwam kanał gry" },
+                        { Language.EN, "Removing game voice channel" },
                     }
                 },
             };

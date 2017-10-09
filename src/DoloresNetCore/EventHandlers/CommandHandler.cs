@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Dolores.Modules.Social;
 using Dolores.EventHandlers;
+using Dolores.DataClasses;
 
 namespace Dolores
 {
@@ -47,10 +48,13 @@ namespace Dolores
             var context = new CommandContext(m_Client, message);
             var result = await m_Commands.ExecuteAsync(context, argPos, m_Map);
 
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(context.Guild.Id);
+
             if (!result.IsSuccess)
             {
                 if(result.ErrorReason == "Unknown command.")
-                    await message.Channel.SendMessageAsync($"Niczego mi to nie przypomina");
+                    await message.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.UnknownCommand, guildConfig.Lang)}");
                 else
                     await message.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
             }

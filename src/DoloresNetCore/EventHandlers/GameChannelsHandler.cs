@@ -24,6 +24,8 @@ namespace Dolores.EventHandlers
 
         private async Task Client_UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig((user as IGuildUser).Guild.Id);
             if (before.VoiceChannel != after.VoiceChannel)
             {
                 var createdChannels = m_Map.GetService<CreatedChannels>();
@@ -42,7 +44,7 @@ namespace Dolores.EventHandlers
                 if (delete)
                 {
                     ITextChannel channel = await (user as IGuildUser).Guild.GetDefaultChannelAsync();
-                    await channel.SendMessageAsync($"Usuwam kanał gry: {before.VoiceChannel.Name}");
+                    await channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.RemovingChannel, guildConfig.Lang)}: {before.VoiceChannel.Name}");
                     await before.VoiceChannel.DeleteAsync();
                 }
             }

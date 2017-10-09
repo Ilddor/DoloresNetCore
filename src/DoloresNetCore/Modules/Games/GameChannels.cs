@@ -25,6 +25,8 @@ namespace Dolores.Modules.Games
         [LangSummary(LanguageDictionary.Language.EN, "Creates voice game channel and moves there all users from your voice channel that play the same game")]
         private async Task GameStart(string mention = null)
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             SocketUser callingUser = Context.User as SocketUser;
             if (Context.User.Username == "Ilddor" && mention != null) // change user if someone else mentioned
             {
@@ -33,7 +35,7 @@ namespace Dolores.Modules.Games
 
             if (callingUser.Game.HasValue)
             {
-                string message = $"Przenoszę: {callingUser.Username}";
+                string message = $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Moving, guildConfig.Lang)}: {callingUser.Username}";
                 bool success = true;
                 IVoiceChannel newChannel = await Context.Guild.CreateVoiceChannelAsync(callingUser.Game.Value.Name);
                 try
@@ -49,7 +51,7 @@ namespace Dolores.Modules.Games
                             await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
                         }
                     }
-                    message += $" na kanał gry {callingUser.Game.Value.Name}";
+                    message += $" {LanguageDictionary.GetString(LanguageDictionary.LangString.ToChannel, guildConfig.Lang)} {callingUser.Game.Value.Name}";
                     foreach (var it in moves)
                     {
                         it.Wait();
