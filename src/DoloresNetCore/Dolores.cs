@@ -201,7 +201,7 @@ namespace Dolores
             await m_Client.StopAsync();
         }
 
-        public void LoadState()
+        private void LoadState()
         {
             // Create and load all DataClasses implementing IState
             m_DataContainers = new List<IState>();

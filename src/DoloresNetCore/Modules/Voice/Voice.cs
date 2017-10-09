@@ -9,6 +9,8 @@ using Discord.WebSocket;
 using Discord.Audio;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 
 namespace Dolores.Modules.Voice
 {
@@ -72,7 +74,8 @@ namespace Dolores.Modules.Voice
         }
 
         [Command("joinAudio", RunMode = RunMode.Async)]
-        [Summary("Powoduje że bot dołącza do twojego kanału głosowego")]
+        [LangSummary(LanguageDictionary.Language.PL, "Powoduje że bot dołącza do twojego kanału głosowego")]
+        [LangSummary(LanguageDictionary.Language.EN, "Bot will join your voice channel")]
         private async Task JoinAudio()
         {
             IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
@@ -80,14 +83,16 @@ namespace Dolores.Modules.Voice
         }
 
         [Command("leaveAudio", RunMode = RunMode.Async)]
-        [Summary("Powoduje że bot wychodzi z kanału głosowego")]
+        [LangSummary(LanguageDictionary.Language.PL, "Powoduje że bot wychodzi z kanału głosowego")]
+        [LangSummary(LanguageDictionary.Language.EN, "Bot will leave voice channel")]
         private async Task LeaveAudio()
         {
             await m_Map.GetService<AudioClientWrapper>().LeaveVoiceChannel(m_Map);
         }
 
         [Command("westworld", RunMode = RunMode.Async)]
-        [Summary("Odtawrza Westworld Main Theme")]
+        [LangSummary(LanguageDictionary.Language.PL, "Odtawrza Westworld Main Theme")]
+        [LangSummary(LanguageDictionary.Language.EN, "Plays Westworld Main Theme")]
         private async Task Westworld()
         {
             {
@@ -104,7 +109,8 @@ namespace Dolores.Modules.Voice
         }
 
         [Command("play", RunMode = RunMode.Async)]
-        [Summary("Podaj link jako parametr, a zagra muzyke z tego linka(youtube)")]
+        [LangSummary(LanguageDictionary.Language.PL, "Podaj link jako parametr, a zagra muzyke z tego linka(youtube)")]
+        [LangSummary(LanguageDictionary.Language.EN, "When a youtube link is given, bot will start to play a song from that link")]
         private async Task Play(string url)
         {
             AudioClientWrapper tmp = m_Map.GetService<AudioClientWrapper>();
@@ -147,7 +153,8 @@ namespace Dolores.Modules.Voice
         }
 
         [Command("stopPlay")]
-        [Summary("Przerywa wykonywanie aktualnego utworu jeśli jest odtwarzany")]
+        [LangSummary(LanguageDictionary.Language.PL, "Przerywa wykonywanie aktualnego utworu jeśli jest odtwarzany")]
+        [LangSummary(LanguageDictionary.Language.EN, "Stops playing current song")]
         private async Task StopPlay()
         {
             AudioClientWrapper audioWrapper = m_Map.GetService<AudioClientWrapper>();

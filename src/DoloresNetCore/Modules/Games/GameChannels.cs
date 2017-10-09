@@ -7,6 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
@@ -20,7 +21,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("game")]
-        [Summary("Tworzy kanał dla gry oraz przenosi wszystkich użytkowników z aktualnego kanału grających w tę samą gre co autor na nowy kanał")]
+        [LangSummary(LanguageDictionary.Language.PL, "Tworzy kanał dla gry oraz przenosi wszystkich użytkowników z aktualnego kanału grających w tę samą gre co autor na nowy kanał")]
+        [LangSummary(LanguageDictionary.Language.EN, "Creates voice game channel and moves there all users from your voice channel that play the same game")]
         private async Task GameStart(string mention = null)
         {
             SocketUser callingUser = Context.User as SocketUser;

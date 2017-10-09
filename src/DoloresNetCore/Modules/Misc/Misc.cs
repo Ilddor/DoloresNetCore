@@ -33,22 +33,40 @@ namespace Dolores.Modules.Misc
 
         [Command("help")]
         [Alias("analiza")]
-        [Summary("Wyświetla ten tekst, dodając komendę jako parametr wyświetli dokładniejszy opis lub użycie")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla ten tekst, dodając komendę jako parametr wyświetli dokładniejszy opis lub użycie")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows this text, when you add command as a parameter it should show more detailed description of a command")]
         public async Task Help(string command = null)
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             if (command == null)
             {
-                string message = "Dostępne komendy:\n";
+                var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
+                embedMessage.WithTitle($"{LanguageDictionary.GetString(LanguageDictionary.LangString.AvailableCommands, guildConfig.Lang)}:\n");
+                string message = ""; // $"{LanguageDictionary.GetString(LanguageDictionary.LangString.AvailableCommands, guildConfig.Lang)}:\n";
                 foreach (var it in m_Commands.Commands)
                 {
                     if (!it.Preconditions.Any(x => x is HiddenAttribute))
-                        message += $" -`!{it.Name}`    - {it.Summary}\n";
+                    {
+                        message += $" -`!{it.Name}`    - ";
+                        Func<Attribute, bool> languageSummaryLambda = 
+                            (Attribute x) =>
+                            {
+                                return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == guildConfig.Lang;
+                            };
+                        if (it.Attributes.Any(languageSummaryLambda))
+                            message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
+                        message += "\n";
+                    }
                 }
-                message += $"\n\n";
+                embedMessage.WithDescription(message);
+
+                message = "";
                 var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
-                message += $"Czas online(bota): {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
-                message += $"Wersja: {Dolores.m_Instance.m_Version}\n";
-                await Context.Channel.SendMessageAsync(message);
+                message += $"{LanguageDictionary.GetString(LanguageDictionary.LangString.TimeOnline, guildConfig.Lang)}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
+                message += $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Version, guildConfig.Lang)}: {Dolores.m_Instance.m_Version}\n";
+                embedMessage.WithFooter(message);
+                await Context.Channel.SendMessageAsync("", embed: embedMessage);
             }
             else
             {
@@ -60,8 +78,22 @@ namespace Dolores.Modules.Misc
             }
         }
 
+        [Command("setLang")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić język jakim będzie posługiwać się bot na tym serwerze")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set language in which bot will operate on this server")]
+        public async Task SetLang(LanguageDictionary.Language lang)
+        {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+            guildConfig.Lang = lang;
+
+            configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+        }
+
         [Command("ping")]
-        [Summary("Umożliwia sprawdzenie działania bota")]
+        [LangSummary(LanguageDictionary.Language.PL, "Umożliwia sprawdzenie działania bota")]
+        [LangSummary(LanguageDictionary.Language.EN, "Checks if bot works")]
         public async Task Ping()
         {
             await Context.Channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription("Pong!").WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
@@ -84,14 +116,16 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("roll")]
-        [Summary("Losuje liczbę z podanego przedziału (100 jeśli nie zdefiniowano)")]
+        [LangSummary(LanguageDictionary.Language.PL, "Losuje liczbę z podanego przedziału (100 jeśli nie zdefiniowano)")]
+        [LangSummary(LanguageDictionary.Language.EN, "Draws a number from the given range (100 default)")]
         private async Task Roll(int max = 100)
         {
             await Context.Channel.SendMessageAsync($"{Context.User.Username}: {m_Random.Next(0, max)}");
         }
 
         [Command("rollChannel")]
-        [Summary("Losuje liczby dla całego kanału głosowego oraz wyświetla je w kolejności malejącej")]
+        [LangSummary(LanguageDictionary.Language.PL, "Losuje liczby dla całego kanału głosowego oraz wyświetla je w kolejności malejącej")]
+        [LangSummary(LanguageDictionary.Language.EN, "Draws random numbers for each person in your voice channel and shows it in descending order")]
         private async Task RollChannel()
         {
             SortedDictionary<int, string> results = new SortedDictionary<int, string>();
@@ -115,7 +149,8 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("notifyMe")]
-        [Summary("Wysyła jednorazowo notyfikację gdy poszukiwana osoba pojawi się online")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wysyła jednorazowo notyfikację gdy poszukiwana osoba pojawi się online")]
+        [LangSummary(LanguageDictionary.Language.EN, "Sends one time notification when a searched person comes online")]
         [Remarks("W parametrze należy podać osobę o której chce się dostać notyfikację. Parametr musi używać \"Wzmianki\"")]
         private async Task NotifyMe(IGuildUser notify)
         {
@@ -125,7 +160,8 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("removeHistory")]
-        [Summary("Usuwa historie n wiadomości")]
+        [LangSummary(LanguageDictionary.Language.PL, "Usuwa historie n wiadomości")]
+        [LangSummary(LanguageDictionary.Language.EN, "Removes history of n messages")]
         [RequireOwner]
         private async Task RemoveHistory(int count, bool allUsers = false, string channelName = null)
         {
@@ -154,7 +190,8 @@ namespace Dolores.Modules.Misc
 
         [Command("nsfw", RunMode = RunMode.Async)]
         [Alias("bodziuBajt")]
-        [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         [OwnerOrBodziu]
         public async Task NSFW()
@@ -187,7 +224,8 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("banSubreddit", RunMode = RunMode.Async)]
-        [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         [OwnerOrBodziu]
         public async Task BanSubreddit(string subreddit)

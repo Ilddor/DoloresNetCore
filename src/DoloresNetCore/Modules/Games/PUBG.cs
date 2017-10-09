@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 using PUBGSharp;
 using PUBGSharp.Exceptions;
 using PUBGSharp.Helpers;
@@ -47,7 +48,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("PUBG", RunMode = RunMode.Async)]
-        [Summary("Wyświetla staty danego gracza w PUBG")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla staty danego gracza w PUBG")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows PUBG stats of a given player")]
         public async Task PUBGStats(string name, PUBGSharp.Data.Mode mode, StatType type)
         {
             /*HttpClient tmp = new HttpClient();

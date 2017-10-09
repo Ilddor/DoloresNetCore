@@ -27,6 +27,8 @@ namespace Dolores.Modules.Social
 
         [Command("reactToMe")]
         [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         public async Task ReactToMe(params string[] messages)
         {
@@ -43,6 +45,8 @@ namespace Dolores.Modules.Social
 
         [Command("stopReactToMe")]
         [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         public async Task StopReactToMe(params string[] messages)
         {
@@ -64,6 +68,8 @@ namespace Dolores.Modules.Social
 
         [Command("reactTo")]
         [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         [RequireOwner]
         public async Task ReactTo(IUser user, params string[] messages)
@@ -81,6 +87,8 @@ namespace Dolores.Modules.Social
 
         [Command("stopReactTo")]
         [Summary("")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
         [Hidden]
         [RequireOwner]
         public async Task StopReactTo(IUser user, params string[] messages)

@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Rest;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
@@ -22,7 +23,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("key")]
-        [Summary("Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pisząc tę komendę w prywatnej wiadomości i podając jako parametr klucz gry możesz dodać do bazy bota klucz który rozlosuje wśród zgłoszonych użytkowników")]
+        [LangSummary(LanguageDictionary.Language.EN, "Sending this command as a private DM to the bot it will select random person from signed users that will receive game activation code provided as a parameter")]
         [RequireContext(ContextType.DM)]
         public async Task Key(string key)
         {
@@ -45,7 +47,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("keyChannel")]
-        [Summary("Działa podobnie do komendy key z tą różnicą, że losuje klucz z osób znajdujących się na twoim kanale głosowym")]
+        [LangSummary(LanguageDictionary.Language.PL, "Działa podobnie do komendy key z tą różnicą, że losuje klucz z osób znajdujących się na twoim kanale głosowym")]
+        [LangSummary(LanguageDictionary.Language.EN, "Works similarly to key command but it will select random person from your voice channel")]
         [RequireContext(ContextType.DM)]
         public async Task KeyChannel(string key)
         {
@@ -74,7 +77,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("listKey")]
-        [Summary("Wpisuje liste osób zapisanych do losowania kluczy")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wpisuje liste osób zapisanych do losowania kluczy")]
+        [LangSummary(LanguageDictionary.Language.EN, "Prints out list of users signed for a key raffles")]
         public async Task ListKey()
         {
             SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
@@ -94,7 +98,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("signKey")]
-        [Summary("Wpisując tę komendę zapisujesz się do grupy osób wśród której rozlosowywany będzie klucz gry jeśli ktoś takowy zgłosi botowi")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wpisując tę komendę zapisujesz się do grupy osób wśród której rozlosowywany będzie klucz gry jeśli ktoś takowy zgłosi botowi")]
+        [LangSummary(LanguageDictionary.Language.EN, "Signs you to group for a game key raffle if someone will send key to the bot")]
         public async Task SignKey(string mention = null)
         {
             IGuildUser user = Context.User as IGuildUser;

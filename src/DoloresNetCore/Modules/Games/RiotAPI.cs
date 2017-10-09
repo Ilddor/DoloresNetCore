@@ -15,6 +15,7 @@ using Dolores.LeagueOfLegends.DataObjects.League;
 using Dolores.LeagueOfLegends.DataObjects.Summoner;
 using Dolores.LeagueOfLegends.DataObjects.CurrentGame;
 using Dolores.LeagueOfLegends.DataObjects.StaticData;
+using Dolores.CustomAttributes;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -69,7 +70,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("showLore", RunMode = RunMode.Async)]
-        [Summary("Wyświetla lore podanego bohatera z League of Legends")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla lore podanego bohatera z League of Legends")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows lore of a given champion from League of Legends")]
         public async Task ShowLore(string championName = null)
         {
             string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;
@@ -87,7 +89,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("showSkills", RunMode = RunMode.Async)]
-        [Summary("Wyświetla lore podanego bohatera z League of Legends")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla skille podanego bohatera z League of Legends")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows skills of a given champion from League of Legends")]
         public async Task ShowSkills(string championName = null)
         {
             string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;
@@ -154,7 +157,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("showEnemyLoL", RunMode = RunMode.Async)]
-        [Summary("Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla rangi aktualnych przeciwników w grze League of Legends")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows ranks of current enemies in League of Legends for a given player")]
         public async Task ShowEnemyLoL(string summonerName = null)
         {
             string apiKey = m_Map.GetService<APIKeys>().RiotAPIKey;

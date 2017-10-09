@@ -14,6 +14,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Net;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
@@ -27,7 +28,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("CSGO", RunMode = RunMode.Async)]
-        [Summary("Wyświetla staty danego gracza w CS:GO (trzeba podac login steam zamiast nick)")]
+        [LangSummary(LanguageDictionary.Language.PL, "Wyświetla staty danego gracza w CS:GO (trzeba podac login steam zamiast nick)")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows stats of a given player in CS:GO (you have to provide your steam login, not a current nickname")]
         public async Task CSGOStats(string name)
         {
             string steamWebAPIKey = (m_Map.GetService<APIKeys>().SteamWebAPIKey);

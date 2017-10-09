@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using Dolores.CustomAttributes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -25,7 +26,8 @@ namespace Dolores.Modules.Games
         }
 
         [Command("showGameTime", RunMode = RunMode.Async)]
-        [Summary("Pokazuje czas gry spędzony w konkretnych grach")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pokazuje czas gry spędzony w konkretnych grach")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows game time spent for each game recorded")]
         public async Task ShowGameTime()
         {
             Bitmap image = DrawBitmap();

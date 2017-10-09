@@ -37,7 +37,11 @@ namespace Dolores
 
             int argPos = 0;
 
+#if _WINDOWS_
+            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasCharPrefix('?', ref argPos))) return;
+#else
             if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasCharPrefix('!', ref argPos))) return;
+#endif
 
             var typingState = message.Channel.EnterTypingState();
             var context = new CommandContext(m_Client, message);

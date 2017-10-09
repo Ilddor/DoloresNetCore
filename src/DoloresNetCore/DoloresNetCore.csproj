@@ -18,6 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CustomAttributes\LangSummary.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CoreCompat.System.Drawing.v2" Version="5.2.0-preview1-r131" />
     <PackageReference Include="Discord.Addons.EmojiTools" Version="2.0.1" />
     <PackageReference Include="Discord.Net" Version="1.0.2" />
