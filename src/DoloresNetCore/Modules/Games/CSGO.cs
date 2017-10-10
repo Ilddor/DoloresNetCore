@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class CSGO : ModuleBase
     {
         IServiceProvider m_Map;

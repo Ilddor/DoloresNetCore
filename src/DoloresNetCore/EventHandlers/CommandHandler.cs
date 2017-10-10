@@ -38,18 +38,18 @@ namespace Dolores
 
             int argPos = 0;
 
+            var context = new CommandContext(m_Client, message);
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(context.Guild.Id);
+
 #if _WINDOWS_
-            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasCharPrefix('?', ref argPos))) return;
+            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos))) return;
 #else
-            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasCharPrefix('!', ref argPos))) return;
+            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos))) return;
 #endif
 
             var typingState = message.Channel.EnterTypingState();
-            var context = new CommandContext(m_Client, message);
             var result = await m_Commands.ExecuteAsync(context, argPos, m_Map);
-
-            var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(context.Guild.Id);
 
             if (!result.IsSuccess)
             {

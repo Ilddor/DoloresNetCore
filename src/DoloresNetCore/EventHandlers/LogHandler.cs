@@ -243,7 +243,7 @@ namespace Dolores.Modules.Misc
             public bool IsConnect()
             {
                 bool result = false;
-                try
+                /*try
                 {
                     if (Connection == null)
                     {
@@ -255,7 +255,7 @@ namespace Dolores.Modules.Misc
                         result = true;
                     }
                 }
-                catch (Exception) { }
+                catch (Exception) { }*/
 
                 return result;
             }

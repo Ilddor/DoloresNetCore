@@ -21,8 +21,8 @@ namespace Dolores.Modules.Misc
 {
     public class Misc : ModuleBase
     {
-        IServiceProvider m_Map;
-        CommandService m_Commands;
+        private IServiceProvider m_Map;
+        private CommandService m_Commands;
         private Random m_Random = new Random();
 
         public Misc(CommandService commands, IServiceProvider map)
@@ -39,27 +39,38 @@ namespace Dolores.Modules.Misc
         {
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+            Func<Attribute, bool> languageSummaryLambda =
+                (Attribute x) =>
+                {
+                    return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == guildConfig.Lang;
+                };
+
             if (command == null)
             {
                 var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
                 embedMessage.WithTitle($"{LanguageDictionary.GetString(LanguageDictionary.LangString.AvailableCommands, guildConfig.Lang)}:\n");
-                string message = ""; // $"{LanguageDictionary.GetString(LanguageDictionary.LangString.AvailableCommands, guildConfig.Lang)}:\n";
-                foreach (var it in m_Commands.Commands)
+                string message = "";
+                foreach (var module in m_Commands.Modules)
                 {
-                    if (!it.Preconditions.Any(x => x is HiddenAttribute))
+                    if(module.Preconditions.Any(x => x is RequireInstalledAttribute) &&
+                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissions(Context, module.Commands.First(), m_Map)).IsSuccess)
+                        continue; // If module was not installed, omit it in help
+
+                    message = "";
+                    foreach (var it in module.Commands)
                     {
-                        message += $" -`!{it.Name}`    - ";
-                        Func<Attribute, bool> languageSummaryLambda = 
-                            (Attribute x) =>
-                            {
-                                return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == guildConfig.Lang;
-                            };
-                        if (it.Attributes.Any(languageSummaryLambda))
-                            message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
-                        message += "\n";
+                        if (!it.Preconditions.Any(x => x is HiddenAttribute))
+                        {
+                            message += $" -`{guildConfig.Prefix}{it.Name}`    - ";
+                            if (it.Attributes.Any(languageSummaryLambda))
+                                message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
+                            message += "\n";
+                        }
                     }
+                    if(message != "")
+                        embedMessage.AddField(module.Name, message);
                 }
-                embedMessage.WithDescription(message);
 
                 message = "";
                 var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
@@ -81,12 +92,27 @@ namespace Dolores.Modules.Misc
         [Command("setLang")]
         [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić język jakim będzie posługiwać się bot na tym serwerze")]
         [LangSummary(LanguageDictionary.Language.EN, "This allows you to set language in which bot will operate on this server")]
+        [RequireAdministrator]
         public async Task SetLang(LanguageDictionary.Language lang)
         {
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
 
             guildConfig.Lang = lang;
+
+            configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+        }
+
+        [Command("setPrefix")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić jakiego prefixu będzie nasłuchiwać bot")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set bot prefix to use commands")]
+        [RequireAdministrator]
+        public async Task SetPrefix(string prefix)
+        {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+            guildConfig.Prefix = prefix;
 
             configs.SetGuildConfig(Context.Guild.Id, guildConfig);
         }

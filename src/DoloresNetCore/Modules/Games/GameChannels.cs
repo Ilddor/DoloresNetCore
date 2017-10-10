@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class GameChannels : ModuleBase
     {
         IServiceProvider m_Map;

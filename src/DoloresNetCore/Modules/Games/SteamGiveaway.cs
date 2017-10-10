@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class SteamGiveaway : ModuleBase
     {
         IServiceProvider m_Map;

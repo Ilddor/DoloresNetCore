@@ -24,7 +24,7 @@ namespace Dolores.EventHandlers
         private Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
             var gameTimes = m_Map.GetService<GameTimes>();
-            if (after.Guild.Id == 269960016591716362)
+            //if (after.Guild.Id == 269960016591716362)
             {
                 if (before.Game.HasValue || !after.Game.HasValue)
                 {

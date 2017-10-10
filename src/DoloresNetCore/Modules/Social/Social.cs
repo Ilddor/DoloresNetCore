@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Social
 {
+    [RequireInstalled]
     public class Social : ModuleBase
     {
         private DiscordSocketClient m_Client;

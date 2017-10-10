@@ -16,6 +16,7 @@ using System.Drawing.Imaging;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class GameTime : ModuleBase
     {
         IServiceProvider m_Map;

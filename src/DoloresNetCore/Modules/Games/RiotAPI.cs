@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class RiotAPI : ModuleBase
     {
         IServiceProvider m_Map;

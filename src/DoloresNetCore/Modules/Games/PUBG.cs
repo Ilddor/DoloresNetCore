@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolores.Modules.Games
 {
+    [RequireInstalled]
     public class PUBG : ModuleBase
     {
         private IServiceProvider m_Map;

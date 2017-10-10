@@ -11,7 +11,16 @@ namespace Dolores.DataClasses
     {
         public class GuildConfig
         {
-            public LanguageDictionary.Language Lang = LanguageDictionary.Language.EN;
+            public LanguageDictionary.Language Lang { get; set; }
+            public string Prefix { get; set; }
+            public HashSet<string> InstalledModules { get; set; }
+
+            public GuildConfig()
+            {
+                Lang = LanguageDictionary.Language.EN;
+                Prefix = "!";
+                InstalledModules = new HashSet<string>(StringComparer.Ordinal);
+            }
 
             public GuildConfig ShallowCopy()
             {

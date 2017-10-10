@@ -14,6 +14,7 @@ using Dolores.CustomAttributes;
 
 namespace Dolores.Modules.Voice
 {
+    [RequireInstalled]
     public class Voice : ModuleBase
     {
         private IServiceProvider m_Map;
