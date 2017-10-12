@@ -24,6 +24,16 @@ namespace Dolores.EventHandlers
         private Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
             var gameTimes = m_Map.GetService<GameTimes>();
+            if(after.IsBot)
+            {
+                gameTimes.m_Mutex.WaitOne();
+                try
+                {
+                    gameTimes.m_Times.Remove(after.Id);
+                }
+                catch (Exception) { }
+                return Task.CompletedTask;
+            }
             //if (after.Guild.Id == 269960016591716362)
             {
                 if (before.Game.HasValue || !after.Game.HasValue)
