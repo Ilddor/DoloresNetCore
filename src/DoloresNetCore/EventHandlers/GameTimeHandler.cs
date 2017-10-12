@@ -32,6 +32,7 @@ namespace Dolores.EventHandlers
                     gameTimes.m_Times.Remove(after.Id);
                 }
                 catch (Exception) { }
+                gameTimes.m_Mutex.ReleaseMutex();
                 return Task.CompletedTask;
             }
             //if (after.Guild.Id == 269960016591716362)
