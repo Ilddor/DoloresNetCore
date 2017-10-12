@@ -44,7 +44,7 @@ namespace Dolores.EventHandlers
                 if (delete)
                 {
                     ITextChannel channel = await (user as IGuildUser).Guild.GetDefaultChannelAsync();
-                    await channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.RemovingChannel, guildConfig.Lang)}: {before.VoiceChannel.Name}");
+                    await channel.SendMessageAsync($"{guildConfig.Translation.RemovingChannel}: {before.VoiceChannel.Name}");
                     await before.VoiceChannel.DeleteAsync();
                 }
             }

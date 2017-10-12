@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Social
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Dodaje możliwość \"interakcji\" z użytkownikami, jak narazię jest to tylko dodawanie reakcji do wiadomości wskazanych osób")]
+    [LangSummary(LanguageDictionary.Language.EN, "Adds \"interactions\" with users, so far it's only adding reactions to configured users")]
     public class Social : ModuleBase
     {
         private DiscordSocketClient m_Client;

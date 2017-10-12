@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Dolores.CustomAttributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -14,12 +16,14 @@ namespace Dolores.DataClasses
             public LanguageDictionary.Language Lang { get; set; }
             public string Prefix { get; set; }
             public HashSet<string> InstalledModules { get; set; }
+            public dynamic Translation { get; set; }
 
             public GuildConfig()
             {
                 Lang = LanguageDictionary.Language.EN;
                 Prefix = "!";
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
+                Translation = new ExpandoObject();
             }
 
             public GuildConfig ShallowCopy()
@@ -31,7 +35,7 @@ namespace Dolores.DataClasses
         private Dictionary<ulong, GuildConfig> m_GuildConfigs = new Dictionary<ulong, GuildConfig>();
         private Mutex m_Mutex = new Mutex();
 
-        public GuildConfig GetGuildConfig(ulong guild)
+        public dynamic GetGuildConfig(ulong guild)
         {
             GuildConfig tmp = null;
             m_Mutex.WaitOne();
@@ -45,6 +49,15 @@ namespace Dolores.DataClasses
                 m_GuildConfigs.Add(guild, tmp);
             }
             m_Mutex.ReleaseMutex();
+
+            tmp.Translation = new ExpandoObject();
+            string value = null;
+            foreach (var langString in Enum.GetValues(typeof(LanguageDictionary.LangString)))
+            {
+                value = LanguageDictionary.GetString((LanguageDictionary.LangString)Enum.Parse(typeof(LanguageDictionary.LangString), langString.ToString()), tmp.Lang);
+                (tmp.Translation as ExpandoObject).TryAdd(langString.ToString(), value);
+            }
+
             return tmp;
         }
 
@@ -88,6 +101,11 @@ namespace Dolores.DataClasses
             }
             catch (Exception) { }
             m_Mutex.ReleaseMutex();
+        }
+
+        public static bool FindLangSummaryAttribute(Attribute x, LanguageDictionary.Language lang)
+        {
+            return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == lang;
         }
     }
 }

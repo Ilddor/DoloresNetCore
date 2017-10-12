@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Mechanizm losowania kluczy wśród ludzi zgłoszonych z serwera")]
+    [LangSummary(LanguageDictionary.Language.EN, "Raffle mechanism to draw game key for current server users signed for raffle")]
     public class SteamGiveaway : ModuleBase
     {
         IServiceProvider m_Map;

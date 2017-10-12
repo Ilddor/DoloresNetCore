@@ -19,6 +19,8 @@ using System.Text.RegularExpressions;
 
 namespace Dolores.Modules.Misc
 {
+    [LangSummary(LanguageDictionary.Language.PL, "Domyślny moduł z zestawem podstawowych komend")]
+    [LangSummary(LanguageDictionary.Language.EN, "Default module with basic set of commands")]
     public class Misc : ModuleBase
     {
         private IServiceProvider m_Map;
@@ -49,7 +51,7 @@ namespace Dolores.Modules.Misc
             if (command == null)
             {
                 var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
-                embedMessage.WithTitle($"{LanguageDictionary.GetString(LanguageDictionary.LangString.AvailableCommands, guildConfig.Lang)}:\n");
+                embedMessage.WithTitle($"{guildConfig.Translation.AvailableCommands}:\n");
                 string message = "";
                 foreach (var module in m_Commands.Modules)
                 {
@@ -74,8 +76,8 @@ namespace Dolores.Modules.Misc
 
                 message = "";
                 var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
-                message += $"{LanguageDictionary.GetString(LanguageDictionary.LangString.TimeOnline, guildConfig.Lang)}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
-                message += $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Version, guildConfig.Lang)}: {Dolores.m_Instance.m_Version}\n";
+                message += $"{guildConfig.Translation.TimeOnline}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
+                message += $"{guildConfig.Translation.Version}: {Dolores.m_Instance.m_Version}\n";
                 embedMessage.WithFooter(message);
                 await Context.Channel.SendMessageAsync("", embed: embedMessage);
             }
@@ -141,6 +143,23 @@ namespace Dolores.Modules.Misc
             await Context.Channel.SendFileAsync($"DoloresGoodnight{m_Random.Next(1, 3)}.jpg");
         }
 
+        [Command("listGuilds")]
+        [Summary("")]
+        [Hidden]
+        [RequireOwner]
+        public async Task ListGuilds()
+        {
+            var client = m_Map.GetService<DiscordSocketClient>();
+            string message = "";
+            foreach(var guild in client.Guilds)
+            {
+                message += $"{guild.Id} - {guild.Name}\n";
+            }
+
+
+            await Context.Channel.SendMessageAsync("Available guilds:", embed: new EmbedBuilder().WithDescription(message).WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+        }
+
         [Command("roll")]
         [LangSummary(LanguageDictionary.Language.PL, "Losuje liczbę z podanego przedziału (100 jeśli nie zdefiniowano)")]
         [LangSummary(LanguageDictionary.Language.EN, "Draws a number from the given range (100 default)")]
@@ -168,7 +187,7 @@ namespace Dolores.Modules.Misc
 
                 results.Add(roll, user.Mention);
             }
-            string message = $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Results, guildConfig.Lang)}:\n";
+            string message = $"{guildConfig.Translation.Results}:\n";
             foreach (var it in results.OrderByDescending(x => x.Key))
             {
                 message += $"{it.Value}: {it.Key}\n";

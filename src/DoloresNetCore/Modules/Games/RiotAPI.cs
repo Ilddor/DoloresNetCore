@@ -22,6 +22,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Pozwala wyświetlać informacje na temat gry League of Legends")]
+    [LangSummary(LanguageDictionary.Language.EN, "Allows showing informations about League of Legends")]
     public class RiotAPI : ModuleBase
     {
         IServiceProvider m_Map;

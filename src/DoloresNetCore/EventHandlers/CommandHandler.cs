@@ -54,7 +54,7 @@ namespace Dolores
             if (!result.IsSuccess)
             {
                 if(result.ErrorReason == "Unknown command.")
-                    await message.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.UnknownCommand, guildConfig.Lang)}");
+                    await message.Channel.SendMessageAsync($"{guildConfig.Translation.UnknownCommand}");
                 else
                     await message.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
             }

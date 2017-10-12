@@ -15,6 +15,8 @@ using Dolores.CustomAttributes;
 namespace Dolores.Modules.Voice
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Dodaje możliwość dołączania do kanału oraz puszczania muzyki")]
+    [LangSummary(LanguageDictionary.Language.EN, "Adds possibility to join voice channels and playing music")]
     public class Voice : ModuleBase
     {
         private IServiceProvider m_Map;
@@ -119,7 +121,7 @@ namespace Dolores.Modules.Voice
             AudioClientWrapper tmp = m_Map.GetService<AudioClientWrapper>();
             if (tmp.m_Playing)
             {
-                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.CurrentlyPlaying, guildConfig.Lang)}");
+                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.CurrentlyPlaying}");
                 return;
             }
 
@@ -141,7 +143,7 @@ namespace Dolores.Modules.Voice
             }
 
             
-            await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.StartingPlaying, guildConfig.Lang)}");
+            await Context.Channel.SendMessageAsync($"{guildConfig.Translation.StartingPlaying}");
             {
                 var ffmpeg = CreateStream(name);
                 tmp.m_Process = ffmpeg;
@@ -151,7 +153,7 @@ namespace Dolores.Modules.Voice
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.SongEnd, guildConfig.Lang)}");
+                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.SongEnd}");
             }
         }
 
@@ -168,7 +170,7 @@ namespace Dolores.Modules.Voice
                 //process.m_Process.Dispose();
                 //process.m_Process.StandardInput.WriteLine("\x3");
                 audioWrapper.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync($"{LanguageDictionary.GetString(LanguageDictionary.LangString.StoppingPlaying, guildConfig.Lang)}: {audioWrapper.m_Process.HasExited}");
+                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.StoppingPlaying}: {audioWrapper.m_Process.HasExited}");
             }
         }
 

@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Umożliwia tworzenie kanałów gier i przenoszenie tam grających użytkowników po użyciu komendy")]
+    [LangSummary(LanguageDictionary.Language.EN, "Allows to create game voice channels and moving users to these channels on command use")]
     public class GameChannels : ModuleBase
     {
         IServiceProvider m_Map;
@@ -36,7 +38,7 @@ namespace Dolores.Modules.Games
 
             if (callingUser.Game.HasValue)
             {
-                string message = $"{LanguageDictionary.GetString(LanguageDictionary.LangString.Moving, guildConfig.Lang)}: {callingUser.Username}";
+                string message = $"{guildConfig.Translation.Moving}: {callingUser.Username}";
                 bool success = true;
                 IVoiceChannel newChannel = await Context.Guild.CreateVoiceChannelAsync(callingUser.Game.Value.Name);
                 try
@@ -52,7 +54,7 @@ namespace Dolores.Modules.Games
                             await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
                         }
                     }
-                    message += $" {LanguageDictionary.GetString(LanguageDictionary.LangString.ToChannel, guildConfig.Lang)} {callingUser.Game.Value.Name}";
+                    message += $" {guildConfig.Translation.ToChannel} {callingUser.Game.Value.Name}";
                     foreach (var it in moves)
                     {
                         it.Wait();

@@ -17,6 +17,8 @@ using System.Drawing.Imaging;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Pozwala wyświetlać statystyki czasu gry użytkowników tego serwera")]
+    [LangSummary(LanguageDictionary.Language.EN, "Allows to show game time statistics of users of this server")]
     public class GameTime : ModuleBase
     {
         IServiceProvider m_Map;

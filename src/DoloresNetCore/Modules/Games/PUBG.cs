@@ -24,6 +24,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Stat tracker do gry PlayerUnknown's Battlegrounds")]
+    [LangSummary(LanguageDictionary.Language.EN, "Stat tracker for PlayerUnknown's Battlegrounds")]
     public class PUBG : ModuleBase
     {
         private IServiceProvider m_Map;

@@ -20,6 +20,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [LangSummary(LanguageDictionary.Language.PL, "Stat tracker do gry Counter Strike : Global Offensive")]
+    [LangSummary(LanguageDictionary.Language.EN, "Stat tracker for Counter Strike : Global Offensive")]
     public class CSGO : ModuleBase
     {
         IServiceProvider m_Map;
