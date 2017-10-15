@@ -63,6 +63,8 @@ namespace Dolores.Modules.Games
             var result = JsonConvert.DeserializeObject<StatsResponse>(responseData);*/
 
             var statsClient = new PUBGStatsClient(m_Map.GetService<APIKeys>().PUBGTrackerKey);
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             var stats = await statsClient.GetPlayerStatsAsync(name);
 
             var image = RenderStats(stats, mode, type);
@@ -75,7 +77,7 @@ namespace Dolores.Modules.Games
             fileOutput.Close();
 
             Context.Message.DeleteAsync();
-            var channelPUBGStats = await Context.Guild.GetTextChannelAsync(359789815576788992);
+            var channelPUBGStats = await Context.Guild.GetTextChannelAsync(guildConfig.PUBGTrackerChannelId);
             await channelPUBGStats.SendFileAsync($"RTResources/Images/StatsPUBG/{name}.png");
         }
 

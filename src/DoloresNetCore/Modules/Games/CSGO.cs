@@ -36,6 +36,8 @@ namespace Dolores.Modules.Games
         public async Task CSGOStats(string name)
         {
             string steamWebAPIKey = (m_Map.GetService<APIKeys>().SteamWebAPIKey);
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
 
             var webClient = new HttpClient();
             HttpResponseMessage steamIDResponse = await webClient.GetAsync($"http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key={steamWebAPIKey}&vanityurl={name}");
@@ -56,7 +58,7 @@ namespace Dolores.Modules.Games
             fileOutput.Close();
 
             Context.Message.DeleteAsync();
-            var channelCSGOStats = await Context.Guild.GetTextChannelAsync(360033939257032704);
+            var channelCSGOStats = await Context.Guild.GetTextChannelAsync(guildConfig.CSGOTrackerChannelId);
             await channelCSGOStats.SendFileAsync($"RTResources/Images/StatsCSGO/{name}.png");
         }
 

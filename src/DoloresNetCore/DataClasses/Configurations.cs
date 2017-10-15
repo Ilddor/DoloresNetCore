@@ -18,6 +18,8 @@ namespace Dolores.DataClasses
             public HashSet<string> InstalledModules { get; set; }
             public dynamic Translation { get; set; }
             public ulong NSFWCHannelId { get; set; }
+            public ulong PUBGTrackerChannelId { get; set; }
+            public ulong CSGOTrackerChannelId { get; set; }
 
             public GuildConfig()
             {
@@ -26,6 +28,8 @@ namespace Dolores.DataClasses
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
                 Translation = new ExpandoObject();
                 NSFWCHannelId = 272419366744883200;
+                CSGOTrackerChannelId = 360033939257032704;
+                PUBGTrackerChannelId = 359789815576788992;
             }
 
             public GuildConfig ShallowCopy()
