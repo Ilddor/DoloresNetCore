@@ -17,6 +17,7 @@ namespace Dolores.DataClasses
             public string Prefix { get; set; }
             public HashSet<string> InstalledModules { get; set; }
             public dynamic Translation { get; set; }
+            public ulong NSFWCHannelId { get; set; }
 
             public GuildConfig()
             {
@@ -24,6 +25,7 @@ namespace Dolores.DataClasses
                 Prefix = "!";
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
                 Translation = new ExpandoObject();
+                NSFWCHannelId = 272419366744883200;
             }
 
             public GuildConfig ShallowCopy()

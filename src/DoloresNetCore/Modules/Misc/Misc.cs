@@ -245,7 +245,9 @@ namespace Dolores.Modules.Misc
         {
             Random random = new Random();
             var client = m_Map.GetService<DiscordSocketClient>();
-            var channel = client.GetChannel(272419366744883200) as ITextChannel;
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+            var channel = client.GetChannel(guildConfig.NSFWCHannelId) as ITextChannel;
 
             BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
 
@@ -284,7 +286,9 @@ namespace Dolores.Modules.Misc
             await Context.Message.DeleteAsync();
 
             var client = m_Map.GetService<DiscordSocketClient>();
-            var channel = client.GetChannel(272419366744883200) as ITextChannel;
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+            var channel = client.GetChannel(guildConfig.NSFWCHannelId) as ITextChannel;
             var messages = channel.GetMessagesAsync(5);
             List<IMessage> forDelete = new List<IMessage>();
             await messages.ForEachAsync(async x =>

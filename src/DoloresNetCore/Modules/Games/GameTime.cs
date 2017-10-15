@@ -36,10 +36,17 @@ namespace Dolores.Modules.Games
             Bitmap image = DrawBitmap();
 
             var fileOutput = File.Open($"RTResources/Images/GameTime.png", FileMode.OpenOrCreate);
-            var encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
-            var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
-            image.Save(fileOutput, codec, encoderParameters);
+            try
+            {
+                var encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
+                var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
+                image.Save(fileOutput, codec, encoderParameters);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             fileOutput.Close();
 
             Context.Message.DeleteAsync();
@@ -50,6 +57,8 @@ namespace Dolores.Modules.Games
         {
             var gameTimes = m_Map.GetService<GameTimes>();
             var client = m_Map.GetService<DiscordSocketClient>();
+            int max = 2000;
+            int counter = 0;
             int lineCount = 1;
             Bitmap image = null;
             gameTimes.m_Mutex.WaitOne();
@@ -57,12 +66,18 @@ namespace Dolores.Modules.Games
             {
                 foreach (var user in gameTimes.m_Times)
                 {
-                    if (client.GetUser(user.Key) == null)
-                        continue; // skip non existent user on this guild
+                    if (user.Value.Count > 100)
+                        continue;
+                    if (lineCount > max)
+                        break;
+                    //if (client.GetUser(user.Key) == null)
+                    //    continue; // skip non existent user on this guild
                     lineCount++;
                     foreach (var game in user.Value)
                     {
                         lineCount++;
+                        if (lineCount > max)
+                            break;
                     }
                 }
 
@@ -92,14 +107,22 @@ namespace Dolores.Modules.Games
 
                 foreach (var user in gameTimes.m_Times)
                 {
-                    if (client.GetUser(user.Key) == null)
-                        continue; // skip non existent user on this guild
-                    var userName = client.GetUser(user.Key).Username;
+                    if (user.Value.Count > 100)
+                        continue;
+                    if (counter > max)
+                        break;
+                    //if (client.GetUser(user.Key) == null)
+                    //    continue; // skip non existent user on this guild
+                    string userName = null;
+                    if (client.GetUser(user.Key) != null)
+                        userName = client.GetUser(user.Key).Username;
+                    else
+                        userName = user.Key.ToString();
 
                     string line = $"{userName}: ";
                     graphics.DrawString(line, drawFont, Brushes.White, posX, posY);
                     posY += drawFont.Size + 10;
-
+                    counter++;
                     foreach (var game in user.Value)
                     {
                         line = $"    - {game.Key}: ";
@@ -110,13 +133,19 @@ namespace Dolores.Modules.Games
 
                         graphics.DrawString(line, drawFont, Brushes.White, posX, posY);
                         posY += drawFont.Size + 10;
+                        counter++;
+                        if (counter > max)
+                            break;
                     }
                 }
 
                 graphics.Save();
                 drawFont.Dispose();
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             gameTimes.m_Mutex.ReleaseMutex();
 
             return image;
