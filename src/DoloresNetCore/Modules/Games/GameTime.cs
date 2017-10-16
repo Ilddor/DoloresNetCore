@@ -17,10 +17,19 @@ using System.Drawing.Imaging;
 namespace Dolores.Modules.Games
 {
     [RequireInstalled]
+    [Group("GameTime")]
     [LangSummary(LanguageDictionary.Language.PL, "Pozwala wyświetlać statystyki czasu gry użytkowników tego serwera")]
     [LangSummary(LanguageDictionary.Language.EN, "Allows to show game time statistics of users of this server")]
     public class GameTime : ModuleBase
     {
+        public enum StatType
+        {
+            TopGames,
+            TopUsers,
+            //GuildTopGames,
+            //GuildTopUsers
+        }
+
         IServiceProvider m_Map;
 
         public GameTime(IServiceProvider map)
@@ -28,12 +37,12 @@ namespace Dolores.Modules.Games
             m_Map = map;
         }
 
-        [Command("showGameTime", RunMode = RunMode.Async)]
-        [LangSummary(LanguageDictionary.Language.PL, "Pokazuje czas gry spędzony w konkretnych grach")]
-        [LangSummary(LanguageDictionary.Language.EN, "Shows game time spent for each game recorded")]
-        public async Task ShowGameTime()
+        [Command("topGames", RunMode = RunMode.Async)]
+        [LangSummary(LanguageDictionary.Language.PL, "Pokazuje czas gry spędzony w konkretnych grach zsumowany dla wszystkich serwerów na których znajduje się bot")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows game time spent for each game recorded on all servers that bot is on")]
+        public async Task TopGames(int numTopResults = 10)
         {
-            Bitmap image = DrawBitmap();
+            Bitmap image = DrawBitmap(StatType.TopGames, numTopResults);
 
             var fileOutput = File.Open($"RTResources/Images/GameTime.png", FileMode.OpenOrCreate);
             try
@@ -53,38 +62,57 @@ namespace Dolores.Modules.Games
             await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png");
         }
 
-        private Bitmap DrawBitmap()
+        [Command("topGamesGuild", RunMode = RunMode.Async)]
+        [LangSummary(LanguageDictionary.Language.PL, "Pokazuje czas gry spędzony w konkretnych grach zsumowany dla tego serwera")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows game time spent for each game recorded on this server")]
+        public async Task TopGamesGuild(int numTopResults = 10)
+        {
+            var users = await Context.Guild.GetUsersAsync();
+            var list = users.Select(x => x.Id);
+            Bitmap image = DrawBitmap(StatType.TopGames, numTopResults, list);
+
+            var fileOutput = File.Open($"RTResources/Images/GameTime.png", FileMode.OpenOrCreate);
+            try
+            {
+                var encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75);
+                var codec = ImageCodecInfo.GetImageDecoders().FirstOrDefault(x => x.FormatID == System.Drawing.Imaging.ImageFormat.Png.Guid);
+                image.Save(fileOutput, codec, encoderParameters);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            fileOutput.Close();
+
+            Context.Message.DeleteAsync();
+            await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png");
+        }
+
+        private Bitmap DrawBitmap(StatType type, int numTopResults, IEnumerable<ulong> userSet = null)
         {
             var gameTimes = m_Map.GetService<GameTimes>();
             var client = m_Map.GetService<DiscordSocketClient>();
-            int max = 2000;
-            int counter = 0;
-            int lineCount = 1;
             Bitmap image = null;
-            gameTimes.m_Mutex.WaitOne();
+
+            var list = gameTimes.GetTopGames(numTopResults, userSet);
+            IEnumerable<string> printList = null;
+            switch(type)
+            {
+                case StatType.TopGames:
+                    printList = GetPrintStringsTopGames(list);
+                    break;
+                case StatType.TopUsers:
+                    printList = GetPrintStringsTopUsers(list);
+                    break;
+            }
+
             try
             {
-                foreach (var user in gameTimes.m_Times)
-                {
-                    if (user.Value.Count > 100)
-                        continue;
-                    if (lineCount > max)
-                        break;
-                    //if (client.GetUser(user.Key) == null)
-                    //    continue; // skip non existent user on this guild
-                    lineCount++;
-                    foreach (var game in user.Value)
-                    {
-                        lineCount++;
-                        if (lineCount > max)
-                            break;
-                    }
-                }
-
                 // TODO: think of copying DB outside mutex scope to avoid long locks
                 int startX = 10, startY = 10;
                 Font drawFont = new Font(SystemFonts.DefaultFont.FontFamily, 18, FontStyle.Regular, GraphicsUnit.Point);
-                image = new Bitmap(640, (int)((drawFont.Height) * lineCount) + 20);
+                image = new Bitmap(640, (int)((drawFont.Height) * (numTopResults + 1)) + 20);
 
                 image.SetResolution(96, 96);
                 var graphics = Graphics.FromImage(image);
@@ -105,38 +133,10 @@ namespace Dolores.Modules.Games
                 graphics.DrawString("Czas gry:", drawFont, Brushes.White, posX, posY);
                 posY += drawFont.Size + 10;
 
-                foreach (var user in gameTimes.m_Times)
+                foreach (var row in printList)
                 {
-                    if (user.Value.Count > 100)
-                        continue;
-                    if (counter > max)
-                        break;
-                    //if (client.GetUser(user.Key) == null)
-                    //    continue; // skip non existent user on this guild
-                    string userName = null;
-                    if (client.GetUser(user.Key) != null)
-                        userName = client.GetUser(user.Key).Username;
-                    else
-                        userName = user.Key.ToString();
-
-                    string line = $"{userName}: ";
-                    graphics.DrawString(line, drawFont, Brushes.White, posX, posY);
+                    graphics.DrawString(row, drawFont, Brushes.White, posX, posY);
                     posY += drawFont.Size + 10;
-                    counter++;
-                    foreach (var game in user.Value)
-                    {
-                        line = $"    - {game.Key}: ";
-                        TimeSpan time = new TimeSpan(game.Value);
-                        if (time.Days != 0)
-                            line += $"{time.Days}d ";
-                        line += $"{time.ToString(@"hh\:mm\:ss")}\n";
-
-                        graphics.DrawString(line, drawFont, Brushes.White, posX, posY);
-                        posY += drawFont.Size + 10;
-                        counter++;
-                        if (counter > max)
-                            break;
-                    }
                 }
 
                 graphics.Save();
@@ -146,9 +146,26 @@ namespace Dolores.Modules.Games
             {
                 Console.WriteLine(e.ToString());
             }
-            gameTimes.m_Mutex.ReleaseMutex();
 
             return image;
+        }
+
+        private IEnumerable<string> GetPrintStringsTopGames(IEnumerable<KeyValuePair<string,long>> results)
+        {
+            return results.Select(x =>
+            {
+                string line = $"{x.Key} ";
+                TimeSpan time = new TimeSpan(x.Value);
+                if (time.Days != 0)
+                    line += $"{time.Days}d ";
+                line += $"{time.ToString(@"hh\:mm\:ss")}\n";
+                return line;
+            });
+        }
+
+        private IEnumerable<string> GetPrintStringsTopUsers(IEnumerable<KeyValuePair<string, long>> results)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -47,5 +47,66 @@ namespace Dolores.DataClasses
             catch (Exception) { }
             m_Mutex.ReleaseMutex();
         }
+
+        public IEnumerable<KeyValuePair<string, long>> GetTopGames(int numTopResults, IEnumerable<ulong> userSet = null)
+        {
+            IEnumerable<KeyValuePair<string, long>> list = null;
+
+            m_Mutex.WaitOne();
+            try
+            {
+
+                Dictionary<ulong, Dictionary<string, long>> tmp = m_Times;
+                if(userSet != null)
+                    tmp = m_Times.Where(x => userSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+
+                list = tmp.Values
+                    .SelectMany(x => x)
+                    .GroupBy(x => x.Key)
+                    .Select(g => new KeyValuePair<string, long>(g.Key, g.Sum(x => x.Value)))
+                        .OrderByDescending(x => x.Value)
+                        .Take(numTopResults);
+            }
+            catch (Exception) { }
+            m_Mutex.ReleaseMutex();
+
+            return list;
+        }
+
+        public IEnumerable<KeyValuePair<ulong, long>> GetTopUsers(int numTopResults)
+        {
+            IEnumerable<KeyValuePair<ulong, long>> list = null;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                list = m_Times.GroupBy(x => x.Key)
+                    .Select(g => new KeyValuePair<ulong, long>(
+                        g.Key,
+                        g.Sum(x => x.Value.Sum(y => y.Value))))
+                        .OrderByDescending(x => x.Value)
+                        .Take(numTopResults);
+
+            }
+            catch (Exception) { }
+            m_Mutex.ReleaseMutex();
+
+            return list;
+        }
+
+        public IEnumerable<ulong> GetAllUsers()
+        {
+            IEnumerable<ulong> list = null;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                list = m_Times.Keys;
+            }
+            catch (Exception) { }
+            m_Mutex.ReleaseMutex();
+
+            return list;
+        }
     }
 }
