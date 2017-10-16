@@ -37,7 +37,7 @@ namespace Dolores.Modules.Misc
         [Alias("analiza")]
         [LangSummary(LanguageDictionary.Language.PL, "Wyświetla ten tekst, dodając komendę jako parametr wyświetli dokładniejszy opis lub użycie")]
         [LangSummary(LanguageDictionary.Language.EN, "Shows this text, when you add command as a parameter it should show more detailed description of a command")]
-        public async Task Help(string command = null)
+        public async Task Help(params string[] command)
         {
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
@@ -48,7 +48,7 @@ namespace Dolores.Modules.Misc
                     return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == guildConfig.Lang;
                 };
 
-            if (command == null)
+            if (!command.Any())
             {
                 var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
                 embedMessage.WithTitle($"{guildConfig.Translation.AvailableCommands}:\n");
@@ -64,7 +64,7 @@ namespace Dolores.Modules.Misc
                     {
                         if (!it.Preconditions.Any(x => x is HiddenAttribute))
                         {
-                            message += $" -`{guildConfig.Prefix}{it.Name}`    - ";
+                            message += $" -`{guildConfig.Prefix}{it.Aliases.First()}`    - ";
                             if (it.Attributes.Any(languageSummaryLambda))
                                 message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
                             message += "\n";
@@ -83,10 +83,56 @@ namespace Dolores.Modules.Misc
             }
             else
             {
-                if(m_Commands.Commands.Any(x => x.Name == command))
+                var combinedCommand = string.Join(" ", command).ToLower();
+                if(m_Commands.Commands.Any(x => x.Aliases.Contains(combinedCommand)))
                 {
-                    var commandInfo = m_Commands.Commands.Where(x => x.Name == command).First();
-                    await Context.Channel.SendMessageAsync($"`{commandInfo.Name}` - {commandInfo.Summary}\n{commandInfo.Remarks}");
+                    var commandInfo = m_Commands.Commands.Where(x => x.Aliases.Contains(combinedCommand)).First();
+                    var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
+
+                    string title = $"`{guildConfig.Prefix}{combinedCommand}` ";
+
+                    foreach(var parameter in commandInfo.Parameters)
+                    {
+                        if (parameter.IsOptional)
+                            title += "[";
+                        title += $"{parameter.Name}";
+                        if (parameter.IsOptional)
+                            title += "]";
+                        title += " ";
+
+                        string parameterName = parameter.Name;
+                        if (parameter.IsOptional)
+                            parameterName += $" ({guildConfig.Translation.Optional})";
+
+                        string description = "";
+                        if (parameter.Attributes.Any(languageSummaryLambda))
+                            description += (parameter.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary + "\n";
+                        else
+                            description += "No description";
+
+                        if(parameter.Type.IsEnum)
+                        {
+                            description += $"{guildConfig.Translation.PossibleValues}:\n";
+                            foreach(var value in Enum.GetValues(parameter.Type))
+                            {
+                                description += $" - {value}\n";
+                            }
+                        }
+
+                        embedMessage.AddField(parameterName, description);
+                    }
+
+                    embedMessage.WithTitle(title);
+
+                    string message = "";
+                    if (commandInfo.Attributes.Any(languageSummaryLambda))
+                        message += (commandInfo.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
+                    if (message != "")
+                        embedMessage.WithDescription(message);
+
+                    // TODO: Add parameters description here
+
+                    await Context.Channel.SendMessageAsync("", embed: embedMessage);
                 }
             }
         }
