@@ -26,6 +26,8 @@ namespace Dolores.DataClasses
             Moving,
             ToChannel,
             RemovingChannel,
+            Optional,
+            PossibleValues,
         }
 
         private static Dictionary<LangString, Dictionary<Language, string>> m_Dict = new Dictionary<LangString, Dictionary<Language, string>>();
@@ -118,6 +120,18 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Usuwam kanał gry" },
                         { Language.EN, "Removing game voice channel" },
+                    }
+                },
+                { LangString.Optional, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Opcjnalny" },
+                        { Language.EN, "Optional" },
+                    }
+                },
+                { LangString.PossibleValues, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Możliwe wartości" },
+                        { Language.EN, "Possible values" },
                     }
                 },
             };

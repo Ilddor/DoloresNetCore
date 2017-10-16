@@ -7,7 +7,8 @@ using Dolores.DataClasses;
 namespace Dolores.CustomAttributes
 {
     [System.AttributeUsage(System.AttributeTargets.Method |
-                           System.AttributeTargets.Class, AllowMultiple = true)]  // multiuse attribute
+                           System.AttributeTargets.Class |
+                           System.AttributeTargets.Parameter, AllowMultiple = true)]  // multiuse attribute
     public class LangSummaryAttribute : Attribute
     {
         public LangSummaryAttribute(LanguageDictionary.Language lang, string summary)

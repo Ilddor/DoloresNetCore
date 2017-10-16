@@ -53,7 +53,16 @@ namespace Dolores.Modules.Games
         [Command("PUBG", RunMode = RunMode.Async)]
         [LangSummary(LanguageDictionary.Language.PL, "Wyświetla staty danego gracza w PUBG")]
         [LangSummary(LanguageDictionary.Language.EN, "Shows PUBG stats of a given player")]
-        public async Task PUBGStats(string name, PUBGSharp.Data.Mode mode, StatType type)
+        public async Task PUBGStats(
+            [LangSummary(LanguageDictionary.Language.PL, "Nick gracza")]
+            [LangSummary(LanguageDictionary.Language.EN, "Nickname of a player")]
+            string name,
+            [LangSummary(LanguageDictionary.Language.PL, "Tryb gry")]
+            [LangSummary(LanguageDictionary.Language.EN, "Game mode")]
+            PUBGSharp.Data.Mode mode,
+            [LangSummary(LanguageDictionary.Language.PL, "Typ statystyk")]
+            [LangSummary(LanguageDictionary.Language.EN, "Stats type")]
+            StatType type)
         {
             /*HttpClient tmp = new HttpClient();
             tmp.DefaultRequestHeaders.TryAddWithoutValidation("TRN-Api-Key", Dolores.m_Instance.m_APIKeys.PUBGTrackerKey);
