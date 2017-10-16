@@ -85,14 +85,13 @@ namespace Dolores.Modules.Games
         public async Task ListKey()
         {
             SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
-            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             string message = "Zapisani: ";
             signedUsers.m_Mutex.WaitOne();
             try
             {
                 foreach(var id in signedUsers.m_Users)
                 {
-                    message += $" {misiaki.GetUser(id.Key).Mention}";
+                    message += $" {(Context.Guild as SocketGuild).GetUser(id.Key).Mention}";
                 }
             }
             catch (Exception) { }

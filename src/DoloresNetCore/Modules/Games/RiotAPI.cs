@@ -244,7 +244,7 @@ namespace Dolores.Modules.Games
         {
             var client = map.GetService<DiscordSocketClient>();
 
-            client.GuildMemberUpdated += GameChanged;
+            //client.GuildMemberUpdated += GameChanged; Comment this as this probably causes hangs on server O.o
         }
 
         private static Task GameChanged(SocketGuildUser before, SocketGuildUser after)

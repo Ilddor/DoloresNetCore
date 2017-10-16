@@ -21,7 +21,7 @@ namespace Dolores.EventHandlers
             return Task.CompletedTask;
         }
 
-        private Task GameChanged(SocketGuildUser before, SocketGuildUser after)
+        private async Task GameChanged(SocketGuildUser before, SocketGuildUser after)
         {
             var gameTimes = m_Map.GetService<GameTimes>();
             if(after.IsBot)
@@ -33,7 +33,7 @@ namespace Dolores.EventHandlers
                 }
                 catch (Exception) { }
                 gameTimes.m_Mutex.ReleaseMutex();
-                return Task.CompletedTask;
+                return;
             }
             //if (after.Guild.Id == 269960016591716362)
             {
@@ -86,7 +86,7 @@ namespace Dolores.EventHandlers
                 }
             }
 
-            return Task.CompletedTask;
+            return;
         }
     }
 }
