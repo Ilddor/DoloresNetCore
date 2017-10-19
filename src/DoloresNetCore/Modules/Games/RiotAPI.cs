@@ -60,7 +60,7 @@ namespace Dolores.Modules.Games
         public RiotAPI(IServiceProvider map)
         {
             m_Map = map;
-            //TODO move it from here, make it changable and savable to file, make keys hidden in files
+            //TODO move it from here, make it changable and savable to file
             m_SummonerNames = new Dictionary<ulong, string>();
             m_SummonerNames[131816357980405760] = "Ilddor";
             m_SummonerNames[191149407700385793] = "Wojtus";

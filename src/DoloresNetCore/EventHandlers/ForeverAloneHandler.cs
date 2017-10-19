@@ -14,7 +14,7 @@ namespace Dolores.Modules.Social
     {
         private DiscordSocketClient m_Client;
         private IServiceProvider m_Map;
-        private ulong m_UserIDToFollow = 131816357980405760;
+        private ulong m_UserIDToFollow = 131816357980405760; // This is only for me so I don't think I need to move it to config
 
         public Task Install(IServiceProvider map)
         {

@@ -17,7 +17,10 @@ namespace Dolores.DataClasses
             public string Prefix { get; set; }
             public HashSet<string> InstalledModules { get; set; }
             public dynamic Translation { get; set; }
+            public bool LogsEnabled { get; set; }
             public ulong NSFWCHannelId { get; set; }
+            public ulong LogChannelId { get; set; }
+            public static ulong DebugChannelId { get; set; }
             public ulong PUBGTrackerChannelId { get; set; }
             public ulong CSGOTrackerChannelId { get; set; }
 
@@ -28,6 +31,8 @@ namespace Dolores.DataClasses
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
                 Translation = new ExpandoObject();
                 NSFWCHannelId = 272419366744883200;
+                LogChannelId = 356852896559661056;
+                DebugChannelId = 272513888539639818;
                 CSGOTrackerChannelId = 360033939257032704;
                 PUBGTrackerChannelId = 359789815576788992;
             }
