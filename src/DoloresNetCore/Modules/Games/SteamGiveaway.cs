@@ -58,8 +58,7 @@ namespace Dolores.Modules.Games
             SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
 
             ulong userId = 0;
-            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
-            SocketGuildUser donor = misiaki.GetUser(Context.User.Id);
+            SocketGuildUser donor = (Context.Guild as SocketGuild).GetUser(Context.User.Id);
             int userCount = donor.VoiceChannel.Users.Count - 1;
             if (donor.VoiceChannel != null)
             {
@@ -72,11 +71,11 @@ namespace Dolores.Modules.Games
                 }
             }
 
-            SocketGuildUser winningUser = misiaki.GetUser(userId);
+            SocketGuildUser winningUser = (Context.Guild as SocketGuild).GetUser(userId);
             IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
             await Context.Channel.SendMessageAsync($"Klucz wygrał(a): {winningUser.Mention} , udział brało {userCount} użytkowników.");
-            await misiaki.DefaultChannel.SendMessageAsync($"Spośród osób na kanale głosowym {winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {userCount}. Gratulacje!");
+            await (Context.Guild as SocketGuild).DefaultChannel.SendMessageAsync($"Spośród osób na kanale głosowym {winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {userCount}. Gratulacje!");
         }
 
         [Command("listKey")]
@@ -104,15 +103,19 @@ namespace Dolores.Modules.Games
         [LangSummary(LanguageDictionary.Language.EN, "Signs you to group for a game key raffle if someone will send key to the bot")]
         public async Task SignKey(string mention = null)
         {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+            if (!guildConfig.GiveawayEnabled)
+                return;
+
             IGuildUser user = Context.User as IGuildUser;
             if (user.Username == "Ilddor" && mention != null)
             {
                 user = await Context.Guild.GetUserAsync(ulong.Parse(mention.Replace("<@!","").Replace("<@","").Replace(">","")));
             }
             var roles = user.RoleIds;
-            ulong role = 273446118405177345; // Misiaki
             //SocketUser user = Context.Guild.GetUserAsync()
-            if (roles.Contains(role))
+            if (roles.Contains(guildConfig.GiveawayEntitledRole))
             {
                 SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
                 signedUsers.m_Mutex.WaitOne();

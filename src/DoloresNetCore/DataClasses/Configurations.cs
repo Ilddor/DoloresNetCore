@@ -18,6 +18,8 @@ namespace Dolores.DataClasses
             public HashSet<string> InstalledModules { get; set; }
             public dynamic Translation { get; set; }
             public bool LogsEnabled { get; set; }
+            public bool GiveawayEnabled { get; set; }
+            public ulong GiveawayEntitledRole { get; set; }
             public ulong NSFWCHannelId { get; set; }
             public ulong LogChannelId { get; set; }
             public static ulong DebugChannelId { get; set; }
@@ -30,6 +32,12 @@ namespace Dolores.DataClasses
                 Prefix = "!";
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
                 Translation = new ExpandoObject();
+
+                LogsEnabled = false;
+                GiveawayEnabled = false;
+
+                GiveawayEntitledRole = 273446118405177345;
+
                 NSFWCHannelId = 272419366744883200;
                 LogChannelId = 356852896559661056;
                 DebugChannelId = 272513888539639818;
