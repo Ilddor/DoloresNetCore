@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.IO;
-using System.Runtime.Serialization.Formatters;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Reflection;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Discord.Audio;
-using System.Runtime.Loader;
-using System.Xml.Serialization;
-using Dolores.Modules.Games;
 using Dolores.Modules.Voice;
-using Dolores.Modules.Social;
-using Dolores.Modules.Misc;
 using Dolores.DataClasses;
 using Dolores.EventHandlers;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Dolores
 {
