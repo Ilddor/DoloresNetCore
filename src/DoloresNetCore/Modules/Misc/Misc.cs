@@ -170,7 +170,12 @@ namespace Dolores.Modules.Misc
         [LangSummary(LanguageDictionary.Language.EN, "Checks if bot works")]
         public async Task Ping()
         {
-            await Context.Channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription("Pong!").WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+            var client = m_Map.GetService<DiscordSocketClient>();
+            await Context.Channel.SendMessageAsync("", embed:
+                new EmbedBuilder()
+                    .WithDescription("Pong!")
+                    .AddField("Latency:", $"{client.Latency}")
+                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
         [Command("rawr")]

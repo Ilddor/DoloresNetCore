@@ -42,7 +42,7 @@ namespace Dolores.Modules.Games
             } while (userId == Context.User.Id);
             signedUsers.m_Mutex.ReleaseMutex();
             // Make this get guild in some way from player guilds ... may be tricky
-            // SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
+            SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
             IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
