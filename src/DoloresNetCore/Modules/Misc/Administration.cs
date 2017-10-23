@@ -40,6 +40,26 @@ namespace Dolores.Modules.Misc
             await Context.Channel.SendMessageAsync("Available guilds:", embed: new EmbedBuilder().WithDescription(message).WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
+        [Command("guildInfo")]
+        [Hidden]
+        [RequireOwner]
+        public async Task ListGuilds(ulong id)
+        {
+            var client = m_Map.GetService<DiscordSocketClient>();
+            var guild = client.GetGuild(id);
+
+            var embedMessage = new EmbedBuilder()
+                .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
+
+            embedMessage.WithTitle($"Guild {guild.Name} info:");
+            embedMessage.AddField("Users:", guild.Users.Count.ToString(), true);
+            embedMessage.AddField("Text channels:", guild.TextChannels.Count.ToString(), true);
+            embedMessage.AddField("Voice channels:", guild.VoiceChannels.Count.ToString(), true);
+            embedMessage.AddField("Permissions:", guild.GetUser(client.CurrentUser.Id).GuildPermissions.ToString(), true);
+
+            await Context.Channel.SendMessageAsync("", embed: embedMessage);
+        }
+
         [Command("whereAreYou")]
         [Hidden]
         [RequireOwner]
