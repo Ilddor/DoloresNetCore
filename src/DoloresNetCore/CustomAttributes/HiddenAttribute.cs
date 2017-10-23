@@ -7,7 +7,9 @@ using Discord.Commands;
 
 namespace Dolores.CustomAttributes
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(
+        AttributeTargets.Method |
+        AttributeTargets.Class)]
     public class HiddenAttribute : PreconditionAttribute
     {
         public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)

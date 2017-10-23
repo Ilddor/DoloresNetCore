@@ -59,12 +59,15 @@ namespace Dolores.Modules.Misc
                        !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissions(Context, module.Commands.First(), m_Map)).IsSuccess)
                         continue; // If module was not installed, omit it in help
 
+                    if (module.Preconditions.Any(x => x is HiddenAttribute))
+                        continue; // Do not show hidden modules
+
                     message = "";
                     foreach (var it in module.Commands)
                     {
                         if (!it.Preconditions.Any(x => x is HiddenAttribute))
                         {
-                            message += $" -`{guildConfig.Prefix}{it.Aliases.First()}`    - ";
+                            message += $"-`{guildConfig.Prefix}{it.Aliases.First()}`    - ";
                             if (it.Attributes.Any(languageSummaryLambda))
                                 message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
                             message += "\n";
@@ -130,39 +133,9 @@ namespace Dolores.Modules.Misc
                     if (message != "")
                         embedMessage.WithDescription(message);
 
-                    // TODO: Add parameters description here
-
                     await Context.Channel.SendMessageAsync("", embed: embedMessage);
                 }
             }
-        }
-
-        [Command("setLang")]
-        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić język jakim będzie posługiwać się bot na tym serwerze")]
-        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set language in which bot will operate on this server")]
-        [RequireAdministrator]
-        public async Task SetLang(LanguageDictionary.Language lang)
-        {
-            var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
-
-            guildConfig.Lang = lang;
-
-            configs.SetGuildConfig(Context.Guild.Id, guildConfig);
-        }
-
-        [Command("setPrefix")]
-        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić jakiego prefixu będzie nasłuchiwać bot")]
-        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set bot prefix to use commands")]
-        [RequireAdministrator]
-        public async Task SetPrefix(string prefix)
-        {
-            var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
-
-            guildConfig.Prefix = prefix;
-
-            configs.SetGuildConfig(Context.Guild.Id, guildConfig);
         }
 
         [Command("ping")]
@@ -174,7 +147,7 @@ namespace Dolores.Modules.Misc
             await Context.Channel.SendMessageAsync("", embed:
                 new EmbedBuilder()
                     .WithDescription("Pong!")
-                    .AddField("Latency:", $"{client.Latency}")
+                    .AddField("Latency:", $"{client.Latency} ms")
                     .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
@@ -192,23 +165,6 @@ namespace Dolores.Modules.Misc
         public async Task Goodnight()
         {
             await Context.Channel.SendFileAsync($"DoloresGoodnight{m_Random.Next(1, 3)}.jpg");
-        }
-
-        [Command("listGuilds")]
-        [Summary("")]
-        [Hidden]
-        [RequireOwner]
-        public async Task ListGuilds()
-        {
-            var client = m_Map.GetService<DiscordSocketClient>();
-            string message = "";
-            foreach(var guild in client.Guilds)
-            {
-                message += $"{guild.Id} - {guild.Name}\n";
-            }
-
-
-            await Context.Channel.SendMessageAsync("Available guilds:", embed: new EmbedBuilder().WithDescription(message).WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
         [Command("roll")]
@@ -260,7 +216,7 @@ namespace Dolores.Modules.Misc
         [Command("removeHistory")]
         [LangSummary(LanguageDictionary.Language.PL, "Usuwa historie n wiadomości")]
         [LangSummary(LanguageDictionary.Language.EN, "Removes history of n messages")]
-        [RequireOwner]
+        [RequireUserPermission(ChannelPermission.ManageMessages)]
         private async Task RemoveHistory(int count, bool allUsers = false, string channelName = null)
         {
             SocketTextChannel channel;
