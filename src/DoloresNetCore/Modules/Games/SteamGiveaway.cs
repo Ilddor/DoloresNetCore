@@ -106,7 +106,7 @@ namespace Dolores.Modules.Games
         {
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
-            if (!guildConfig.GiveawayEnabled)
+            if (!guildConfig.GiveawayEntitledRole.HasValue)
                 return;
 
             IGuildUser user = Context.User as IGuildUser;
@@ -116,7 +116,7 @@ namespace Dolores.Modules.Games
             }
             var roles = user.RoleIds;
             //SocketUser user = Context.Guild.GetUserAsync()
-            if (roles.Contains(guildConfig.GiveawayEntitledRole))
+            if (roles.Contains(guildConfig.GiveawayEntitledRole.Value))
             {
                 SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
                 signedUsers.m_Mutex.WaitOne();

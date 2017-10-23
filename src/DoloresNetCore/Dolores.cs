@@ -134,6 +134,8 @@ namespace Dolores
             DiscordSocketConfig config = new DiscordSocketConfig();
             config.ConnectionTimeout = 120000;
             config.LogLevel = LogSeverity.Debug;
+            config.AlwaysDownloadUsers = true;
+            config.MessageCacheSize = 100000;
 
             m_Client = new DiscordSocketClient(config);
 

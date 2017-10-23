@@ -15,16 +15,17 @@ namespace Dolores.DataClasses
         {
             public LanguageDictionary.Language Lang { get; set; }
             public string Prefix { get; set; }
-            public HashSet<string> InstalledModules { get; set; }
-            public dynamic Translation { get; set; }
-            public bool LogsEnabled { get; set; }
-            public bool GiveawayEnabled { get; set; }
-            public ulong GiveawayEntitledRole { get; set; }
-            public ulong NSFWCHannelId { get; set; }
-            public ulong LogChannelId { get; set; }
-            public static ulong DebugChannelId { get; set; }
-            public ulong PUBGTrackerChannelId { get; set; }
-            public ulong CSGOTrackerChannelId { get; set; }
+            public HashSet<string> InstalledModules { get; }
+            public dynamic Translation { get; }
+
+            public ulong? GiveawayEntitledRole { get; set; }
+
+            public ulong? NSFWCHannelId { get; set; }
+            public ulong? LogChannelId { get; set; }
+            public ulong? PUBGTrackerChannelId { get; set; }
+            public ulong? CSGOTrackerChannelId { get; set; }
+
+            public static ulong DebugChannelId = 357908791745839104;
 
             public GuildConfig()
             {
@@ -33,16 +34,12 @@ namespace Dolores.DataClasses
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
                 Translation = new ExpandoObject();
 
-                LogsEnabled = false;
-                GiveawayEnabled = false;
+                GiveawayEntitledRole = null;
 
-                GiveawayEntitledRole = 273446118405177345;
-
-                NSFWCHannelId = 272419366744883200;
-                LogChannelId = 356852896559661056;
-                DebugChannelId = 272513888539639818;
-                CSGOTrackerChannelId = 360033939257032704;
-                PUBGTrackerChannelId = 359789815576788992;
+                NSFWCHannelId = null;
+                LogChannelId = null;
+                CSGOTrackerChannelId = null;
+                PUBGTrackerChannelId = null;
             }
 
             public GuildConfig ShallowCopy()
@@ -69,7 +66,6 @@ namespace Dolores.DataClasses
             }
             m_Mutex.ReleaseMutex();
 
-            tmp.Translation = new ExpandoObject();
             string value = null;
             foreach (var langString in Enum.GetValues(typeof(LanguageDictionary.LangString)))
             {

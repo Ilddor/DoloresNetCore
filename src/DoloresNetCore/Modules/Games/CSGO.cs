@@ -58,7 +58,12 @@ namespace Dolores.Modules.Games
             fileOutput.Close();
 
             Context.Message.DeleteAsync();
-            var channelCSGOStats = await Context.Guild.GetTextChannelAsync(guildConfig.CSGOTrackerChannelId);
+            ITextChannel channelCSGOStats = null;
+            if (guildConfig.LogChannelId.HasValue)
+                channelCSGOStats = await Context.Guild.GetTextChannelAsync(guildConfig.CSGOTrackerChannelId.Value);
+            else
+                channelCSGOStats = Context.Channel as ITextChannel;
+
             await channelCSGOStats.SendFileAsync($"RTResources/Images/StatsCSGO/{name}.png");
         }
 

@@ -254,7 +254,10 @@ namespace Dolores.Modules.Misc
             var client = m_Map.GetService<DiscordSocketClient>();
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
-            var channel = client.GetChannel(guildConfig.NSFWCHannelId) as ITextChannel;
+            if (!guildConfig.NSFWCHannelId.HasValue)
+                return;
+
+            var channel = client.GetChannel(guildConfig.NSFWCHannelId.Value) as ITextChannel;
 
             BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
 
@@ -295,7 +298,10 @@ namespace Dolores.Modules.Misc
             var client = m_Map.GetService<DiscordSocketClient>();
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
-            var channel = client.GetChannel(guildConfig.NSFWCHannelId) as ITextChannel;
+            if (!guildConfig.NSFWCHannelId.HasValue)
+                return;
+
+            var channel = client.GetChannel(guildConfig.NSFWCHannelId.Value) as ITextChannel;
             var messages = channel.GetMessagesAsync(5);
             List<IMessage> forDelete = new List<IMessage>();
             await messages.ForEachAsync(async x =>

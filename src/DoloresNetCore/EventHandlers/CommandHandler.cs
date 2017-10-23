@@ -36,6 +36,8 @@ namespace Dolores
             var message = parameterMessage as SocketUserMessage;
             if (message == null) return;
 
+            await message.Channel.GetMessageAsync(message.Id, CacheMode.AllowDownload); // to cache it:)
+
             int argPos = 0;
 
             var context = new CommandContext(m_Client, message);

@@ -33,7 +33,7 @@ namespace Dolores.Modules.Misc
             string message = "";
             foreach (var guild in client.Guilds)
             {
-                message += $"{guild.Id} - {guild.Name}\n";
+                message += $"{guild.Id} - {guild.Name} : {guild.Users.Count}\n";
             }
 
 

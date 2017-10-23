@@ -86,7 +86,12 @@ namespace Dolores.Modules.Games
             fileOutput.Close();
 
             Context.Message.DeleteAsync();
-            var channelPUBGStats = await Context.Guild.GetTextChannelAsync(guildConfig.PUBGTrackerChannelId);
+            ITextChannel channelPUBGStats = null;
+            if (guildConfig.PUBGTrackerChannelId.HasValue)
+                channelPUBGStats = await Context.Guild.GetTextChannelAsync(guildConfig.PUBGTrackerChannelId.Value);
+            else
+                channelPUBGStats = Context.Channel as ITextChannel;
+
             await channelPUBGStats.SendFileAsync($"RTResources/Images/StatsPUBG/{name}.png");
         }
 

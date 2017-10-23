@@ -13,6 +13,7 @@ namespace Dolores.Modules.Misc
 {
     [LangSummary(LanguageDictionary.Language.PL, "Domyślny moduł służący do zarządzania konfiguracją bota dla serwera")]
     [LangSummary(LanguageDictionary.Language.EN, "Default module to manage bot configuration for this server")]
+    [Group("Config")]
     public class Configuration : ModuleBase
     {
         private IServiceProvider m_Map;
@@ -21,6 +22,30 @@ namespace Dolores.Modules.Misc
         public Configuration(IServiceProvider map)
         {
             m_Map = map;
+        }
+
+        [Command("show")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozkazuje aktualną konfigurację dla tego serwera")]
+        [LangSummary(LanguageDictionary.Language.EN, "Shows current configuration for this server")]
+        [RequireAdministrator]
+        public async Task Show()
+        {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+            string message = "";
+            foreach(var property in guildConfig.GetType().GetProperties())
+            {
+                if (property.SetMethod == null)
+                    continue;
+
+                if (property.GetValue(guildConfig) != null)
+                    message += $"{property.Name} = {property.GetValue(guildConfig).ToString()}\n";
+                else
+                    message += $"{property.Name} = Not set\n";
+            }
+
+            await Context.Channel.SendMessageAsync(message);
         }
 
         [Command("setLang")]
@@ -49,6 +74,63 @@ namespace Dolores.Modules.Misc
             guildConfig.Prefix = prefix;
 
             configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+        }
+
+        [Command("setNSFWChannel")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić jaki kanał będzie używany przez bota jako NSFW")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set by bot as a NSFW channel")]
+        [RequireAdministrator]
+        public async Task SetNSFW(string mentionString)
+        {
+            if(Context.Message.MentionedChannelIds.Count > 0)
+            {
+                var configs = m_Map.GetService<Configurations>();
+                Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+                var enumerator = Context.Message.MentionedChannelIds.GetEnumerator();
+                enumerator.MoveNext();
+                guildConfig.NSFWCHannelId = enumerator.Current;
+
+                configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+            }
+        }
+
+        [Command("setPUBGChannel")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić jaki kanał będzie używany przez bota do zmieszczania statystyk PUBG")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set by bot to put PUBG statistics")]
+        [RequireAdministrator]
+        public async Task SetPUBG(string mentionString)
+        {
+            if (Context.Message.MentionedChannelIds.Count > 0)
+            {
+                var configs = m_Map.GetService<Configurations>();
+                Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+                var enumerator = Context.Message.MentionedChannelIds.GetEnumerator();
+                enumerator.MoveNext();
+                guildConfig.PUBGTrackerChannelId = enumerator.Current;
+
+                configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+            }
+        }
+
+        [Command("setCSGOChannel")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić jaki kanał będzie używany przez bota do zmieszczania statystyk CSGO")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set by bot to put CSGO statistics")]
+        [RequireAdministrator]
+        public async Task SetCSGO(string mentionString)
+        {
+            if (Context.Message.MentionedChannelIds.Count > 0)
+            {
+                var configs = m_Map.GetService<Configurations>();
+                Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+                var enumerator = Context.Message.MentionedChannelIds.GetEnumerator();
+                enumerator.MoveNext();
+                guildConfig.CSGOTrackerChannelId = enumerator.Current;
+
+                configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+            }
         }
     }
 }

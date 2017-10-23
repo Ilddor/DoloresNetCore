@@ -21,6 +21,7 @@ namespace Dolores.Modules.Misc
         Notifications m_Notifications;
         Configurations m_Configs;
         Data.DBConnection m_DBConnection;
+        private Random m_Random = new Random();
 
         public Task Install(IServiceProvider map)
         {
@@ -78,20 +79,39 @@ namespace Dolores.Modules.Misc
             m_Client.UserJoined += UserJoined;
             m_Client.UserLeft += UserLeft;
             m_Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
+            m_Client.MessageDeleted += MessageDeleted;
 
             return Task.CompletedTask;
+        }
+
+        private async Task MessageDeleted(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
+        {
+            Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig((channel as SocketTextChannel).Guild.Id);
+            if ((channel as SocketTextChannel).Guild.Id != 269960016591716362)
+                return;
+
+            if (message.HasValue && !message.Value.Author.IsBot)
+            {
+                var logChannel = (channel as SocketTextChannel).Guild.GetTextChannel(Configurations.GuildConfig.DebugChannelId);
+                await logChannel.SendMessageAsync("Deleted message", embed:
+                    new EmbedBuilder()
+                        .WithAuthor(message.Value.Author)
+                        .WithDescription(message.Value.Content)
+                        .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+            }
         }
 
         private async Task UserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
         {
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(after.VoiceChannel.Guild.Id);
-            if (!guildConfig.LogsEnabled)
-                return;
             if (after.VoiceChannel != null)
                 return;
             if (before.VoiceChannel != null)
                 return;
-            var logChannel = after.VoiceChannel.Guild.GetTextChannel(guildConfig.LogChannelId);
+            if (!guildConfig.LogChannelId.HasValue)
+                return;
+
+            var logChannel = after.VoiceChannel.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             if (before.VoiceChannel == null && after.VoiceChannel != null)
             {
@@ -152,9 +172,9 @@ namespace Dolores.Modules.Misc
         private async Task UserLeft(SocketGuildUser user)
         {
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(user.Guild.Id);
-            if (!guildConfig.LogsEnabled)
+            if (!guildConfig.LogChannelId.HasValue)
                 return;
-            var logChannel = user.Guild.GetTextChannel(guildConfig.LogChannelId);
+            var logChannel = user.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} opuścił serwer");
         }
@@ -162,9 +182,9 @@ namespace Dolores.Modules.Misc
         private async Task UserJoined(SocketGuildUser user)
         {
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(user.Guild.Id);
-            if (!guildConfig.LogsEnabled)
+            if (!guildConfig.LogChannelId.HasValue)
                 return;
-            var logChannel = user.Guild.GetTextChannel(guildConfig.LogChannelId);
+            var logChannel = user.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} dołączył do serwera");
         }
@@ -172,9 +192,9 @@ namespace Dolores.Modules.Misc
         private async Task UserBanned(SocketUser user, SocketGuild guild)
         {
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(guild.Id);
-            if (!guildConfig.LogsEnabled)
+            if (!guildConfig.LogChannelId.HasValue)
                 return;
-            var logChannel = guild.GetTextChannel(guildConfig.LogChannelId);
+            var logChannel = guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {user.Username} został zbanowany");
         }
@@ -182,9 +202,9 @@ namespace Dolores.Modules.Misc
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
         {
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(after.Guild.Id);
-            if (!guildConfig.LogsEnabled)
+            if (!guildConfig.LogChannelId.HasValue)
                 return;
-            var logChannel = after.Guild.GetTextChannel(guildConfig.LogChannelId);
+            var logChannel = after.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             if (before.Status != after.Status)
             {
