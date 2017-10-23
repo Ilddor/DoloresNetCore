@@ -76,6 +76,9 @@ namespace Dolores.Modules.Misc
 
             foreach (var module in m_Commands.Modules)
             {
+                if (module.Preconditions.Any(x => x is HiddenAttribute))
+                    continue;
+
                 bool installed = true;
                 if (module.Preconditions.Any(x => x is RequireInstalledAttribute) &&
                        !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissions(Context, module.Commands.First(), m_Map)).IsSuccess)
