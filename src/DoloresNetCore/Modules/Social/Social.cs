@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord.Addons;
 using Dolores.DataClasses;
 using Dolores.CustomAttributes;
 using Microsoft.Extensions.DependencyInjection;
