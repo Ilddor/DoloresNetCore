@@ -8,4 +8,4 @@ build:
     - dotnet build
   artifacts:
     paths:
-      - obj/Debug
+      - bin/Debug/netcoreapp2.0/*
