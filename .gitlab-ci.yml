@@ -2,7 +2,7 @@ build:
   stage: build
   script: 
     - whoami
-    - cd src/Ilddor.com
+    - cd src/DoloresNetCore
     - pwd
     - dotnet restore
     - dotnet build
