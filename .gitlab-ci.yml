@@ -8,4 +8,4 @@ build:
     - dotnet build
   artifacts:
     paths:
-      - bin/Debug/netcoreapp2.0/*
+      - src/DoloresNetCore/bin/Debug/netcoreapp2.0/*
