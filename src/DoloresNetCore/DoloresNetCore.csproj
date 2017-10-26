@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <DefineConstants>$(DefineConstants);_WINDOWS_</DefineConstants>
+    <DefineConstants>TRACE;NETCOREAPP2_0</DefineConstants>
     <AssemblyName>DoloresNetCore</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DoloresNetCore</PackageId>
@@ -10,11 +10,28 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>Dolores</RootNamespace>
+    <Configurations>Debug;ReleaseWindows;ReleaseLinux</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>_WINDOWS_</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)'=='ReleaseWindows'">
+    <DefineConstants>_WINDOWS_</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)'=='ReleaseLinux'">
+    <DefineConstants>_LINUX_</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>portable</DebugType>
     <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLinux|AnyCPU'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
