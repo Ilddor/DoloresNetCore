@@ -19,11 +19,11 @@ deployJob:
   stage: deploy
   script:
     - pwd
-    #- echo $CI_PIPELINE_ID > version
-    #- ./
-    #- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
+#- echo $CI_PIPELINE_ID > version
+#- ./
+#- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
 
 cleanupJob:
   stage: cleanup
   script:
-    #- rm -rf *
+#- rm -rf *
