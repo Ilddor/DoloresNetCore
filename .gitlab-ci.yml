@@ -1,7 +1,7 @@
 stages:
   - build
   - deploy
-  - cleanup
+#  - cleanup
 
 buildJob:
   stage: build
@@ -23,7 +23,7 @@ deployJob:
 #- ./
 #- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
 
-cleanupJob:
-  stage: cleanup
-  script:
+#cleanupJob:
+#  stage: cleanup
+#  script:
 #- rm -rf *
