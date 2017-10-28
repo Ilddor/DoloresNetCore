@@ -13,7 +13,7 @@ buildJob:
     - dotnet publish -c ReleaseLinux
   artifacts:
     paths:
-      - src/DoloresNetCore/bin/Debug/netcoreapp2.0/*
+      - src/DoloresNetCore/bin/ReleaseLinux/netcoreapp2.0/publish*
 
 deployJob:
   stage: deploy
