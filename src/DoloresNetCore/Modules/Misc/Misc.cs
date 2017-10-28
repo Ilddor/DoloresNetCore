@@ -151,6 +151,19 @@ namespace Dolores.Modules.Misc
                     .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
         }
 
+        [Command("invite")]
+        [LangSummary(LanguageDictionary.Language.PL, "Link do zaproszenia bota na swój serwer")]
+        [LangSummary(LanguageDictionary.Language.EN, "Link to invite bot to own server")]
+        public async Task Invite()
+        {
+            var client = m_Map.GetService<DiscordSocketClient>();
+            await Context.Channel.SendMessageAsync("", embed:
+                new EmbedBuilder()
+                    .WithTitle("InviteMe!")
+                    .WithUrl("https://discordapp.com/oauth2/authorize?client_id=274940517735858176&scope=bot&permissions=255323384")
+                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+        }
+
         [Command("rawr")]
         [Summary("Zdjecie Dolores")]
         [Hidden]
