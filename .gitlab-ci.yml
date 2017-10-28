@@ -18,7 +18,7 @@ buildJob:
 deployJob:
   stage: deploy
   script:
-    - cp src/DoloresNetCore/bin/ReleaseLinux/netcoreapp2.0/publish/* /home/gitlab-runner/ProjectInstances/Dolores/
+    - cp -R src/DoloresNetCore/bin/ReleaseLinux/netcoreapp2.0/publish/* /home/gitlab-runner/ProjectInstances/Dolores/
     - cd /home/gitlab-runner/ProjectInstances/Dolores
     - echo $CI_PIPELINE_ID > version
     - /home/ilddor/Scripts/DoloresDeploy
