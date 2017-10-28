@@ -19,6 +19,7 @@ deployJob:
   stage: deploy
   script:
     - pwd
+    - ls
 #- echo $CI_PIPELINE_ID > version
 #- ./
 #- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
