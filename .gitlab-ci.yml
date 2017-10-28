@@ -1,11 +1,29 @@
-build:
+stages:
+  - build
+  - deploy
+  - cleanup
+
+buildJob:
   stage: build
   script: 
     - whoami
     - cd src/DoloresNetCore
     - pwd
     - dotnet restore
-    - dotnet build
+    - dotnet publish -c ReleaseLinux
   artifacts:
     paths:
       - src/DoloresNetCore/bin/Debug/netcoreapp2.0/*
+
+deployJob:
+  stage: deploy
+  script:
+    - pwd
+    #- echo $CI_PIPELINE_ID > version
+    #- ./
+    #- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
+
+cleanupJob:
+  stage: cleanup
+  script:
+    #- rm -rf *
