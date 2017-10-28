@@ -159,6 +159,7 @@ namespace Dolores
                 // Move it to configuration when configuration/installation command is finished
                 Directory.CreateDirectory("Music");
                 Directory.CreateDirectory("RTResources");
+                Directory.CreateDirectory("RTResources/GuildConfigs/");
                 Directory.CreateDirectory("RTResources/Images");
                 Directory.CreateDirectory("RTResources/Images/StatsPUBG");
                 Directory.CreateDirectory("RTResources/Images/StatsCSGO");

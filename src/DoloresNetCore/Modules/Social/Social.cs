@@ -18,13 +18,13 @@ namespace Dolores.Modules.Social
     {
         private DiscordSocketClient m_Client;
         IServiceProvider m_Map;
-        Reactions m_Reactions;
+        //Reactions m_Reactions;
 
         public Social(IServiceProvider map)
         {
             m_Map = map;
             m_Client = map.GetService<DiscordSocketClient>();
-            m_Reactions = map.GetService<Reactions>();
+            //m_Reactions = map.GetService<Reactions>();
         }
 
         [Command("reactToMe")]
@@ -40,7 +40,7 @@ namespace Dolores.Modules.Social
                 reactions.AddRange(message.Split(new string[] { ">", "<" }, options: StringSplitOptions.RemoveEmptyEntries).ToList());
             }
 
-            m_Reactions.Add(Context.User.Id, reactions.ToArray());
+            //m_Reactions.Add(Context.User.Id, reactions.ToArray());
 
             await Context.Message.DeleteAsync();
         }
@@ -52,18 +52,18 @@ namespace Dolores.Modules.Social
         [Hidden]
         public async Task StopReactToMe(params string[] messages)
         {
-            if (!messages.Any())
-                m_Reactions.ClearUser(Context.User.Id);
-            else
-            {
+            //if (!messages.Any())
+                //m_Reactions.ClearUser(Context.User.Id);
+            //else
+            //{
                 List<string> reactions = new List<string>();
                 foreach (var message in messages)
                 {
                     reactions.AddRange(message.Split(new string[] { ">", "<" }, options: StringSplitOptions.RemoveEmptyEntries).ToList());
                 }
 
-                m_Reactions.Remove(Context.User.Id, reactions.ToArray());
-            }
+                //m_Reactions.Remove(Context.User.Id, reactions.ToArray());
+            //}
 
             await Context.Message.DeleteAsync();
         }
@@ -82,7 +82,7 @@ namespace Dolores.Modules.Social
                 reactions.AddRange(message.Split(new string[] { ">", "<" }, options: StringSplitOptions.RemoveEmptyEntries).ToList());
             }
 
-            m_Reactions.Add(user.Id, reactions.ToArray());
+            //m_Reactions.Add(user.Id, reactions.ToArray());
 
             await Context.Message.DeleteAsync();
         }
@@ -95,18 +95,18 @@ namespace Dolores.Modules.Social
         [RequireOwner]
         public async Task StopReactTo(IUser user, params string[] messages)
         {
-            if (!messages.Any())
-                m_Reactions.ClearUser(user.Id);
-            else
-            {
+            //if (!messages.Any())
+                //m_Reactions.ClearUser(user.Id);
+            //else
+            //{
                 List<string> reactions = new List<string>();
                 foreach (var message in messages)
                 {
                     reactions.AddRange(message.Split(new string[] { ">", "<" }, options: StringSplitOptions.RemoveEmptyEntries).ToList());
                 }
 
-                m_Reactions.Remove(user.Id, reactions.ToArray());
-            }
+                //m_Reactions.Remove(user.Id, reactions.ToArray());
+            //}
 
             await Context.Message.DeleteAsync();
         }

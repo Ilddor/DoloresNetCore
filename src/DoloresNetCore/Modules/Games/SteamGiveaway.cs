@@ -31,23 +31,27 @@ namespace Dolores.Modules.Games
         [RequireContext(ContextType.DM)]
         public async Task Key(string key)
         {
-            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
+            // FIXME: this will definitely not work as in DM there will be no guild in context
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id); 
 
-            signedUsers.m_Mutex.WaitOne();
-            int usersCount = signedUsers.m_Users.Count;
+            guildConfig.SignedUsers.m_Mutex.WaitOne();
+            int usersCount = guildConfig.SignedUsers.m_Users.Count;
             ulong userId = 0;
             do
             {
-                userId = signedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount - 1)).Key;
+                userId = guildConfig.SignedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount - 1)).Key;
             } while (userId == Context.User.Id);
-            signedUsers.m_Mutex.ReleaseMutex();
+            guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
             // Make this get guild in some way from player guilds ... may be tricky
             SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
             IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
             await Context.Channel.SendMessageAsync($"Klucz wygrał(a): {winningUser.Mention} , udział brało {usersCount} użytkowników.");
-            await misiaki.DefaultChannel.SendMessageAsync($"{winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {usersCount}. Gratulacje!");
+            await misiaki.DefaultChannel.SendMessageAsync(
+                $"{winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, " +
+                $"w zabawie brało udział tyle osób: {usersCount}. Gratulacje!");
         }
 
         [Command("keyChannel")]
@@ -56,8 +60,6 @@ namespace Dolores.Modules.Games
         [RequireContext(ContextType.DM)]
         public async Task KeyChannel(string key)
         {
-            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
-
             ulong userId = 0;
             SocketGuildUser donor = (Context.Guild as SocketGuild).GetUser(Context.User.Id);
             int userCount = donor.VoiceChannel.Users.Count - 1;
@@ -76,7 +78,10 @@ namespace Dolores.Modules.Games
             IDMChannel winnerChannel = await winningUser.GetOrCreateDMChannelAsync();
             await winnerChannel.SendMessageAsync($"Wygrałeś(aś) klucz podarowany przez: {Context.User.Mention} oto i on: {key}");
             await Context.Channel.SendMessageAsync($"Klucz wygrał(a): {winningUser.Mention} , udział brało {userCount} użytkowników.");
-            await (Context.Guild as SocketGuild).DefaultChannel.SendMessageAsync($"Spośród osób na kanale głosowym {winningUser.Mention} wygrał klucz zgłoszony przez {Context.User.Mention}, w zabawie brało udział tyle osób: {userCount}. Gratulacje!");
+            await (Context.Guild as SocketGuild).DefaultChannel.SendMessageAsync(
+                $"Spośród osób na kanale głosowym {winningUser.Mention} " +
+                $"wygrał klucz zgłoszony przez {Context.User.Mention}, " +
+                $"w zabawie brało udział tyle osób: {userCount}. Gratulacje!");
         }
 
         [Command("listKey")]
@@ -84,18 +89,19 @@ namespace Dolores.Modules.Games
         [LangSummary(LanguageDictionary.Language.EN, "Prints out list of users signed for a key raffles")]
         public async Task ListKey()
         {
-            SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             string message = "Zapisani: ";
-            signedUsers.m_Mutex.WaitOne();
+            guildConfig.SignedUsers.m_Mutex.WaitOne();
             try
             {
-                foreach(var id in signedUsers.m_Users)
+                foreach(var id in guildConfig.SignedUsers.m_Users)
                 {
                     message += $" {(Context.Guild as SocketGuild).GetUser(id.Key).Mention}";
                 }
             }
             catch (Exception) { }
-            signedUsers.m_Mutex.ReleaseMutex();
+            guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
             await Context.Channel.SendMessageAsync(message);
         }
 
@@ -118,18 +124,17 @@ namespace Dolores.Modules.Games
             //SocketUser user = Context.Guild.GetUserAsync()
             if (roles.Contains(guildConfig.GiveawayEntitledRole.Value))
             {
-                SignedUsers signedUsers = m_Map.GetService<SignedUsers>();
-                signedUsers.m_Mutex.WaitOne();
+                guildConfig.SignedUsers.m_Mutex.WaitOne();
                 bool added = true;
                 try
                 {
-                    if (!signedUsers.m_Users.ContainsKey(user.Id))
-                        signedUsers.m_Users.Add(user.Id, true);
+                    if (!guildConfig.SignedUsers.m_Users.ContainsKey(user.Id))
+                        guildConfig.SignedUsers.m_Users.Add(user.Id, true);
                     else
                         added = false;
                 }
                 catch (Exception) { }
-                signedUsers.m_Mutex.ReleaseMutex();
+                guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
                 if(added)
                     await Context.Channel.SendMessageAsync($"{user.Mention} zostałeś dodany na listę, jeśli kiedyś wygrasz klucz to otrzymasz go w prywatnej wiadomości");
                 else

@@ -272,8 +272,6 @@ namespace Dolores.Modules.Misc
 
             var channel = client.GetChannel(guildConfig.NSFWCHannelId.Value) as ITextChannel;
 
-            BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
-
             var cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
             var webClient = new HttpClient(handler);
@@ -285,7 +283,7 @@ namespace Dolores.Modules.Misc
                 page = await webClient.GetAsync($"https://www.reddit.com/r/randnsfw/new.json?sort=popular&limit=5");
                 subreddit = page.RequestMessage.RequestUri.LocalPath;
                 subreddit = Regex.Match(subreddit, "/r/(.*)/").Groups[1].Value;
-            } while (banned.Contains(subreddit));
+            } while (guildConfig.BannedSubreddits.Contains(subreddit));
             var reader = new StreamReader(await page.Content.ReadAsStreamAsync());
             JToken tmp = JsonConvert.DeserializeObject<JToken>(await reader.ReadToEndAsync());
             foreach(var child in tmp["data"]["children"])
@@ -302,15 +300,14 @@ namespace Dolores.Modules.Misc
         [OwnerOrBodziu]
         public async Task BanSubreddit(string subreddit)
         {
-            BannedSubreddits banned = m_Map.GetService<BannedSubreddits>();
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
 
-            banned.Ban(subreddit);
+            guildConfig.BannedSubreddits.Ban(subreddit);
 
             await Context.Message.DeleteAsync();
 
             var client = m_Map.GetService<DiscordSocketClient>();
-            var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             if (!guildConfig.NSFWCHannelId.HasValue)
                 return;
 

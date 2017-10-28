@@ -16,6 +16,12 @@ namespace Dolores.DataClasses
             public LanguageDictionary.Language Lang { get; set; }
             public string Prefix { get; set; }
             public HashSet<string> InstalledModules { get; }
+
+            public BannedSubreddits BannedSubreddits { get; }
+            public Reactions Reactions { get; }
+            public SignedUsers SignedUsers { get; }
+
+            [JsonIgnore]
             public dynamic Translation { get; }
 
             public ulong? GiveawayEntitledRole { get; set; }
@@ -32,6 +38,11 @@ namespace Dolores.DataClasses
                 Lang = LanguageDictionary.Language.EN;
                 Prefix = "!";
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
+
+                BannedSubreddits = new BannedSubreddits();
+                Reactions = new Reactions();
+                SignedUsers = new SignedUsers();
+
                 Translation = new ExpandoObject();
 
                 GiveawayEntitledRole = null;

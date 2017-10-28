@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Dolores.DataClasses
 {
-    public class Reactions : IState
+    public class Reactions
     {
+        [JsonProperty("Reactions")]
         private Dictionary<ulong, HashSet<string>> m_Reactions = new Dictionary<ulong, HashSet<string>>();
         private Mutex m_Mutex = new Mutex();
 
@@ -23,7 +24,7 @@ namespace Dolores.DataClasses
                     m_Reactions.Add(user, new HashSet<string>());
                 }
 
-                foreach(var reaction in reactions)
+                foreach (var reaction in reactions)
                     m_Reactions[user].Add(reaction);
             }
             catch (Exception) { }
@@ -48,7 +49,7 @@ namespace Dolores.DataClasses
             {
                 if (m_Reactions.ContainsKey(user))
                 {
-                    foreach(var reaction in reactions)
+                    foreach (var reaction in reactions)
                     {
                         if (m_Reactions[user].Contains(reaction))
                             m_Reactions[user].Remove(reaction);
@@ -76,38 +77,6 @@ namespace Dolores.DataClasses
             m_Mutex.ReleaseMutex();
 
             return retValue.ToArray();
-        }
-
-        public void Save()
-        {
-            m_Mutex.WaitOne();
-            try
-            {
-                using (FileStream stream = File.Open("reactions.dat", FileMode.Create))
-                {
-                    var streamWriter = new StreamWriter(stream);
-                    streamWriter.WriteLine(JsonConvert.SerializeObject(m_Reactions));
-                    streamWriter.Flush();
-                    stream.Flush();
-                }
-            }
-            catch (Exception) { }
-            m_Mutex.ReleaseMutex();
-        }
-
-        public void Load()
-        {
-            m_Mutex.WaitOne();
-            try
-            {
-                using (Stream stream = File.Open("reactions.dat", FileMode.Open))
-                {
-                    var streamReader = new StreamReader(stream);
-                    m_Reactions = JsonConvert.DeserializeObject<Dictionary<ulong, HashSet<string>>>(streamReader.ReadLine());
-                }
-            }
-            catch (Exception) { }
-            m_Mutex.ReleaseMutex();
         }
     }
 }

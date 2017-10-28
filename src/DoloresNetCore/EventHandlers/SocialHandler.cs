@@ -13,12 +13,10 @@ namespace Dolores.EventHandlers
     {
         private DiscordSocketClient m_Client;
         IServiceProvider m_Map;
-        Reactions m_Reactions;
 
         public Task Install(IServiceProvider map)
         {
             m_Client = map.GetService<DiscordSocketClient>();
-            m_Reactions = map.GetService<Reactions>();
             m_Client.MessageReceived += MessageReceived;
 
             return Task.CompletedTask;
@@ -29,12 +27,15 @@ namespace Dolores.EventHandlers
             var message = parameterMessage as SocketUserMessage;
             if (message.Author.Id == m_Client.CurrentUser.Id) return;
 
-            var reactions = m_Reactions.GetReactions(message.Author.Id);
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig((message.Channel as SocketTextChannel).Guild.Id);
 
-            foreach (var reaction in reactions)
+            var reactions = guildConfig.Reactions.GetReactions(message.Author.Id);
+
+            /*foreach (var reaction in reactions)
             {
-                await message.AddReactionAsync(new Emoji(reaction));
-            }
+                message.AddReactionAsync(new Emoji(reaction));
+            }*/
 
             if (message.Content == "Jaki jest twój cel?")
                 await message.Channel.SendMessageAsync("Znaleźć środek labiryntu");
