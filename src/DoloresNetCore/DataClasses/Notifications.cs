@@ -52,7 +52,7 @@ namespace Dolores.DataClasses
                 using (FileStream stream = File.Open("notifications.dat", FileMode.Create))
                 {
                     var streamWriter = new StreamWriter(stream);
-                    streamWriter.WriteLine(JsonConvert.SerializeObject(m_Notifications));
+                    streamWriter.WriteLine(JsonConvert.SerializeObject(m_Notifications, Formatting.Indented));
                     streamWriter.Flush();
                     stream.Flush();
                 }
@@ -69,7 +69,7 @@ namespace Dolores.DataClasses
                 using (Stream stream = File.Open("notifications.dat", FileMode.Open))
                 {
                     var streamReader = new StreamReader(stream);
-                    m_Notifications = JsonConvert.DeserializeObject<Dictionary<ulong, ulong>>(streamReader.ReadLine());
+                    m_Notifications = JsonConvert.DeserializeObject<Dictionary<ulong, ulong>>(streamReader.ReadToEnd());
                 }
             }
             catch (IOException) { }

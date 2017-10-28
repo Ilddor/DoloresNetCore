@@ -22,7 +22,7 @@ namespace Dolores.DataClasses
                 using (FileStream stream = File.Open("keys.dat", FileMode.Create))
                 {
                     var streamWriter = new StreamWriter(stream);
-                    streamWriter.WriteLine(JsonConvert.SerializeObject(this));
+                    streamWriter.WriteLine(JsonConvert.SerializeObject(this, Formatting.Indented));
                     streamWriter.Flush();
                     stream.Flush();
                 }
@@ -37,7 +37,7 @@ namespace Dolores.DataClasses
                 using (Stream stream = File.Open("keys.dat", FileMode.Open))
                 {
                     var streamReader = new StreamReader(stream);
-                    var tmp = JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadLine());
+                    var tmp = JsonConvert.DeserializeObject<APIKeys>(streamReader.ReadToEnd());
                     // Is here a better way to do this?
                     Type t = this.GetType();
                     PropertyInfo[] properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);

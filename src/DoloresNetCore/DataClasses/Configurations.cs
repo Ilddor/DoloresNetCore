@@ -105,7 +105,7 @@ namespace Dolores.DataClasses
                 using (Stream stream = File.Open("guildConfigs.dat", FileMode.Open))
                 {
                     var streamReader = new StreamReader(stream);
-                    m_GuildConfigs = JsonConvert.DeserializeObject<Dictionary<ulong, GuildConfig>> (streamReader.ReadLine());
+                    m_GuildConfigs = JsonConvert.DeserializeObject<Dictionary<ulong, GuildConfig>> (streamReader.ReadToEnd());
                 }
             }
             catch (Exception) { }
@@ -120,7 +120,7 @@ namespace Dolores.DataClasses
                 using (FileStream stream = File.Open("guildConfigs.dat", FileMode.Create))
                 {
                     var streamWriter = new StreamWriter(stream);
-                    streamWriter.WriteLine(JsonConvert.SerializeObject(m_GuildConfigs));
+                    streamWriter.Write(JsonConvert.SerializeObject(m_GuildConfigs, Formatting.Indented));
                     streamWriter.Flush();
                     stream.Flush();
                 }
