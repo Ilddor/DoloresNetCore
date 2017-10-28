@@ -157,6 +157,7 @@ namespace Dolores
             if (!m_Installed)
             {
                 // Move it to configuration when configuration/installation command is finished
+                Directory.CreateDirectory("Music");
                 Directory.CreateDirectory("RTResources");
                 Directory.CreateDirectory("RTResources/Images");
                 Directory.CreateDirectory("RTResources/Images/StatsPUBG");

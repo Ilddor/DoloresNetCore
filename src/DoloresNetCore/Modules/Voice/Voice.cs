@@ -125,7 +125,7 @@ namespace Dolores.Modules.Voice
                 return;
             }
 
-            string name = "/home/ilddor/Music/" + url.Substring(url.Length - 11, 11) + ".mp3";
+            string name = "Music/" + url.Substring(url.Length - 11, 11) + ".mp3";
             if (!System.IO.File.Exists(name))
             {
                 var ytd = new ProcessStartInfo

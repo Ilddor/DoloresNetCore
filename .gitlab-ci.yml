@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-#  - cleanup
 
 buildJob:
   stage: build
@@ -22,11 +21,3 @@ deployJob:
     - cd /home/gitlab-runner/ProjectInstances/Dolores
     - echo $CI_PIPELINE_ID > version
     - /home/ilddor/Scripts/DoloresDeploy
-#- echo $CI_PIPELINE_ID > version
-#- ./
-#- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
-
-#cleanupJob:
-#  stage: cleanup
-#  script:
-#- rm -rf *
