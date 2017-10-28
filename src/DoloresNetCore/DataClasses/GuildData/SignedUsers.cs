@@ -12,6 +12,7 @@ namespace Dolores.DataClasses
     {
         [JsonProperty("UserIDs")]
         public Dictionary<ulong, bool> m_Users = new Dictionary<ulong, bool>();
+        [JsonIgnore]
         public Mutex m_Mutex = new Mutex();
     }
 }
