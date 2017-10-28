@@ -18,8 +18,10 @@ buildJob:
 deployJob:
   stage: deploy
   script:
-    - pwd
-    - ls
+    - cp src/DoloresNetCore/bin/ReleaseLinux/netcoreapp2.0/publish/* /home/gitlab-runner/ProjectInstances/Dolores/
+    - cd /home/gitlab-runner/ProjectInstances/Dolores
+    - echo $CI_PIPELINE_ID > version
+    - /home/ilddor/Scripts/DoloresDeploy
 #- echo $CI_PIPELINE_ID > version
 #- ./
 #- screen -m -d -L -S Dolores dotnet DoloresNetCore.dll
