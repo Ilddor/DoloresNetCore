@@ -11,8 +11,42 @@ namespace Dolores.DataClasses
     public class SignedUsers
     {
         [JsonProperty("UserIDs")]
-        public Dictionary<ulong, bool> m_Users = new Dictionary<ulong, bool>();
-        [JsonIgnore]
-        public Mutex m_Mutex = new Mutex();
+        private Dictionary<ulong, bool> m_Users = new Dictionary<ulong, bool>();
+        private Mutex m_Mutex = new Mutex();
+
+        public int GetNumUsers()
+        {
+            int count = 0;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                count = m_Users.Count;
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+
+            return count;
+        }
+
+        public ulong GetRandomUser()
+        {
+            var rand = new Random();
+            ulong user = 0;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                user = m_Users.ElementAt(rand.Next(0, m_Users.Count - 1)).Key;
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+
+            return user;
+        }
     }
 }
