@@ -33,16 +33,14 @@ namespace Dolores.Modules.Games
         {
             // FIXME: this will definitely not work as in DM there will be no guild in context
             var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id); 
+            Configurations.GuildConfig guildConfig = configs.GetGuildFromDMContext(m_Map.GetService<DiscordSocketClient>(), Context.User.Id);
 
-            guildConfig.SignedUsers.m_Mutex.WaitOne();
-            int usersCount = guildConfig.SignedUsers.m_Users.Count;
+            int usersCount = guildConfig.SignedUsers.GetNumUsers();
             ulong userId = 0;
             do
             {
-                userId = guildConfig.SignedUsers.m_Users.ElementAt(m_Random.Next(0, usersCount - 1)).Key;
+                userId = guildConfig.SignedUsers.GetRandomUser();
             } while (userId == Context.User.Id);
-            guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
             // Make this get guild in some way from player guilds ... may be tricky
             SocketGuild misiaki = m_Map.GetService<DiscordSocketClient>().GetGuild(269960016591716362);
             SocketGuildUser winningUser = misiaki.GetUser(userId);
@@ -87,27 +85,23 @@ namespace Dolores.Modules.Games
         [Command("listKey")]
         [LangSummary(LanguageDictionary.Language.PL, "Wpisuje liste osób zapisanych do losowania kluczy")]
         [LangSummary(LanguageDictionary.Language.EN, "Prints out list of users signed for a key raffles")]
+        [RequireContext(ContextType.Guild)]
         public async Task ListKey()
         {
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
             string message = "Zapisani: ";
-            guildConfig.SignedUsers.m_Mutex.WaitOne();
-            try
+            foreach(var id in guildConfig.SignedUsers.GetUsers())
             {
-                foreach(var id in guildConfig.SignedUsers.m_Users)
-                {
-                    message += $" {(Context.Guild as SocketGuild).GetUser(id.Key).Mention}";
-                }
+                message += $" {(Context.Guild as SocketGuild).GetUser(id).Mention}";
             }
-            catch (Exception) { }
-            guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
             await Context.Channel.SendMessageAsync(message);
         }
 
         [Command("signKey")]
         [LangSummary(LanguageDictionary.Language.PL, "Wpisując tę komendę zapisujesz się do grupy osób wśród której rozlosowywany będzie klucz gry jeśli ktoś takowy zgłosi botowi")]
         [LangSummary(LanguageDictionary.Language.EN, "Signs you to group for a game key raffle if someone will send key to the bot")]
+        [RequireContext(ContextType.Guild)]
         public async Task SignKey(string mention = null)
         {
             var configs = m_Map.GetService<Configurations>();
@@ -124,18 +118,7 @@ namespace Dolores.Modules.Games
             //SocketUser user = Context.Guild.GetUserAsync()
             if (roles.Contains(guildConfig.GiveawayEntitledRole.Value))
             {
-                guildConfig.SignedUsers.m_Mutex.WaitOne();
-                bool added = true;
-                try
-                {
-                    if (!guildConfig.SignedUsers.m_Users.ContainsKey(user.Id))
-                        guildConfig.SignedUsers.m_Users.Add(user.Id, true);
-                    else
-                        added = false;
-                }
-                catch (Exception) { }
-                guildConfig.SignedUsers.m_Mutex.ReleaseMutex();
-                if(added)
+                if(guildConfig.SignedUsers.AddUser(user.Id))
                     await Context.Channel.SendMessageAsync($"{user.Mention} zostałeś dodany na listę, jeśli kiedyś wygrasz klucz to otrzymasz go w prywatnej wiadomości");
                 else
                     await Context.Channel.SendMessageAsync($"{user.Mention} już jesteś na liście chętnych na klucze, nie przesadzaj");

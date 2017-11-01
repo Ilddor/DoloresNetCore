@@ -1,9 +1,11 @@
-﻿using Dolores.CustomAttributes;
+﻿using Discord.WebSocket;
+using Dolores.CustomAttributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -62,7 +64,7 @@ namespace Dolores.DataClasses
         private Dictionary<ulong, GuildConfig> m_GuildConfigs = new Dictionary<ulong, GuildConfig>();
         private Mutex m_Mutex = new Mutex();
 
-        public dynamic GetGuildConfig(ulong guild)
+        public GuildConfig GetGuildConfig(ulong guild)
         {
             GuildConfig tmp = null;
             m_Mutex.WaitOne();
@@ -132,6 +134,19 @@ namespace Dolores.DataClasses
         public static bool FindLangSummaryAttribute(Attribute x, LanguageDictionary.Language lang)
         {
             return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == lang;
+        }
+
+        public GuildConfig GetGuildFromDMContext(DiscordSocketClient client, ulong userId)
+        {
+            // So far search in guilds voice channels for one that user is in
+            foreach (var guild in client.Guilds)
+            {
+                if (guild.Users.Where(x => x.Id == userId && x.VoiceChannel != null).Any())
+                {
+                    return GetGuildConfig(guild.Id);
+                }
+            }
+            return null;
         }
     }
 }

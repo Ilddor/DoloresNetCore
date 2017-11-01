@@ -39,7 +39,7 @@ namespace Dolores.DataClasses
             m_Mutex.WaitOne();
             try
             {
-                user = m_Users.ElementAt(rand.Next(0, m_Users.Count - 1)).Key;
+                user = m_Users.ElementAt(rand.Next(0, m_Users.Count)).Key;
             }
             finally
             {
@@ -47,6 +47,43 @@ namespace Dolores.DataClasses
             }
 
             return user;
+        }
+
+        public List<ulong> GetUsers()
+        {
+            List<ulong> users = null;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                users = new List<ulong>(m_Users.Keys);
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+
+            return users;
+        }
+
+        public bool AddUser(ulong id)
+        {
+            bool added = true;
+
+            m_Mutex.WaitOne();
+            try
+            {
+                if (!m_Users.ContainsKey(id))
+                    m_Users.Add(id, true);
+                else
+                    added = false;
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+
+            return added;
         }
     }
 }

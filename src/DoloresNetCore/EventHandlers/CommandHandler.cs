@@ -42,7 +42,18 @@ namespace Dolores
 
             var context = new CommandContext(m_Client, message);
             var configs = m_Map.GetService<Configurations>();
-            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(context.Guild.Id);
+            Configurations.GuildConfig guildConfig = null;
+            if (context.Channel is IDMChannel)
+            {
+                guildConfig = configs.GetGuildFromDMContext(m_Client, context.User.Id);
+
+                if(guildConfig == null) // Get default values then
+                    guildConfig = new Configurations.GuildConfig();
+            }
+            else
+            {
+                guildConfig = configs.GetGuildConfig(context.Guild.Id);
+            }
 
 #if _WINDOWS_
             if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos))) return;
