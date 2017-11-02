@@ -58,8 +58,9 @@ namespace Dolores.Modules.Games
             }
             fileOutput.Close();
 
+            var command = Context.Message.Content;
             Context.Message.DeleteAsync();
-            await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png");
+            await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png", text: $"Command: `{command}`");
         }
 
         [Command("topGamesGuild", RunMode = RunMode.Async)]
@@ -85,8 +86,9 @@ namespace Dolores.Modules.Games
             }
             fileOutput.Close();
 
+            var command = Context.Message.Content;
             Context.Message.DeleteAsync();
-            await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png");
+            await Context.Channel.SendFileAsync($"RTResources/Images/GameTime.png", text: $"Command: `{command}`");
         }
 
         private Bitmap DrawBitmap(StatType type, int numTopResults, IEnumerable<ulong> userSet = null)

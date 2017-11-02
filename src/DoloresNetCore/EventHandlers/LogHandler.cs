@@ -89,6 +89,9 @@ namespace Dolores.Modules.Misc
             if ((channel as SocketTextChannel).Guild.Id != 269960016591716362)
                 return;
 
+            if ((channel as IMessageChannel).IsNsfw)
+                return;
+
             if (message.HasValue && !message.Value.Author.IsBot)
             {
                 var logChannel = (channel as SocketTextChannel).Guild.GetTextChannel(Configurations.GuildConfig.DebugChannelId);

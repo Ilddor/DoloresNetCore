@@ -56,9 +56,9 @@ namespace Dolores
             }
 
 #if _WINDOWS_
-            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos))) return;
+            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos)) || message.Author.IsBot) return;
 #else
-            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos))) return;
+            if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos)) || message.Author.IsBot) return;
 #endif
 
             var typingState = message.Channel.EnterTypingState();
