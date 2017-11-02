@@ -83,7 +83,8 @@ namespace Dolores.DataClasses
             foreach (var langString in Enum.GetValues(typeof(LanguageDictionary.LangString)))
             {
                 value = LanguageDictionary.GetString((LanguageDictionary.LangString)Enum.Parse(typeof(LanguageDictionary.LangString), langString.ToString()), tmp.Lang);
-                (tmp.Translation as ExpandoObject).TryAdd(langString.ToString(), value);
+                if (!(tmp.Translation as ExpandoObject).TryAdd(langString.ToString(), value))
+                    (tmp.Translation as IDictionary<string, Object>)[langString.ToString()] = value;
             }
 
             return tmp;
