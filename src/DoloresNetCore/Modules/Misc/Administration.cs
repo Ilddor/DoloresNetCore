@@ -6,7 +6,6 @@ using Dolores.DataClasses;
 using Dolores.Modules.Voice;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,7 +68,7 @@ namespace Dolores.Modules.Misc
             Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
             if (audioClient.m_AudioClient != null)
             {
-                if(audioClient.m_AudioClient.ConnectionState == ConnectionState.Connected)
+                if (audioClient.m_AudioClient.ConnectionState == ConnectionState.Connected)
                 {
                     message = (audioClient.m_CurrentChannel as SocketVoiceChannel).Guild.Name;
                 }
