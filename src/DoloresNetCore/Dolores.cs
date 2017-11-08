@@ -227,7 +227,7 @@ namespace Dolores
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
-            using (Stream stream = File.Open("version", FileMode.Append))
+            using (Stream stream = File.Open("log.txt", FileMode.Append))
             {
                 var streamWriter = new StreamWriter(stream);
                 streamWriter.WriteLine(msg.ToString());
