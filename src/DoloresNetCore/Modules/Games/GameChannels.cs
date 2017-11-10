@@ -95,6 +95,10 @@ namespace Dolores.Modules.Games
                 }
                 await Context.Channel.SendMessageAsync(message);
             }
+            else
+            {
+                await Context.Channel.SendMessageAsync(guildConfig.Translation.NoGame);
+            }
         }
     }
 }

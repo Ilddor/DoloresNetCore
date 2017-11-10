@@ -28,6 +28,7 @@ namespace Dolores.DataClasses
             RemovingChannel,
             Optional,
             PossibleValues,
+            NoGame,
         }
 
         private static Dictionary<LangString, Dictionary<Language, string>> m_Dict = new Dictionary<LangString, Dictionary<Language, string>>();
@@ -132,6 +133,12 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Możliwe wartości" },
                         { Language.EN, "Possible values" },
+                    }
+                },
+                { LangString.NoGame, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Nie grasz aktualnie w żadną grę" },
+                        { Language.EN, "You're not playing anything right now" },
                     }
                 },
             };
