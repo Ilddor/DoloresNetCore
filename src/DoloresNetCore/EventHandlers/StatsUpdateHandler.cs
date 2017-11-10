@@ -20,9 +20,9 @@ namespace Dolores.EventHandlers
             m_Map = map;
             m_Client = m_Map.GetService<DiscordSocketClient>();
 
-            m_Client.JoinedGuild += JoinedGuild;
-            m_Client.LeftGuild += LeftGuild;
-            m_Client.GuildAvailable += GuildAvailable;
+            //m_Client.JoinedGuild += JoinedGuild;
+            //m_Client.LeftGuild += LeftGuild;
+            //m_Client.GuildAvailable += GuildAvailable;
 
             return Task.CompletedTask;
         }
