@@ -206,11 +206,15 @@ namespace Dolores.Modules.Misc
             Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(after.Guild.Id);
             if (!guildConfig.LogChannelId.HasValue)
                 return;
+            // Fix me - add possibility to log guild on others guild channel?
             var logChannel = after.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
             if (before.Status != after.Status)
             {
-                await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {after.Username} zmienił status na: {after.Status.ToString()}");
+                if (logChannel != null)
+                {
+                    await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {after.Username} zmienił status na: {after.Status.ToString()}");
+                }   
                 if (m_DBConnection.IsConnect())
                 {
                     string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
