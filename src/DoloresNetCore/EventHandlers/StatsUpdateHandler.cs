@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Dolores.EventHandlers
 {
@@ -14,6 +15,10 @@ namespace Dolores.EventHandlers
     {
         private DiscordSocketClient m_Client;
         IServiceProvider m_Map;
+        struct Stats
+        {
+            public int server_count { get; set; }
+        }
 
         public Task Install(IServiceProvider map)
         {
@@ -22,7 +27,7 @@ namespace Dolores.EventHandlers
 
             //m_Client.JoinedGuild += JoinedGuild;
             //m_Client.LeftGuild += LeftGuild;
-            //m_Client.GuildAvailable += GuildAvailable;
+            m_Client.GuildAvailable += GuildAvailable;
 
             return Task.CompletedTask;
         }
@@ -50,13 +55,8 @@ namespace Dolores.EventHandlers
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", m_Map.GetService<APIKeys>().BotsDiscordAPI);
             int numGuilds = m_Client.Guilds.Count;
 
-            MemoryStream contentStream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(contentStream);
-            writer.Write($"{{ \"server_count\": {m_Client.Guilds.Count} }}");
-            writer.Flush();
-            contentStream.Position = 0;
-
-            HttpContent content = new StreamContent(contentStream);
+            StringContent content = new StringContent(JsonConvert.SerializeObject(new Stats { server_count = m_Client.Guilds.Count }));
+            content.Headers.TryAddWithoutValidation("Authorization", m_Map.GetService<APIKeys>().BotsDiscordAPI);
 
             var response = await httpClient.PostAsync($"https://bots.discord.pw/api/bots/274940517735858176/stats", content);
             var responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

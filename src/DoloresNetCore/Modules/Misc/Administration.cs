@@ -59,6 +59,29 @@ namespace Dolores.Modules.Misc
             await Context.Channel.SendMessageAsync("", embed: embedMessage);
         }
 
+        [Command("guildConfigInfo")]
+        [Hidden]
+        [RequireOwner]
+        public async Task Show(ulong id)
+        {
+            var configs = m_Map.GetService<Configurations>();
+            Configurations.GuildConfig guildConfig = configs.GetGuildConfig(id);
+
+            string message = "";
+            foreach (var property in guildConfig.GetType().GetProperties())
+            {
+                if (property.SetMethod == null)
+                    continue;
+
+                if (property.GetValue(guildConfig) != null)
+                    message += $"{property.Name} = {property.GetValue(guildConfig).ToString()}\n";
+                else
+                    message += $"{property.Name} = Not set\n";
+            }
+
+            await Context.Channel.SendMessageAsync(message);
+        }
+
         [Command("whereAreYou")]
         [Hidden]
         [RequireOwner]

@@ -17,7 +17,8 @@ namespace Dolores.EventHandlers
         public Task Install(IServiceProvider map)
         {
             m_Client = map.GetService<DiscordSocketClient>();
-            m_Client.MessageReceived += MessageReceived;
+            // Disable it till it's fixed
+            //m_Client.MessageReceived += MessageReceived;
 
             return Task.CompletedTask;
         }
