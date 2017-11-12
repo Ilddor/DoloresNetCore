@@ -8,3 +8,4 @@ src/DoloresNetCore/bin/*
 src/DoloresNetCore/StatsPUBG/*
 src/DoloresNetCore/StatsCSGO/*
 src/DoloresNetCore/RTResources/*
+src/DoloresNetCore/log.txt

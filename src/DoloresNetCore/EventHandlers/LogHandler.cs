@@ -203,38 +203,45 @@ namespace Dolores.Modules.Misc
 
         private async Task GuildMemberUpdated(SocketGuildUser before, SocketGuildUser after)
         {
-            Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(after.Guild.Id);
-            if (!guildConfig.LogChannelId.HasValue)
-                return;
-            // Fix me - add possibility to log guild on others guild channel?
-            var logChannel = after.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
-
-            if (before.Status != after.Status)
+            try
             {
-                if (logChannel != null)
-                {
-                    await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {after.Username} zmienił status na: {after.Status.ToString()}");
-                }   
-                if (m_DBConnection.IsConnect())
-                {
-                    string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
-                        + $"('{DateTime.Now.Ticks}', '{after.Status.ToString().ToUpper()}', '{after.Username}')";
-                    var cmd = new MySqlCommand(query, m_DBConnection.Connection);
-                    cmd.ExecuteNonQuery();
-                }
+                Configurations.GuildConfig guildConfig = m_Configs.GetGuildConfig(after.Guild.Id);
+                if (!guildConfig.LogChannelId.HasValue)
+                    return;
+                // Fix me - add possibility to log guild on others guild channel?
+                var logChannel = after.Guild.GetTextChannel(guildConfig.LogChannelId.Value);
 
-                if (after.Status == UserStatus.Online)
+                if (before.Status != after.Status)
                 {
-                    ulong id = m_Notifications.ShouldNofity(after.Id);
-                    if (id != 0)
+                    if (logChannel != null)
                     {
-                        var user = m_Client.GetUser(id);
-                        var notify = m_Client.GetUser(after.Id);
+                        await logChannel.SendMessageAsync($"[{DateTime.Now.ToString("HH:mm:ss")}] {after.Username} zmienił status na: {after.Status.ToString()}");
+                    }
+                    if (m_DBConnection.IsConnect())
+                    {
+                        string query = $"INSERT INTO UserStatusLogs (date, status, user) VALUES "
+                            + $"('{DateTime.Now.Ticks}', '{after.Status.ToString().ToUpper()}', '{after.Username}')";
+                        var cmd = new MySqlCommand(query, m_DBConnection.Connection);
+                        cmd.ExecuteNonQuery();
+                    }
 
-                        var userChannel = await user.GetOrCreateDMChannelAsync();
-                        await userChannel.SendMessageAsync($"{notify.Mention} pojawił się online");
+                    if (after.Status == UserStatus.Online)
+                    {
+                        ulong id = m_Notifications.ShouldNofity(after.Id);
+                        if (id != 0)
+                        {
+                            var user = m_Client.GetUser(id);
+                            var notify = m_Client.GetUser(after.Id);
+
+                            var userChannel = await user.GetOrCreateDMChannelAsync();
+                            await userChannel.SendMessageAsync($"{notify.Mention} pojawił się online");
+                        }
                     }
                 }
+            }
+            catch(Exception e)
+            {
+
             }
         }
     }

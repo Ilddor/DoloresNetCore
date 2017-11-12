@@ -27,7 +27,7 @@ namespace Dolores.EventHandlers
 
             //m_Client.JoinedGuild += JoinedGuild;
             //m_Client.LeftGuild += LeftGuild;
-            m_Client.GuildAvailable += GuildAvailable;
+            //m_Client.GuildAvailable += GuildAvailable;
 
             return Task.CompletedTask;
         }

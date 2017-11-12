@@ -144,10 +144,12 @@ namespace Dolores
 
             m_Map = ConfigureServices();
 
+            m_Client.Connected += Connected;
+
             await m_Client.LoginAsync(TokenType.Bot, m_Map.GetService<APIKeys>().DiscordAPIKey);
             await m_Client.StartAsync();
 
-            m_Client.Connected += Connected;
+            
 
             await Task.Delay(-1);
         }
@@ -227,10 +229,19 @@ namespace Dolores
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
-            using (Stream stream = File.Open("log.txt", FileMode.Append))
+            try
             {
-                var streamWriter = new StreamWriter(stream);
-                streamWriter.WriteLine(msg.ToString());
+                using (Stream stream = File.Open("log.txt", FileMode.Append))
+                {
+                    var streamWriter = new StreamWriter(stream);
+                    streamWriter.WriteLine(msg.ToString());
+                    streamWriter.Flush();
+                    stream.Flush();
+                }
+            }
+            catch(IOException e)
+            {
+
             }
             return Task.CompletedTask;
         }
