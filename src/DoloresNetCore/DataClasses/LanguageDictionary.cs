@@ -77,8 +77,8 @@ namespace Dolores.DataClasses
                 },
                 { LangString.UnknownCommand, new Dictionary<Language, string>()
                     {
-                        { Language.PL, "Niczego mi to nie przypomina (nie ma takiej komendy)" },
-                        { Language.EN, "Doesn't look like anything to me (there's no such command)" },
+                        { Language.PL, "Niczego mi to nie przypomina" },
+                        { Language.EN, "Doesn't look like anything to me" },
                     }
                 },
                 { LangString.CurrentlyPlaying, new Dictionary<Language, string>()
