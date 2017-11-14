@@ -61,17 +61,19 @@ namespace Dolores
             if (!(message.HasMentionPrefix(m_Client.CurrentUser, ref argPos) || message.HasStringPrefix(guildConfig.Prefix, ref argPos)) || message.Author.IsBot) return;
 #endif
 
-            var typingState = message.Channel.EnterTypingState();
+            await message.Channel.TriggerTypingAsync();
             var result = await m_Commands.ExecuteAsync(context, argPos, m_Map);
 
             if (!result.IsSuccess)
             {
-                if(result.ErrorReason == "Unknown command.")
-                    await message.Channel.SendMessageAsync($"{guildConfig.Translation.UnknownCommand}");
-                else
-                    await message.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
+                if (guildConfig.CommandNotFoundEnabled)
+                {
+                    if (result.ErrorReason == "Unknown command.")
+                        await message.Channel.SendMessageAsync($"{guildConfig.Translation.UnknownCommand}");
+                    else
+                        await message.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
+                }
             }
-            typingState.Dispose();
         }
     }
 }

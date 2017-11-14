@@ -17,6 +17,7 @@ namespace Dolores.DataClasses
         {
             public LanguageDictionary.Language Lang { get; set; }
             public string Prefix { get; set; }
+            public bool CommandNotFoundEnabled { get; set; }
             public HashSet<string> InstalledModules { get; }
 
             public BannedSubreddits BannedSubreddits { get; }
@@ -39,6 +40,7 @@ namespace Dolores.DataClasses
             {
                 Lang = LanguageDictionary.Language.EN;
                 Prefix = "!";
+                CommandNotFoundEnabled = true;
                 InstalledModules = new HashSet<string>(StringComparer.Ordinal);
 
                 BannedSubreddits = new BannedSubreddits();

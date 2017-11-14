@@ -132,5 +132,22 @@ namespace Dolores.Modules.Misc
                 configs.SetGuildConfig(Context.Guild.Id, guildConfig);
             }
         }
+
+        [Command("commandNotFound")]
+        [LangSummary(LanguageDictionary.Language.PL, "Pozwala ustawić czy bot powinien reagować na wezwanie jeśli nie znaleziono komendy")]
+        [LangSummary(LanguageDictionary.Language.EN, "This allows you to set if bot should respond to call if command was not found")]
+        [RequireAdministrator]
+        public async Task SetCommandNotFound(bool enabled)
+        {
+            if (Context.Message.MentionedChannelIds.Count > 0)
+            {
+                var configs = m_Map.GetService<Configurations>();
+                Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
+
+                guildConfig.CommandNotFoundEnabled = enabled;
+
+                configs.SetGuildConfig(Context.Guild.Id, guildConfig);
+            }
+        }
     }
 }
