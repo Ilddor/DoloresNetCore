@@ -11,7 +11,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dolores.Modules.Misc
+namespace Dolores.EventHandlers
 {
     public class LogHandler : IInstallable
     {

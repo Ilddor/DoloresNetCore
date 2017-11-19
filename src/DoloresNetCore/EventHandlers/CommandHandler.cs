@@ -12,7 +12,7 @@ using Dolores.Modules.Social;
 using Dolores.EventHandlers;
 using Dolores.DataClasses;
 
-namespace Dolores
+namespace Dolores.EventHandlers
 {
     class CommandHandler : IInstallable
     {

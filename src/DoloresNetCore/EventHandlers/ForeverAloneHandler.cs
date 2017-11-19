@@ -7,8 +7,9 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Dolores.EventHandlers;
+using Dolores.Modules.Voice;
 
-namespace Dolores.Modules.Social
+namespace Dolores.EventHandlers
 {
     public class ForeverAloneHandler : IInstallable
     {
@@ -36,7 +37,7 @@ namespace Dolores.Modules.Social
                 var usersOnVoiceChannelAsync = guildUser.VoiceChannel.GetUsersAsync();
                 var usersOnVoiceChannel = await usersOnVoiceChannelAsync.Flatten();
                 int usersCount = System.Linq.Enumerable.Count(usersOnVoiceChannel);
-                Voice.Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.Voice.AudioClientWrapper>();
+                Voice.AudioClientWrapper audioClient = m_Map.GetService<Voice.AudioClientWrapper>();
                 if (usersCount == 1)
                 {
                     bool follow = true;

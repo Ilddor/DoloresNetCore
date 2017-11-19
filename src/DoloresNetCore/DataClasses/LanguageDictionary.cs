@@ -29,6 +29,13 @@ namespace Dolores.DataClasses
             Optional,
             PossibleValues,
             NoGame,
+            OrganizationalMessage,
+            OrganizationalMessageFullPart1,
+            OrganizationalMessageFullPart2,
+            MissingAddresses,
+            FilledAddresses,
+            Missing,
+            UserFilledAddressResponse,
         }
 
         private static Dictionary<LangString, Dictionary<Language, string>> m_Dict = new Dictionary<LangString, Dictionary<Language, string>>();
@@ -139,6 +146,52 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Nie grasz aktualnie w żadną grę" },
                         { Language.EN, "You're not playing anything right now" },
+                    }
+                },
+                { LangString.OrganizationalMessage, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Wiadomość organizacyjna" },
+                        { Language.EN, "Organizational message" },
+                    }
+                },
+                { LangString.OrganizationalMessageFullPart1, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Wiadomość organizacyjna, jeśli widniejesz w polu `brakujące adresy` wyślij proszę swój adres do bota w prywatnej wiadomości " +
+                                       "formatując ją w następujący sposób: " },
+                        { Language.EN, "Organizational message, if you're in a field `missing addresses` then please send your shipping address to bot in private message " +
+                                       "format your message in following way: "},
+                    }
+                },
+                { LangString.OrganizationalMessageFullPart2, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, " tutaj_wpisz_swój_adres` w przeciwnym wypadku nie będziesz brać udziału w zabawie, " +
+                                       "w wiadomości zwróć uwagę na poprawne wpisanie numeru z tej wiadomości." },
+                        { Language.EN, " here_write_your_address` or you'll not take part in gift exchange, " +
+                                       "in a message note to write given number from this message properly."},
+                    }
+                },
+                { LangString.MissingAddresses, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Brakujące adresy" },
+                        { Language.EN, "Missing addresses" },
+                    }
+                },
+                { LangString.FilledAddresses, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Wypełnione adresy" },
+                        { Language.EN, "Filled addresses" },
+                    }
+                },
+                { LangString.Missing, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Brak" },
+                        { Language.EN, "Missing" },
+                    }
+                },
+                { LangString.UserFilledAddressResponse, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Dzięki za wypełnienie swojego adresu, sprawdź proszę w wiadomości organizacyjnej czy wszystko się zaktualizowało, w razie problemów napisz do autora bota" },
+                        { Language.EN, "Thanks for filling your address for gift exchange, please check organizational message to see if everything updated, in case of problems reach out to bot author" },
                     }
                 },
             };
