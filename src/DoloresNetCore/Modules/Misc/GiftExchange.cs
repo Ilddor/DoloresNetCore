@@ -13,8 +13,8 @@ using System.Threading.Tasks;
 namespace Dolores.Modules.Misc
 {
     //[RequireInstalled]
-    [LangSummary(LanguageDictionary.Language.PL, "brak opisu")]
-    [LangSummary(LanguageDictionary.Language.EN, "no description")]
+    [LangSummary(LanguageDictionary.Language.PL, "Umożliwia tworzenie eventów polegających na wymianie okazjonjonalnej prezentów między osobami zapisanymi, zapisy odbywają się przez dodanie reakcji do wybranego wpisu")]
+    [LangSummary(LanguageDictionary.Language.EN, "Allows to create events consisting of exchange of occasional gifts between registered users, the registration takes place by adding a reaction to the selected message.")]
     public class GiftExchange : ModuleBase
     {
         private IServiceProvider m_Map;
@@ -26,8 +26,8 @@ namespace Dolores.Modules.Misc
         }
 
         [Command("setExchange")]
-        [LangSummary(LanguageDictionary.Language.PL, "")]
-        [LangSummary(LanguageDictionary.Language.EN, "")]
+        [LangSummary(LanguageDictionary.Language.PL, "Ustawia wiadomość o podanym ID jako zapis do eventu wymiany, jako drugi parametr musi być podana reakcja służąca do zapisu")]
+        [LangSummary(LanguageDictionary.Language.EN, "Sets message of given ID as a signup message for gift exchange event, as a second parameter there should be added a reaction that will sign users that use it")]
         [RequireAdministrator]
         public async Task SetExchange(ulong postID, string signInEmoji)
         {
