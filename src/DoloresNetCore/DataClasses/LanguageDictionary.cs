@@ -36,6 +36,13 @@ namespace Dolores.DataClasses
             FilledAddresses,
             Missing,
             UserFilledAddressResponse,
+            Yes,
+            No,
+            ExchangeRolled,
+            GifterMessagePart1,
+            GifterMessagePart2,
+            GifterMessagePart3,
+            GifterMessagePart4,
         }
 
         private static Dictionary<LangString, Dictionary<Language, string>> m_Dict = new Dictionary<LangString, Dictionary<Language, string>>();
@@ -192,6 +199,48 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Dzięki za wypełnienie swojego adresu, sprawdź proszę w wiadomości organizacyjnej czy wszystko się zaktualizowało, w razie problemów napisz do autora bota" },
                         { Language.EN, "Thanks for filling your address for gift exchange, please check organizational message to see if everything updated, in case of problems reach out to bot author" },
+                    }
+                },
+                { LangString.Yes, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Tak" },
+                        { Language.EN, "Yes" },
+                    }
+                },
+                { LangString.No, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Nie" },
+                        { Language.EN, "No" },
+                    }
+                },
+                { LangString.ExchangeRolled, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Wymiana rozlosowana" },
+                        { Language.EN, "Exchange rolled" },
+                    }
+                },
+                { LangString.GifterMessagePart1, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Hej, właśnie wylosowałam pary do wymiany prezentów z serwera: " },
+                        { Language.EN, "Hi, I just drew pairs for gift exchange on server: " },
+                    }
+                },
+                { LangString.GifterMessagePart2, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, " tobie został przydzielony użytkownik: " },
+                        { Language.EN, " you've been assigned user: " },
+                    }
+                },
+                { LangString.GifterMessagePart3, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, " jego/jej adres to: " },
+                        { Language.EN, " his/her address is: " },
+                    }
+                },
+                { LangString.GifterMessagePart4, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, " więcej informacji z czasem do kiedy trzeba wysłać prezent znajduje się w wiadomości o wymianie do której się zapisałeś/aś. W przypadku braku adresu w tej wiadomości lub jeśli jest on nieprawidłowy skontaktuj się z administratorem wspomnianego serwera lub z autorem tego bota." },
+                        { Language.EN, " more information about when is a deadline for sending package you can find in a message you've signed in with. In case of address not showing up in this message or in case of incorrect address, please contect mentioned server administrator or bot owner." },
                     }
                 },
             };

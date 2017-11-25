@@ -27,7 +27,7 @@ namespace Dolores.EventHandlers
         private async Task ReactionAdded(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel messageChannel, SocketReaction reaction)
         {
             var exchanges = m_Map.GetService<Exchanges>();
-            if (exchanges.IsExchange(message.Id))
+            if (exchanges.IsExchange(message.Id) && !exchanges.IsRolled(message.Id))
             {
                 await UpdateHelperMessage(message.Id, m_Map);
             }
@@ -76,6 +76,8 @@ namespace Dolores.EventHandlers
 
             gatheredAddresses.AddField(guildConfig.Translation.MissingAddresses, WithoutAddress);
             gatheredAddresses.AddField(guildConfig.Translation.FilledAddresses, WithAddress);
+            gatheredAddresses.AddField(guildConfig.Translation.ExchangeRolled,
+                exchanges.IsRolled(exchangeID) ? guildConfig.Translation.Yes : guildConfig.Translation.No);
 
             var helperMessage = await messageChannel.GetMessageAsync(exchanges.GetHelperMessageID(exchangeID));
             await (helperMessage as IUserMessage).ModifyAsync(x =>

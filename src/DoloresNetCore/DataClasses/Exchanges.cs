@@ -15,6 +15,7 @@ namespace Dolores.DataClasses
             public ulong m_ChannelID = 0;
             public ulong m_GuildID = 0;
             public string m_SignInReaction = null;
+            public bool m_Rolled = false;
             public Dictionary<ulong, string> m_Addresses = new Dictionary<ulong, string>();
         }
 
@@ -102,6 +103,40 @@ namespace Dolores.DataClasses
             {
                 m_Mutex.ReleaseMutex();
             }
+        }
+
+        public void SetRolled(ulong exchangeID)
+        {
+            m_Mutex.WaitOne();
+            try
+            {
+                if (m_Exchanges.ContainsKey(exchangeID))
+                {
+                    m_Exchanges[exchangeID].m_Rolled = true;
+                }
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+        }
+
+        public bool IsRolled(ulong exchangeID)
+        {
+            bool result = false;
+            m_Mutex.WaitOne();
+            try
+            {
+                if (m_Exchanges.ContainsKey(exchangeID))
+                {
+                    result = m_Exchanges[exchangeID].m_Rolled;
+                }
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+            return result;
         }
 
         public bool IsExchange(ulong exchangeID)
