@@ -140,7 +140,7 @@ namespace Dolores.Modules.Misc
                 var streamWriter = new StreamWriter(stream);
                 foreach (var pair in giftPairs)
                 {
-                    streamWriter.WriteLine($"{pair.Key.Mention} - {pair.Value.Item1.Mention} : {pair.Value.Item2}");
+                    streamWriter.WriteLine($"{pair.Key.Username} - {pair.Value.Item1.Username} : {pair.Value.Item2}");
                 }
                 streamWriter.Flush();
                 stream.Flush();
@@ -148,16 +148,20 @@ namespace Dolores.Modules.Misc
 
             foreach (var pair in giftPairs)
             {
-                var dmChannel = await pair.Key.GetOrCreateDMChannelAsync();
+                var gifter = await Context.Guild.GetUserAsync(pair.Key.Id);
+                var dmChannel = await gifter.GetOrCreateDMChannelAsync();
+                await dmChannel.CloseAsync();
+                dmChannel = await gifter.GetOrCreateDMChannelAsync();
 
-                await dmChannel.SendMessageAsync(
-                    guildConfig.Translation.GifterMessagePart1 +
-                    Context.Guild.Name +
-                    guildConfig.Translation.GifterMessagePart2 +
-                    pair.Value.Item1.Username +
-                    guildConfig.Translation.GifterMessagePart3 +
-                    pair.Value.Item2 +
-                    guildConfig.Translation.GifterMessagePart4);
+                string message = guildConfig.Translation.GifterMessagePart1 +
+                Context.Guild.Name +
+                guildConfig.Translation.GifterMessagePart2 +
+                pair.Value.Item1.Username +
+                guildConfig.Translation.GifterMessagePart3 +
+                pair.Value.Item2 +
+                guildConfig.Translation.GifterMessagePart4;
+
+                var tmp = await dmChannel.SendMessageAsync(message);
             }
 
             await GiftExchangeHandler.UpdateHelperMessage(postID, m_Map);
