@@ -48,7 +48,8 @@ namespace Dolores.Modules.Games
                     {
                         if (user != callingUser &&
                             user.Game.HasValue &&
-                            user.Game.Value.Name == callingUser.Game.Value.Name)
+                            user.Game.Value.Name == callingUser.Game.Value.Name &&
+                            (user as IGuildUser).VoiceChannel != null)
                         {
                             message += $", {user.Username}";
                             await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
