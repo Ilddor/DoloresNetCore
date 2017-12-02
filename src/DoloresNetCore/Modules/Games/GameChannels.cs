@@ -44,15 +44,17 @@ namespace Dolores.Modules.Games
                 try
                 {
                     List<Task> moves = new List<Task>();
-                    foreach (SocketUser user in ((callingUser as IGuildUser).VoiceChannel as SocketChannel).Users)
+                    if ((callingUser as IGuildUser).VoiceChannel != null)
                     {
-                        if (user != callingUser &&
-                            user.Game.HasValue &&
-                            user.Game.Value.Name == callingUser.Game.Value.Name &&
-                            (user as IGuildUser).VoiceChannel != null)
+                        foreach (SocketUser user in ((callingUser as IGuildUser).VoiceChannel as SocketChannel).Users)
                         {
-                            message += $", {user.Username}";
-                            await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
+                            if (user != callingUser &&
+                                user.Game.HasValue &&
+                                user.Game.Value.Name == callingUser.Game.Value.Name)
+                            {
+                                message += $", {user.Username}";
+                                await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
+                            }
                         }
                     }
                     message += $" {guildConfig.Translation.ToChannel} {callingUser.Game.Value.Name}";
