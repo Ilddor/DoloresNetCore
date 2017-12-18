@@ -188,5 +188,26 @@ namespace Dolores.Modules.Misc
                 await Context.Channel.SendMessageAsync(guildConfig.Translation.UserFilledAddressResponse);
             }
         }
+
+        [Command("myExchangePictures")]
+        [LangSummary(LanguageDictionary.Language.PL, "")]
+        [LangSummary(LanguageDictionary.Language.EN, "")]
+        [RequireContext(ContextType.DM)]
+        public async Task SetExchangePictures(ulong exchangeID, params string[] pictures_url)
+        {
+            var exchanges = m_Map.GetService<Exchanges>();
+            if (exchanges.IsExchange(exchangeID))
+            {
+                string ulrCombined = string.Join(" ", pictures_url);
+                exchanges.AddAddress(exchangeID, Context.User.Id, ulrCombined);
+
+                await GiftExchangeHandler.UpdateHelperMessage(exchangeID, m_Map);
+
+                var configs = m_Map.GetService<Configurations>();
+                Configurations.GuildConfig guildConfig = configs.GetGuildConfig(exchanges.GetGuildID(exchangeID));
+
+                await Context.Channel.SendMessageAsync(guildConfig.Translation.UserSentPicturesResponse);
+            }
+        }
     }
 }

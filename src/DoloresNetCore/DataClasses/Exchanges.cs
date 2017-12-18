@@ -17,10 +17,28 @@ namespace Dolores.DataClasses
             public string m_SignInReaction = null;
             public bool m_Rolled = false;
             public Dictionary<ulong, string> m_Addresses = new Dictionary<ulong, string>();
+            public Dictionary<ulong, string> m_PicturesUrls = new Dictionary<ulong, string>();
         }
 
         private Dictionary<ulong, Exchange> m_Exchanges = new Dictionary<ulong, Exchange>();
         private Mutex m_Mutex = new Mutex();
+
+        public void AddPictureUrl(ulong exchangeID, ulong userID, string url)
+        {
+            m_Mutex.WaitOne();
+            try
+            {
+                if (!m_Exchanges.ContainsKey(exchangeID))
+                    m_Exchanges.Add(exchangeID, new Exchange());
+
+                if (!m_Exchanges[exchangeID].m_PicturesUrls.ContainsKey(userID))
+                    m_Exchanges[exchangeID].m_PicturesUrls.Add(userID, url);
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+        }
 
         public void AddAddress(ulong exchangeID, ulong userID, string address)
         {
@@ -147,6 +165,44 @@ namespace Dolores.DataClasses
             {
                 if (m_Exchanges.ContainsKey(exchangeID))
                     result = true;
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+            return result;
+        }
+
+        public bool AnyPictureUrls(ulong exchangeID)
+        {
+            bool result = false;
+            m_Mutex.WaitOne();
+            try
+            {
+                if (m_Exchanges.ContainsKey(exchangeID))
+                {
+                    if (m_Exchanges[exchangeID].m_PicturesUrls.Count > 0)
+                        result = true;
+                }
+            }
+            finally
+            {
+                m_Mutex.ReleaseMutex();
+            }
+            return result;
+        }
+
+        public string GetUserPicturesUrl(ulong exchangeID, ulong userID)
+        {
+            string result = null;
+            m_Mutex.WaitOne();
+            try
+            {
+                if (m_Exchanges.ContainsKey(exchangeID))
+                {
+                    if (m_Exchanges[exchangeID].m_PicturesUrls.ContainsKey(userID))
+                        result = m_Exchanges[exchangeID].m_PicturesUrls[userID];
+                }
             }
             finally
             {

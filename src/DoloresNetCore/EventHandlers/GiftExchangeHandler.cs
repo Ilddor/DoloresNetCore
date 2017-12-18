@@ -53,31 +53,46 @@ namespace Dolores.EventHandlers
 
             gatheredAddresses.WithAuthor(exchangeSignPost.Author);
             gatheredAddresses.WithDescription(
-                guildConfig.Translation.OrganizationalMessageFullPart1 + $"`{guildConfig.Prefix}setExchangeAddress " + exchangeID + guildConfig.Translation.OrganizationalMessageFullPart2);
+                guildConfig.Translation.OrganizationalMessageFullPart1 + $"`{guildConfig.Prefix}setExchangeAddress " + exchangeID + 
+                guildConfig.Translation.OrganizationalMessageFullPart2 + $"`{guildConfig.Prefix}myExchangePictures " + exchangeID + " imgur url`");
 
-            string WithAddress = "";
-            string WithoutAddress = "";
+            string withAddress = "";
+            string withoutAddress = "";
             foreach (var user in signedUsers)
             {
                 if (exchanges.GetUserAddress(exchangeID, user.Id) != null)
                 {
-                    WithAddress += $"- {user.Mention}\n";
+                    withAddress += $"- {user.Mention}\n";
                 }
                 else
                 {
-                    WithoutAddress += $"- {user.Mention}\n";
+                    withoutAddress += $"- {user.Mention}\n";
                 }
             }
 
-            if (WithAddress == "")
-                WithAddress = guildConfig.Translation.Missing;
-            if (WithoutAddress == "")
-                WithoutAddress = guildConfig.Translation.Missing;
+            if (withAddress == "")
+                withAddress = guildConfig.Translation.Missing;
+            if (withoutAddress == "")
+                withoutAddress = guildConfig.Translation.Missing;
 
-            gatheredAddresses.AddField(guildConfig.Translation.MissingAddresses, WithoutAddress);
-            gatheredAddresses.AddField(guildConfig.Translation.FilledAddresses, WithAddress);
+            gatheredAddresses.AddField(guildConfig.Translation.MissingAddresses, withoutAddress);
+            gatheredAddresses.AddField(guildConfig.Translation.FilledAddresses, withAddress);
             gatheredAddresses.AddField(guildConfig.Translation.ExchangeRolled,
                 exchanges.IsRolled(exchangeID) ? guildConfig.Translation.Yes : guildConfig.Translation.No);
+
+            if (exchanges.AnyPictureUrls(exchangeID))
+            {
+                string urls = "";
+                foreach (var user in signedUsers)
+                {
+                    if(exchanges.GetUserPicturesUrl(exchangeID, user.Id) != null)
+                    {
+                        urls += $"- {user.Mention}: {exchanges.GetUserPicturesUrl(exchangeID, user.Id)}\n";
+                    }
+                }
+
+                gatheredAddresses.AddField(guildConfig.Translation.Pictures, urls);
+            }
 
             var helperMessage = await messageChannel.GetMessageAsync(exchanges.GetHelperMessageID(exchangeID));
             await (helperMessage as IUserMessage).ModifyAsync(x =>

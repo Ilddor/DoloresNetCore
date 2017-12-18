@@ -34,8 +34,10 @@ namespace Dolores.DataClasses
             OrganizationalMessageFullPart2,
             MissingAddresses,
             FilledAddresses,
+            Pictures,
             Missing,
             UserFilledAddressResponse,
+            UserSentPicturesResponse,
             Yes,
             No,
             ExchangeRolled,
@@ -172,9 +174,11 @@ namespace Dolores.DataClasses
                 { LangString.OrganizationalMessageFullPart2, new Dictionary<Language, string>()
                     {
                         { Language.PL, " tutaj_wpisz_swój_adres` w przeciwnym wypadku nie będziesz brać udziału w zabawie, " +
-                                       "w wiadomości zwróć uwagę na poprawne wpisanie numeru z tej wiadomości." },
+                                       "w wiadomości zwróć uwagę na poprawne wpisanie numeru z tej wiadomości. " +
+                                       "Po otrzymaniu prezentu, zachęcam do wrzucenia zdjęć na imgur.com a następnie udostępnienie ich przy pomocy prywatnej komendy skierowanej do bota: "},
                         { Language.EN, " here_write_your_address` or you'll not take part in gift exchange, " +
-                                       "in a message note to write given number from this message properly."},
+                                       "in a message note to write given number from this message properly. " +
+                                       "After getting your gift, I encourage you to put pictures on imgur.com and then share them with us by sending message to bot formatted like this: "},
                     }
                 },
                 { LangString.MissingAddresses, new Dictionary<Language, string>()
@@ -189,6 +193,12 @@ namespace Dolores.DataClasses
                         { Language.EN, "Filled addresses" },
                     }
                 },
+                { LangString.Pictures, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Zdjęcia" },
+                        { Language.EN, "Pictures" },
+                    }
+                },
                 { LangString.Missing, new Dictionary<Language, string>()
                     {
                         { Language.PL, "Brak" },
@@ -199,6 +209,12 @@ namespace Dolores.DataClasses
                     {
                         { Language.PL, "Dzięki za wypełnienie swojego adresu, sprawdź proszę w wiadomości organizacyjnej czy wszystko się zaktualizowało, w razie problemów napisz do autora bota" },
                         { Language.EN, "Thanks for filling your address for gift exchange, please check organizational message to see if everything updated, in case of problems reach out to bot author" },
+                    }
+                },
+                { LangString.UserSentPicturesResponse, new Dictionary<Language, string>()
+                    {
+                        { Language.PL, "Dzięki za udostępnienie swoich zdjęć, mam nadzieję, że zabawa była wspaniała, możesz sprawdzić swoje oraz inne zdjęcia w wiadomości organizacyjnej zabawy" },
+                        { Language.EN, "Thanks for sharing your pictures, I hope that was fun, you can check yours and others pictures in organizational message of this exchange" },
                     }
                 },
                 { LangString.Yes, new Dictionary<Language, string>()
