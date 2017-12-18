@@ -199,7 +199,7 @@ namespace Dolores.Modules.Misc
             if (exchanges.IsExchange(exchangeID))
             {
                 string ulrCombined = string.Join(" ", pictures_url);
-                exchanges.AddAddress(exchangeID, Context.User.Id, ulrCombined);
+                exchanges.AddPictureUrl(exchangeID, Context.User.Id, ulrCombined);
 
                 await GiftExchangeHandler.UpdateHelperMessage(exchangeID, m_Map);
 
