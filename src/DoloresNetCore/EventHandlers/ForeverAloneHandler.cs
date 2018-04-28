@@ -28,7 +28,7 @@ namespace Dolores.EventHandlers
 
         private async Task UserVoiceStateUpdated(SocketUser updatedUser, SocketVoiceState before, SocketVoiceState after)
         {
-            SocketGuild guild = m_Client.GetGuild(269960016591716362);
+            /*SocketGuild guild = m_Client.GetGuild(269960016591716362);
             SocketUser user = guild.GetUser(m_UserIDToFollow);
 
             IGuildUser guildUser = user as IGuildUser;
@@ -63,7 +63,7 @@ namespace Dolores.EventHandlers
                     }
                 }
             }
-            return;
+            return;*/
         }
     }
 }
