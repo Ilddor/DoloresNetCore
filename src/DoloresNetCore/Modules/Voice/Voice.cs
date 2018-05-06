@@ -179,7 +179,7 @@ namespace Dolores.Modules.Voice
             var ffmpeg = new ProcessStartInfo
             {
                 FileName = "ffmpeg",
-                Arguments = $"-i {path} -af \"volume=0.1\" pipe:1",
+                Arguments = $"-i {path} -af \"volume=0.1\" -ac 2 -f s16le -ar 48000 pipe:1",
                 //Arguments = $"-i \"https://www.youtube.com/watch?v=8w_lwezZDUw \" -af \"volume=0.1\" -ac 2 -f s16le -ar 44000 pipe:1",
                 UseShellExecute = false,
                 
