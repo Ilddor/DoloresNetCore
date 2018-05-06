@@ -104,7 +104,7 @@ namespace Dolores.Modules.Voice
                 audioWrapper.m_Process = ffmpeg;
 
                 var output = audioWrapper.m_Process.StandardOutput.BaseStream;
-                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
+                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 audioWrapper.StopPlay(m_Map);
@@ -149,7 +149,7 @@ namespace Dolores.Modules.Voice
                 tmp.m_Process = ffmpeg;
                 tmp.m_Playing = true;
                 var output = tmp.m_Process.StandardOutput.BaseStream;
-                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music, 1920);
+                var discord = m_Map.GetService<AudioClientWrapper>().m_AudioClient.CreatePCMStream(AudioApplication.Music);
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
