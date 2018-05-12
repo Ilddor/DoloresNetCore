@@ -126,8 +126,10 @@ namespace Dolores.Modules.Voice
             }
 
             string name = "Music/" + url.Substring(url.Length - 11, 11) + ".mp3";
+
             if (!System.IO.File.Exists(name))
             {
+				var audioInfoMsg = await Context.Channel.SendMessageAsync("Starting download");
                 var ytd = new ProcessStartInfo
                 {
                     FileName = "youtube-dl",
@@ -137,8 +139,19 @@ namespace Dolores.Modules.Voice
 
                     RedirectStandardOutput = true,
                 };
-                Process ytdl = Process.Start(ytd);
-
+				Process ytdl = new Process();
+				ytdl.OutputDataReceived += async (s, e) =>
+				{
+					if(e.Data.StartsWith("[download]"))
+					{
+						await audioInfoMsg.ModifyAsync(x =>
+						{
+							x.Content = e.Data;
+						});
+					}
+				};
+				ytdl.StartInfo = ytd;
+				ytdl.Start();
                 ytdl.WaitForExit();
             }
 
