@@ -146,18 +146,6 @@ namespace Dolores.Modules.Voice
 					RedirectStandardError = true,
                 };
 				Process ytdl = new Process();
-				ytdl.OutputDataReceived += (s, e) =>
-				{
-					if (e.Data.StartsWith("[download]"))
-					{
-						msgMutex.WaitOne();
-						audioInfoMsg.ModifyAsync(x =>
-						{
-							x.Content = e.Data;
-						});
-						msgMutex.ReleaseMutex();
-					}
-				};
 				ytdl.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
 				ytdl.StartInfo = ytd;
 				ytdl.Start();
