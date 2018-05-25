@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Dolores.DataClasses;
 using Dolores.CustomAttributes;
+using System.Threading;
 
 namespace Dolores.Modules.Voice
 {
@@ -81,7 +82,8 @@ namespace Dolores.Modules.Voice
         [LangSummary(LanguageDictionary.Language.EN, "Bot will join your voice channel")]
         private async Task JoinAudio()
         {
-            IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
+			Context.Message.DeleteAsync();
+			IVoiceChannel channel = (Context.Message.Author as IGuildUser)?.VoiceChannel;
             await m_Map.GetService<AudioClientWrapper>().JoinVoiceChannel(m_Map, channel);
         }
 
@@ -90,6 +92,7 @@ namespace Dolores.Modules.Voice
         [LangSummary(LanguageDictionary.Language.EN, "Bot will leave voice channel")]
         private async Task LeaveAudio()
         {
+			Context.Message.DeleteAsync();
             await m_Map.GetService<AudioClientWrapper>().LeaveVoiceChannel(m_Map);
         }
 
@@ -129,34 +132,41 @@ namespace Dolores.Modules.Voice
 
             if (!System.IO.File.Exists(name))
             {
+				await Context.Message.AddReactionAsync(Emote.Parse(":arrow_down:"));
 				var audioInfoMsg = await Context.Channel.SendMessageAsync("Starting download");
+				Mutex msgMutex = new Mutex();
                 var ytd = new ProcessStartInfo
                 {
-                    FileName = "youtube-dl",
+                    FileName = "youtube-dl.exe",
                     Arguments = $"--extract-audio --audio-format mp3 -o Music/%(id)s.%(ext)s {url}",
                     //Arguments = $"-i \"https://www.youtube.com/watch?v=8w_lwezZDUw \" -af \"volume=0.1\" -ac 2 -f s16le -ar 44000 pipe:1",
                     UseShellExecute = false,
 
                     RedirectStandardOutput = true,
+					RedirectStandardError = true,
                 };
 				Process ytdl = new Process();
-				ytdl.OutputDataReceived += async (s, e) =>
+				ytdl.OutputDataReceived += (s, e) =>
 				{
-					if(e.Data.StartsWith("[download]"))
+					if (e.Data.StartsWith("[download]"))
 					{
-						await audioInfoMsg.ModifyAsync(x =>
+						msgMutex.WaitOne();
+						audioInfoMsg.ModifyAsync(x =>
 						{
 							x.Content = e.Data;
 						});
+						msgMutex.ReleaseMutex();
 					}
 				};
+				ytdl.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
 				ytdl.StartInfo = ytd;
 				ytdl.Start();
+				ytdl.BeginOutputReadLine();
+				ytdl.BeginErrorReadLine();
                 ytdl.WaitForExit();
             }
 
-            
-            await Context.Channel.SendMessageAsync($"{guildConfig.Translation.StartingPlaying}");
+			await Context.Message.AddReactionAsync(Emote.Parse(":arrow_forward:"));
             {
                 var ffmpeg = CreateStream(name);
                 tmp.m_Process = ffmpeg;
@@ -166,8 +176,8 @@ namespace Dolores.Modules.Voice
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.SongEnd}");
-            }
+				await Context.Message.AddReactionAsync(Emote.Parse(":white_check_mark:"));
+			}
         }
 
         [Command("stopPlay")]
