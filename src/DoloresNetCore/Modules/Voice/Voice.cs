@@ -154,7 +154,7 @@ namespace Dolores.Modules.Voice
                 ytdl.WaitForExit();
             }
 
-			await Context.Message.AddReactionAsync(Emote.Parse("▶"));
+			await Context.Message.AddReactionAsync(new Emoji("▶"));
             {
                 var ffmpeg = CreateStream(name);
                 tmp.m_Process = ffmpeg;
@@ -164,7 +164,7 @@ namespace Dolores.Modules.Voice
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
-				await Context.Message.AddReactionAsync(Emote.Parse("✅"));
+				await Context.Message.AddReactionAsync(new Emoji("✅"));
 			}
         }
 
