@@ -137,7 +137,7 @@ namespace Dolores.Modules.Voice
 				Mutex msgMutex = new Mutex();
                 var ytd = new ProcessStartInfo
                 {
-                    FileName = "youtube-dl.exe",
+                    FileName = "youtube-dl",
                     Arguments = $"--extract-audio --audio-format mp3 -o Music/%(id)s.%(ext)s {url}",
                     //Arguments = $"-i \"https://www.youtube.com/watch?v=8w_lwezZDUw \" -af \"volume=0.1\" -ac 2 -f s16le -ar 44000 pipe:1",
                     UseShellExecute = false,
