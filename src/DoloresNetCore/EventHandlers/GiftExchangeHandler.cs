@@ -47,7 +47,8 @@ namespace Dolores.EventHandlers
             string signInReaction = exchanges.GetSignInReaction(exchangeID);
             var exchangeSignPost = await messageChannel.GetMessageAsync(exchangeID) as IUserMessage;
 
-            var signedUsers = await exchangeSignPost.GetReactionUsersAsync(signInReaction);
+            var signedUsersAsync = exchangeSignPost.GetReactionUsersAsync(Emote.Parse(signInReaction), 10000);
+			var signedUsers = signedUsersAsync.Flatten();
 
             var gatheredAddresses = new EmbedBuilder().WithColor(random.Next(255), random.Next(255), random.Next(255));
 
@@ -58,17 +59,18 @@ namespace Dolores.EventHandlers
 
             string withAddress = "";
             string withoutAddress = "";
-            foreach (var user in signedUsers)
-            {
-                if (exchanges.GetUserAddress(exchangeID, user.Id) != null)
-                {
-                    withAddress += $"- {user.Mention}\n";
-                }
-                else
-                {
-                    withoutAddress += $"- {user.Mention}\n";
-                }
-            }
+			//foreach (var user in signedUsers)
+			System.Linq.AsyncEnumerable.Do(signedUsers, user =>
+			{
+				if (exchanges.GetUserAddress(exchangeID, user.Id) != null)
+				{
+					withAddress += $"- {user.Mention}\n";
+				}
+				else
+				{
+					withoutAddress += $"- {user.Mention}\n";
+				}
+			});
 
             if (withAddress == "")
                 withAddress = guildConfig.Translation.Missing;
@@ -83,13 +85,14 @@ namespace Dolores.EventHandlers
             if (exchanges.AnyPictureUrls(exchangeID))
             {
                 string urls = "";
-                foreach (var user in signedUsers)
-                {
-                    if(exchanges.GetUserPicturesUrl(exchangeID, user.Id) != null)
-                    {
-                        urls += $"- {user.Mention}: {exchanges.GetUserPicturesUrl(exchangeID, user.Id)}\n";
-                    }
-                }
+				//foreach (var user in signedUsers)
+				System.Linq.AsyncEnumerable.Do(signedUsers, user =>
+				{
+					if (exchanges.GetUserPicturesUrl(exchangeID, user.Id) != null)
+					{
+						urls += $"- {user.Mention}: {exchanges.GetUserPicturesUrl(exchangeID, user.Id)}\n";
+					}
+				});
 
                 gatheredAddresses.AddField(guildConfig.Translation.Pictures, urls);
             }

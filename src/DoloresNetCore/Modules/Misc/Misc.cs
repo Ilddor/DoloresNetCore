@@ -56,7 +56,7 @@ namespace Dolores.Modules.Misc
                 foreach (var module in m_Commands.Modules)
                 {
                     if(module.Preconditions.Any(x => x is RequireInstalledAttribute) &&
-                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissions(Context, module.Commands.First(), m_Map)).IsSuccess)
+                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissionsAsync(Context, module.Commands.First(), m_Map)).IsSuccess)
                         continue; // If module was not installed, omit it in help
 
                     if (module.Preconditions.Any(x => x is HiddenAttribute))
@@ -82,7 +82,7 @@ namespace Dolores.Modules.Misc
                 message += $"{guildConfig.Translation.TimeOnline}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
                 message += $"{guildConfig.Translation.Version}: {Dolores.m_Instance.m_Version}\n";
                 embedMessage.WithFooter(message);
-                await Context.Channel.SendMessageAsync("", embed: embedMessage);
+                await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
             }
             else
             {
@@ -133,7 +133,7 @@ namespace Dolores.Modules.Misc
                     if (message != "")
                         embedMessage.WithDescription(message);
 
-                    await Context.Channel.SendMessageAsync("", embed: embedMessage);
+                    await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
                 }
             }
         }
@@ -148,7 +148,8 @@ namespace Dolores.Modules.Misc
                 new EmbedBuilder()
                     .WithDescription("Pong!")
                     .AddField("Latency:", $"{client.Latency} ms")
-                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255))
+					.Build());
         }
 
         [Command("invite")]
@@ -161,7 +162,8 @@ namespace Dolores.Modules.Misc
                 new EmbedBuilder()
                     .WithTitle("InviteMe!")
                     .WithUrl("https://discordapp.com/oauth2/authorize?client_id=274940517735858176&scope=bot&permissions=255323384")
-                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+                    .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255))
+					.Build());
         }
 
         [Command("rawr")]

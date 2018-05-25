@@ -81,7 +81,7 @@ namespace Dolores.Modules.Misc
 
                 bool installed = true;
                 if (module.Preconditions.Any(x => x is RequireInstalledAttribute) &&
-                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissions(Context, module.Commands.First(), m_Map)).IsSuccess)
+                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissionsAsync(Context, module.Commands.First(), m_Map)).IsSuccess)
                     installed = false;
 
                 if (installed)
@@ -92,7 +92,7 @@ namespace Dolores.Modules.Misc
                         (module.Attributes.Where(x => Configurations.FindLangSummaryAttribute(x, guildConfig.Lang)).First() as LangSummaryAttribute).Summary);
                 //await message.ModifyAsync(x => x.Embed = embedMessage.Build());
             }
-            await Context.Channel.SendMessageAsync("", embed: embedMessage);
+            await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
         }
     }
 }

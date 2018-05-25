@@ -36,11 +36,11 @@ namespace Dolores.Modules.Games
                 callingUser = await Context.Guild.GetUserAsync(ulong.Parse(mention.Replace("<@!", "").Replace("<@", "").Replace(">", ""))) as SocketUser;
             }
 
-            if (callingUser.Game.HasValue)
+            if (callingUser.Activity.Name.Any())
             {
                 string message = $"{guildConfig.Translation.Moving}: {callingUser.Username}";
                 bool success = true;
-                IVoiceChannel newChannel = await Context.Guild.CreateVoiceChannelAsync(callingUser.Game.Value.Name);
+                IVoiceChannel newChannel = await Context.Guild.CreateVoiceChannelAsync(callingUser.Activity.Name);
                 try
                 {
                     List<Task> moves = new List<Task>();
@@ -49,15 +49,15 @@ namespace Dolores.Modules.Games
                         foreach (SocketUser user in ((callingUser as IGuildUser).VoiceChannel as SocketChannel).Users)
                         {
                             if (user != callingUser &&
-                                user.Game.HasValue &&
-                                user.Game.Value.Name == callingUser.Game.Value.Name)
+                                user.Activity.Name.Any() &&
+                                user.Activity.Name == callingUser.Activity.Name)
                             {
                                 message += $", {user.Username}";
                                 await (user as IGuildUser).ModifyAsync((e) => { e.Channel = new Optional<IVoiceChannel>(newChannel); });
                             }
                         }
                     }
-                    message += $" {guildConfig.Translation.ToChannel} {callingUser.Game.Value.Name}";
+                    message += $" {guildConfig.Translation.ToChannel} {callingUser.Activity.Name}";
                     foreach (var it in moves)
                     {
                         it.Wait();

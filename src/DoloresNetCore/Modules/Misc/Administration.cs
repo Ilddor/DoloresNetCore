@@ -36,7 +36,12 @@ namespace Dolores.Modules.Misc
             }
 
 
-            await Context.Channel.SendMessageAsync("Available guilds:", embed: new EmbedBuilder().WithDescription(message).WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+            await Context.Channel.SendMessageAsync(
+				"Available guilds:", 
+				embed: new EmbedBuilder()
+					.WithDescription(message)
+					.WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255))
+					.Build());
         }
 
         [Command("guildInfo")]
@@ -56,7 +61,7 @@ namespace Dolores.Modules.Misc
             embedMessage.AddField("Voice channels:", guild.VoiceChannels.Count.ToString(), true);
             embedMessage.AddField("Permissions:", guild.GetUser(client.CurrentUser.Id).GuildPermissions.ToString(), true);
 
-            await Context.Channel.SendMessageAsync("", embed: embedMessage);
+            await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
         }
 
         [Command("guildConfigInfo")]
@@ -98,7 +103,12 @@ namespace Dolores.Modules.Misc
             }
 
 
-            await Context.Channel.SendMessageAsync("I'm here:", embed: new EmbedBuilder().WithDescription(message).WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+            await Context.Channel.SendMessageAsync(
+				"I'm here:", 
+				embed: new EmbedBuilder()
+					.WithDescription(message)
+					.WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255))
+					.Build());
         }
     }
 }

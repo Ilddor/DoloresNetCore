@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Dolores.DataClasses;
+using System.Linq;
 
 namespace Dolores.EventHandlers
 {
@@ -37,7 +38,7 @@ namespace Dolores.EventHandlers
             }
             //if (after.Guild.Id == 269960016591716362)
             {
-                if (before.Game.HasValue || !after.Game.HasValue)
+                if (before.Activity.Name.Any() || !after.Activity.Name.Any())
                 {
                     gameTimes.m_Mutex.WaitOne();
                     try
@@ -60,7 +61,7 @@ namespace Dolores.EventHandlers
                     gameTimes.m_Mutex.ReleaseMutex();
                 }
 
-                if (after.Game.HasValue)
+                if (after.Activity.Name.Any())
                 {
                     gameTimes.m_Mutex.WaitOne();
                     try
@@ -79,7 +80,7 @@ namespace Dolores.EventHandlers
                             gameTimes.m_StartTimes.Remove(after.Id);
                         }
 
-                        gameTimes.m_StartTimes[after.Id] = new Tuple<string, DateTime>(after.Game.Value.Name, DateTime.Now);
+                        gameTimes.m_StartTimes[after.Id] = new Tuple<string, DateTime>(after.Activity.Name, DateTime.Now);
                     }
                     catch (Exception) { }
                     gameTimes.m_Mutex.ReleaseMutex();

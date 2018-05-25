@@ -13,7 +13,7 @@ namespace Dolores.CustomAttributes
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple = true)]
     class RequireAdministratorAttribute : PreconditionAttribute
     {
-        public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
+        public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             if ((context.User as SocketGuildUser).GuildPermissions.Administrator)
                 return PreconditionResult.FromSuccess();

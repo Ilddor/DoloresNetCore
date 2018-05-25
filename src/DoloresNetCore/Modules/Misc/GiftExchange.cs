@@ -80,17 +80,19 @@ namespace Dolores.Modules.Misc
 
             var signUpMessage = await Context.Channel.GetMessageAsync(postID) as IUserMessage;
 
-            var signedUsers = await signUpMessage.GetReactionUsersAsync(exchanges.GetSignInReaction(postID));
+            var signedUsersAsync = signUpMessage.GetReactionUsersAsync(Emote.Parse(exchanges.GetSignInReaction(postID)), -1);
+			var signedUsers = signedUsersAsync.Flatten();
 
             Dictionary<IUser, string> usersWithAddress = new Dictionary<IUser, string>();
 
-            foreach(var user in signedUsers)
-            {
-                if(exchanges.GetUserAddress(postID, user.Id) != null)
-                {
-                    usersWithAddress.Add(user, exchanges.GetUserAddress(postID, user.Id));
-                }
-            }
+			//foreach(var user in signedUsers)
+			System.Linq.AsyncEnumerable.Do(signedUsers, user =>
+			{
+				if (exchanges.GetUserAddress(postID, user.Id) != null)
+				{
+					usersWithAddress.Add(user, exchanges.GetUserAddress(postID, user.Id));
+				}
+			});
 
             Dictionary<IUser, Tuple<IUser, string>> giftPairs = new Dictionary<IUser, Tuple<IUser, string>>();
 

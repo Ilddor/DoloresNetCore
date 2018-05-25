@@ -13,7 +13,7 @@ namespace Dolores.CustomAttributes
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
     class RequireInstalledAttribute : PreconditionAttribute
     {
-        public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
+        public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             var configs = map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = null;

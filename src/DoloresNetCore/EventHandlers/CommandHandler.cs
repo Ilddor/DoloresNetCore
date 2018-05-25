@@ -26,7 +26,7 @@ namespace Dolores.EventHandlers
             m_Commands = new CommandService();
             m_Map = map;
 
-            await m_Commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await m_Commands.AddModulesAsync(Assembly.GetEntryAssembly(), m_Map);
 
             m_Client.MessageReceived += HandleCommand;
         }

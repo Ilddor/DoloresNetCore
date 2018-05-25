@@ -89,7 +89,7 @@ namespace Dolores.EventHandlers
             if ((channel as SocketTextChannel).Guild.Id != 269960016591716362)
                 return;
 
-            if ((channel as IMessageChannel).IsNsfw)
+            if ((channel as ITextChannel).IsNsfw)
                 return;
 
             if (message.HasValue && !message.Value.Author.IsBot)
@@ -99,7 +99,8 @@ namespace Dolores.EventHandlers
                     new EmbedBuilder()
                         .WithAuthor(message.Value.Author)
                         .WithDescription(message.Value.Content)
-                        .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255)));
+                        .WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255))
+						.Build());
             }
         }
 
