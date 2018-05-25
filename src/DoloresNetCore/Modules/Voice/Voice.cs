@@ -134,7 +134,6 @@ namespace Dolores.Modules.Voice
             {
 				var emote = new Emoji("⬇");
 				await Context.Message.AddReactionAsync(emote);
-				var audioInfoMsg = await Context.Channel.SendMessageAsync("Starting download");
 				Mutex msgMutex = new Mutex();
                 var ytd = new ProcessStartInfo
                 {
