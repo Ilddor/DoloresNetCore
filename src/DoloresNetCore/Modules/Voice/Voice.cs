@@ -181,7 +181,7 @@ namespace Dolores.Modules.Voice
                 //process.m_Process.Dispose();
                 //process.m_Process.StandardInput.WriteLine("\x3");
                 audioWrapper.StopPlay(m_Map);
-                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.StoppingPlaying}: {audioWrapper.m_Process.HasExited}");
+                await Context.Channel.SendMessageAsync($"{guildConfig.Translation.StoppingPlaying}");
             }
         }
 
