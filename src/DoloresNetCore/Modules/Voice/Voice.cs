@@ -132,7 +132,7 @@ namespace Dolores.Modules.Voice
 
             if (!System.IO.File.Exists(name))
             {
-				var emote = new Emoji("⬇️");
+				var emote = new Emoji("⬇");
 				await Context.Message.AddReactionAsync(emote);
 				var audioInfoMsg = await Context.Channel.SendMessageAsync("Starting download");
 				Mutex msgMutex = new Mutex();
@@ -167,7 +167,7 @@ namespace Dolores.Modules.Voice
                 ytdl.WaitForExit();
             }
 
-			await Context.Message.AddReactionAsync(Emote.Parse(":arrow_forward:"));
+			await Context.Message.AddReactionAsync(Emote.Parse("▶"));
             {
                 var ffmpeg = CreateStream(name);
                 tmp.m_Process = ffmpeg;
@@ -177,7 +177,7 @@ namespace Dolores.Modules.Voice
                 await output.CopyToAsync(discord);
                 await discord.FlushAsync();
                 tmp.StopPlay(m_Map);
-				await Context.Message.AddReactionAsync(Emote.Parse(":white_check_mark:"));
+				await Context.Message.AddReactionAsync(Emote.Parse("✅"));
 			}
         }
 
