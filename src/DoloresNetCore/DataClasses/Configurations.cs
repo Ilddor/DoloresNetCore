@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Commands;
+using Discord.WebSocket;
 using Dolores.CustomAttributes;
 using Newtonsoft.Json;
 using System;
@@ -34,7 +35,10 @@ namespace Dolores.DataClasses
             public ulong? PUBGTrackerChannelId { get; set; }
             public ulong? CSGOTrackerChannelId { get; set; }
 
-            public static ulong DebugChannelId = 357908791745839104;
+			public ulong? LastHelpMessageId { get; set; }
+			public ICommandContext LastHelpCommandContext { get; set; }
+
+			public static ulong DebugChannelId = 357908791745839104;
 
             public GuildConfig()
             {
@@ -55,7 +59,9 @@ namespace Dolores.DataClasses
                 LogChannelId = null;
                 CSGOTrackerChannelId = null;
                 PUBGTrackerChannelId = null;
-            }
+				LastHelpMessageId = null;
+				LastHelpCommandContext = null;
+			}
 
             public GuildConfig ShallowCopy()
             {

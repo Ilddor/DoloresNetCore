@@ -33,6 +33,77 @@ namespace Dolores.Modules.Misc
             m_Commands = commands;
         }
 
+		static private string GetModuleCommandsFormatted(ModuleInfo module, Configurations.GuildConfig guildConfig, Func<Attribute, bool> languageSummaryLambda)
+		{
+			string message = "";
+			foreach (var it in module.Commands)
+			{
+				if (!it.Preconditions.Any(x => x is HiddenAttribute))
+				{
+					message += $"-`{guildConfig.Prefix}{it.Aliases.First()}`    - ";
+					if (it.Attributes.Any(languageSummaryLambda))
+						message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
+					message += "\n";
+				}
+			}
+
+			return message;
+		}
+
+		static public Embed BuildHelpPage(int page, Configurations.GuildConfig guildConfig, CommandService commands, IServiceProvider map, ICommandContext context)
+		{
+			var random = new Random();
+			Func<Attribute, bool> languageSummaryLambda =
+				(Attribute x) =>
+				{
+					return x.GetType() == typeof(LangSummaryAttribute) && (x as LangSummaryAttribute).Lang == guildConfig.Lang;
+				};
+
+			var embedMessage = new EmbedBuilder().WithColor(random.Next(255), random.Next(255), random.Next(255));
+			embedMessage.WithTitle($"{guildConfig.Translation.AvailableCommands}:\n");
+
+			var modules = commands.Modules.Where(module =>
+				{
+					bool showIt = true;
+					showIt &= !module.Preconditions.Any(precond => precond is HiddenAttribute);
+					if (module.Preconditions.Any(precond => precond is RequireInstalledAttribute))
+						showIt &= (module.Preconditions.Where(precond => precond is RequireInstalledAttribute).First().CheckPermissionsAsync(context, module.Commands.First(), map)).Result.IsSuccess;
+
+					return showIt;
+				});
+
+			string message = "";
+			if (page >= 0)
+			{
+				if (page >= modules.Count())
+					page--;
+
+				var module = modules.ElementAt(page);
+				message = GetModuleCommandsFormatted(module, guildConfig, languageSummaryLambda);
+				if (message != "")
+					embedMessage.AddField(module.Name, message);
+
+				embedMessage.Description += $"{page}/{modules.Count()-1}";
+			}
+			else
+			{
+				foreach (var module in modules)
+				{
+					message = "";
+					message = GetModuleCommandsFormatted(module, guildConfig, languageSummaryLambda);
+					if (message != "")
+						embedMessage.AddField(module.Name, message);
+				}
+			}
+
+			message = "";
+			var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
+			message += $"{guildConfig.Translation.TimeOnline}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
+			message += $"{guildConfig.Translation.Version}: {Dolores.m_Instance.m_Version}\n";
+			embedMessage.WithFooter(message);
+			return embedMessage.Build();
+		}
+
         [Command("help")]
         [Alias("analiza")]
         [LangSummary(LanguageDictionary.Language.PL, "Wyświetla ten tekst, dodając komendę jako parametr wyświetli dokładniejszy opis lub użycie")]
@@ -42,6 +113,7 @@ namespace Dolores.Modules.Misc
             var configs = m_Map.GetService<Configurations>();
             Configurations.GuildConfig guildConfig = configs.GetGuildConfig(Context.Guild.Id);
 
+
             Func<Attribute, bool> languageSummaryLambda =
                 (Attribute x) =>
                 {
@@ -50,40 +122,15 @@ namespace Dolores.Modules.Misc
 
             if (!command.Any())
             {
-                var embedMessage = new EmbedBuilder().WithColor(m_Random.Next(255), m_Random.Next(255), m_Random.Next(255));
-                embedMessage.WithTitle($"{guildConfig.Translation.AvailableCommands}:\n");
-                string message = "";
-                foreach (var module in m_Commands.Modules)
-                {
-                    if(module.Preconditions.Any(x => x is RequireInstalledAttribute) &&
-                       !(await module.Preconditions.Where(x => x is RequireInstalledAttribute).First().CheckPermissionsAsync(Context, module.Commands.First(), m_Map)).IsSuccess)
-                        continue; // If module was not installed, omit it in help
-
-                    if (module.Preconditions.Any(x => x is HiddenAttribute))
-                        continue; // Do not show hidden modules
-
-                    message = "";
-                    foreach (var it in module.Commands)
-                    {
-                        if (!it.Preconditions.Any(x => x is HiddenAttribute))
-                        {
-                            message += $"-`{guildConfig.Prefix}{it.Aliases.First()}`    - ";
-                            if (it.Attributes.Any(languageSummaryLambda))
-                                message += (it.Attributes.Where(languageSummaryLambda).First() as LangSummaryAttribute).Summary;
-                            message += "\n";
-                        }
-                    }
-                    if(message != "")
-                        embedMessage.AddField(module.Name, message);
-                }
-
-                message = "";
-                var uptime = DateTime.Now - Dolores.m_Instance.m_StartTime;
-                message += $"{guildConfig.Translation.TimeOnline}: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m\n";
-                message += $"{guildConfig.Translation.Version}: {Dolores.m_Instance.m_Version}\n";
-                embedMessage.WithFooter(message);
-                await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
+				guildConfig.LastHelpMessageId = (await Context.Channel.SendMessageAsync("", embed: BuildHelpPage(-1, guildConfig, m_Commands, m_Map, Context))).Id;
             }
+			else if(command.Length == 1 && int.TryParse(command[0], out int pageNum))
+			{
+				var helpMessage = await Context.Channel.SendMessageAsync("", embed: BuildHelpPage(pageNum, guildConfig, m_Commands, m_Map, Context));
+				guildConfig.LastHelpMessageId = helpMessage.Id;
+				helpMessage.AddReactionAsync(new Emoji("⏮"));
+				helpMessage.AddReactionAsync(new Emoji("⏭"));
+			}
             else
             {
                 var combinedCommand = string.Join(" ", command).ToLower();
@@ -133,9 +180,12 @@ namespace Dolores.Modules.Misc
                     if (message != "")
                         embedMessage.WithDescription(message);
 
-                    await Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
+					guildConfig.LastHelpMessageId = (await Context.Channel.SendMessageAsync("", embed: embedMessage.Build())).Id;
                 }
             }
+			guildConfig.LastHelpCommandContext = Context;
+
+			configs.SetGuildConfig(Context.Guild.Id, guildConfig);
         }
 
         [Command("ping")]

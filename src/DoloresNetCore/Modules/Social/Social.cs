@@ -31,7 +31,6 @@ namespace Dolores.Modules.Social
         [Summary("")]
         [LangSummary(LanguageDictionary.Language.PL, "")]
         [LangSummary(LanguageDictionary.Language.EN, "")]
-        [Hidden]
         public async Task ReactToMe(params string[] messages)
         {
             List<string> reactions = new List<string>();
@@ -49,7 +48,6 @@ namespace Dolores.Modules.Social
         [Summary("")]
         [LangSummary(LanguageDictionary.Language.PL, "")]
         [LangSummary(LanguageDictionary.Language.EN, "")]
-        [Hidden]
         public async Task StopReactToMe(params string[] messages)
         {
             //if (!messages.Any())

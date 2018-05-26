@@ -107,7 +107,7 @@ namespace Dolores
 
         private DiscordSocketClient m_Client;
 
-        private List<IInstallable> m_Handlers;
+		public List<IInstallable> m_Handlers;
         private List<IState> m_DataContainers;
 
         private IServiceProvider ConfigureServices()
