@@ -117,7 +117,9 @@ namespace Dolores.DataClasses
                 {
                     var streamReader = new StreamReader(stream);
                     m_GuildConfigs = JsonConvert.DeserializeObject<Dictionary<ulong, GuildConfig>> (streamReader.ReadToEnd());
-                }
+					if(m_GuildConfigs == null)
+						m_GuildConfigs = new Dictionary<ulong, GuildConfig>();
+				}
             }
             catch (Exception) { }
             m_Mutex.ReleaseMutex();
