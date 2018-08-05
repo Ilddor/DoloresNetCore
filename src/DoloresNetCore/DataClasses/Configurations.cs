@@ -35,7 +35,9 @@ namespace Dolores.DataClasses
             public ulong? PUBGTrackerChannelId { get; set; }
             public ulong? CSGOTrackerChannelId { get; set; }
 
+			[JsonIgnore]
 			public ulong? LastHelpMessageId { get; set; }
+			[JsonIgnore]
 			public ICommandContext LastHelpCommandContext { get; set; }
 
 			public static ulong DebugChannelId = 357908791745839104;
