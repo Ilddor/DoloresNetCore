@@ -48,7 +48,9 @@ namespace Dolores.Modules.Social
 				embedMessage.Description += $"{place.ToString()}. {user.Username} - {entry.Value} xp\n";
 			}
 
-			Context.Channel.SendMessageAsync("", embed: embedMessage.Build());
+			var command = Context.Message.Content;
+			Context.Message.DeleteAsync();
+			Context.Channel.SendMessageAsync($"Command: `{command}`", embed: embedMessage.Build());
 		}
 	}
 }
