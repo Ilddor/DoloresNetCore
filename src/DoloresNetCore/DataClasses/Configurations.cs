@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 using Dolores.CustomAttributes;
+using Dolores.DataClasses.GuildData;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Dolores.DataClasses
             public BannedSubreddits BannedSubreddits { get; }
             public Reactions Reactions { get; }
             public SignedUsers SignedUsers { get; }
+			public Levels Levels { get; }
 
             [JsonIgnore]
             public dynamic Translation { get; }
@@ -52,6 +54,7 @@ namespace Dolores.DataClasses
                 BannedSubreddits = new BannedSubreddits();
                 Reactions = new Reactions();
                 SignedUsers = new SignedUsers();
+				Levels = new Levels();
 
                 Translation = new ExpandoObject();
 
